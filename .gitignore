@@ -3,3 +3,7 @@ sent_mails/
 __pycache__/
 run.sh
 .DS_Store
+frontend/.env
+frontend/dist/
+frontend/node_modules/
+node_modules/

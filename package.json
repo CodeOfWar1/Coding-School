@@ -1,0 +1,11 @@
+{
+  "name": "school-management-system-react",
+  "private": true,
+  "scripts": {
+    "dev": "npm --prefix school_management_app run dev",
+    "build": "npm --prefix school_management_app run build",
+    "lint": "npm --prefix school_management_app run lint",
+    "preview": "npm --prefix school_management_app run preview",
+    "install:app": "npm --prefix school_management_app install"
+  }
+}

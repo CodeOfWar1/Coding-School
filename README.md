@@ -1,73 +1,37 @@
-# Online School Management System
-![Logo](https://github.com/probayraka/SchoolManagementSystem-Mandakh/blob/main/media/Logo.png?raw=true)
+# School Management System (React + Tailwind + Supabase)
 
-## Installation
+This project is now frontend-first and runs from `school_management_app` as a React + Tailwind app.
+The old Django codebase is retained only as legacy reference.
 
-Use the package manager [pip](https://pip.pypa.io/en/stable/) to install OSMS.
+## Main App (Current)
+
+- Frontend: `school_management_app`
+- Converted system config folder: `school_management_system` (JS config modules)
+- Legacy Django reference files: `legacy-django/school_management_system_original`
+- Active UI source: `school_management_app/src`
+
+## Quick Start (Root)
 
 ```bash
-pip install -r requirements.txt
+npm run install:app
+npm run dev
 ```
 
-## Demo
+This starts the React app from the root project without running Python.
 
-http://online.exdi.us
+## Run Frontend
 
-| **User Type** | **E-Mail** | **Password** |
-| ------ | ------ | ------ |
-| **Teacher:** | teacher@gmail.com | teacher123 |
-| | teacher2@gmail.com | teacher123 |
-| **Student:** | student3@gmail.com | student123 |
-| |  student4@gmail.com | student123 |
-| **Parent:** | parent@gmail.com | parent123 |
-| | parent2@gmail.com | parent123 |
+```bash
+cd school_management_app
+npm install
+npm run dev
+```
 
-## Tech
+## Supabase Setup
 
-- [django] - Python based framework [backend]
-- [HTML, CSS(Bootstrap...), JS(jQuery...), so many useful plugins] [frontend]
+Supabase integration can be added on top of this converted React app when needed.
 
-## Screenshots
-Login:
+## Migration Note
 
-![Login](https://github.com/probayraka/SchoolManagementSystem-Mandakh/blob/main/media/Screenshots/login.png?raw=true)
-
-Admin Panel:
-
-![Admin](https://github.com/probayraka/SchoolManagementSystem-Mandakh/blob/main/media/Screenshots/admin.png?raw=true)
-
-Teacher Panel:
-
-![Teacher](https://github.com/probayraka/SchoolManagementSystem-Mandakh/blob/main/media/Screenshots/teacher.png?raw=true)
-
-Student Panel:
-
-![Student](https://github.com/probayraka/SchoolManagementSystem-Mandakh/blob/main/media/Screenshots/student.png?raw=true)
-
-Parents Panel:
-
-![Parents](https://github.com/probayraka/SchoolManagementSystem-Mandakh/blob/main/media/Screenshots/parent.png?raw=true)
-
-News:
-
-![News](https://github.com/probayraka/SchoolManagementSystem-Mandakh/blob/main/media/Screenshots/news.png?raw=true)
-
-Grades:
-
-![Grades](https://github.com/probayraka/SchoolManagementSystem-Mandakh/blob/main/media/Screenshots/grade.png?raw=true)
-
-Attendance:
-
-![Attendance](https://github.com/probayraka/SchoolManagementSystem-Mandakh/blob/main/media/Screenshots/attendance.png?raw=true)
-
-COVID-19:
-
-![COVID-19](https://github.com/probayraka/SchoolManagementSystem-Mandakh/blob/main/media/Screenshots/covid19.png?raw=true)
-
-## Contributing
-Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
-
-Please make sure to update tests as appropriate.
-
-## License
-[MIT](https://choosealicense.com/licenses/mit/)
+The old Django runtime config under `school_management_system` and old Django app files are superseded by the React stack. Reference copies are kept under `legacy-django`.
+Do not use `python manage.py runserver` for the migrated UI workflow.
