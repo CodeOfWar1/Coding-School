@@ -1,8 +1,7 @@
-import { Link } from 'react-router-dom'
 import { useAuth } from '../state/AuthContext'
 
 export default function DashboardLayout({ title, menuItems, children }) {
-  const { profile, logout, isDemoMode } = useAuth()
+  const { profile, logout } = useAuth()
   const dark = profile?.role === 'admin' || profile?.role === 'finance'
 
   return (
@@ -11,13 +10,9 @@ export default function DashboardLayout({ title, menuItems, children }) {
         <div className="mx-auto flex max-w-[1500px] items-center justify-between px-6 py-4">
           <h1 className="text-3xl font-semibold">{title}</h1>
           <div className="flex items-center gap-3 text-sm">
-            {isDemoMode && <span className="rounded bg-red-100 px-2 py-1 text-xs font-bold text-red-700">DEMO</span>}
             <span className="rounded bg-indigo-100 px-2 py-1 text-xs font-semibold text-indigo-700">
               {profile?.role}
             </span>
-            <Link to="/" className="underline">
-              Home
-            </Link>
             <button className="rounded bg-slate-900 px-3 py-2 text-sm text-white" onClick={logout}>
               Sign out
             </button>

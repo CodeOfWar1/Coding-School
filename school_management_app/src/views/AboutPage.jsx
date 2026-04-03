@@ -1,10 +1,37 @@
 import { useMemo, useState } from 'react'
 import SiteNavbar from '../components/SiteNavbar'
+import {
+  ACADEMIC_OFFERINGS_TABLE,
+  CLIENT2_COURSES,
+  COMMUNITY_PARTNERSHIPS,
+  FACULTY_AND_ENVIRONMENT,
+  MILESTONES,
+  OVERVIEW_FACTS,
+  PARTNERSHIP_OBJECTIVES,
+  PROFILE_INTRO,
+  SCHOOL_IMAGES,
+  SCHOOL_PROFILE,
+  SIGNATURE_PROGRAMS,
+  STUDENT_SUCCESS,
+  VALUE_DIFFERENTIATORS,
+  WHY_CHOOSE_ANVIL,
+} from '../content/siteProfile'
+import { useScrollReveal } from '../hooks/useScrollReveal'
+import ViviFooter from '../components/ViviFooter'
+
+import assetHowToStart from '../assets/school/how-to-start-a-kids-coding-camp.jpg'
+import assetImages5 from '../assets/school/images (5).jpg'
+import assetIStock128 from '../assets/school/iStock-1288615417.jpg'
+import assetIStock825 from '../assets/school/iStock-825187856-b-scaled.jpg'
+import assetMG3836 from '../assets/school/MG_3836-scaled.jpg'
+import assetSocial from '../assets/school/social_image.webp'
+
+const FOOTER_GALLERY_IMAGES = [assetMG3836, assetIStock825, assetImages5, assetIStock128, assetHowToStart, assetSocial]
 
 const FEATURES = [
   {
     k: 'Real projects',
-    v: 'We teach by building. Every lesson ends with a small working outcome.',
+    v: SCHOOL_PROFILE.aboutBody,
   },
   {
     k: 'Structured feedback',
@@ -23,24 +50,53 @@ const FEATURES = [
 export default function AboutPage() {
   const [active, setActive] = useState('Real projects')
   const feature = useMemo(() => FEATURES.find((f) => f.k === active) ?? FEATURES[0], [active])
+  const revealRef = useScrollReveal({ rootMargin: '0px 0px -10% 0px', threshold: 0.06 })
 
   return (
-    <div className="min-h-screen bg-[var(--app-bg-page)] text-[var(--app-text-primary)]">
-      <SiteNavbar variant="light" sticky showRegisterPay={false} />
-      <main className="mx-auto max-w-7xl px-4 py-10 sm:px-6">
-        <section className="mb-8">
-          <h1 className="text-3xl font-black tracking-tight text-slate-900">About Mandakh</h1>
-          <p className="mt-2 max-w-3xl text-sm text-slate-600">
-            Mandakh is a coding school built around clarity: strong fundamentals, real-world projects, and feedback
-            that helps students improve every week.
-          </p>
-        </section>
+    <div ref={revealRef} className="vivi-page min-h-screen bg-[var(--vivi-light)] text-[var(--app-text-primary)]">
+      <div className="mx-auto w-full max-w-7xl overflow-hidden bg-white shadow-sm">
+        <SiteNavbar variant="light" sticky showRegisterPay={false} />
+        <header className="vivi-page-header">
+          <div className="relative h-[220px]">
+            <img src={SCHOOL_IMAGES.lab} alt="About" className="h-full w-full object-cover" />
+            <div className="absolute inset-0 bg-[rgba(16,55,65,0.55)]" />
+            <div className="absolute inset-0 flex items-center">
+              <div className="px-4 sm:px-6">
+                <h1 className="vivi-heading text-4xl text-white">About Us</h1>
+              </div>
+            </div>
+          </div>
+        </header>
+        <main className="px-4 py-6 sm:px-6">
+          <section className="mb-10">
+            <p className="text-xs font-black uppercase tracking-[0.22em] text-[var(--anvil-royal)]">Profile</p>
+            <h1 className="vivi-heading mt-2 text-3xl tracking-tight text-slate-900">{SCHOOL_PROFILE.name}</h1>
+            <p className="mt-3 max-w-3xl text-sm text-slate-700">{PROFILE_INTRO.lead}</p>
+            <p className="mt-2 max-w-3xl text-sm text-slate-700">{PROFILE_INTRO.about}</p>
+            <div className="mt-5 grid gap-3 sm:grid-cols-3">
+              <div className="rounded-xl bg-[var(--anvil-card-faint)] p-4">
+                <p className="text-[11px] font-black uppercase tracking-[0.22em] text-[var(--anvil-royal)]">Focus</p>
+                <p className="mt-2 text-sm font-semibold text-[var(--anvil-navy)]">{SCHOOL_PROFILE.focusAges}</p>
+                <p className="mt-1 text-xs text-slate-600">Ages</p>
+              </div>
+              <div className="rounded-xl bg-[var(--anvil-card-faint)] p-4">
+                <p className="text-[11px] font-black uppercase tracking-[0.22em] text-[var(--anvil-royal)]">Pricing</p>
+                <p className="mt-2 text-sm font-semibold text-[var(--anvil-navy)]">{SCHOOL_PROFILE.pricing.perCourse}</p>
+                <p className="mt-1 text-xs text-slate-600">Pay {SCHOOL_PROFILE.pricing.paymentOptions.join(', ')}</p>
+              </div>
+              <div className="rounded-xl bg-[var(--anvil-card-faint)] p-4">
+                <p className="text-[11px] font-black uppercase tracking-[0.22em] text-[var(--anvil-royal)]">Duration</p>
+                <p className="mt-2 text-sm font-semibold text-[var(--anvil-navy)]">{SCHOOL_PROFILE.pricing.duration}</p>
+                <p className="mt-1 text-xs text-slate-600">Per course</p>
+              </div>
+            </div>
+          </section>
 
-        <section className="grid gap-6 lg:grid-cols-2">
-          <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-            <h2 className="text-lg font-semibold text-slate-900">Our approach</h2>
+          <section className="grid gap-6 lg:grid-cols-2">
+          <div className="scroll-reveal scroll-reveal--up vivi-card rounded-2xl p-5">
+            <h2 className="text-lg font-semibold text-slate-900">{PROFILE_INTRO.title}</h2>
             <p className="mt-2 text-sm text-slate-600">
-              Pick a focus area to see what it means in practice.
+              {SCHOOL_PROFILE.aboutLead}
             </p>
             <div className="mt-4 flex flex-wrap gap-2">
               {FEATURES.map((f) => (
@@ -49,7 +105,7 @@ export default function AboutPage() {
                   key={f.k}
                   className={`rounded-full border px-4 py-2 text-sm font-semibold transition ${
                     active === f.k
-                      ? 'border-transparent bg-sky-600 text-white'
+                      ? 'border-transparent bg-[var(--vivi-primary)] text-white'
                       : 'border-slate-200 bg-white text-slate-800 hover:bg-slate-50'
                   }`}
                   onClick={() => setActive(f.k)}
@@ -62,45 +118,217 @@ export default function AboutPage() {
               <p className="text-sm font-bold text-slate-900">{feature.k}</p>
               <p className="mt-2 text-sm text-slate-700">{feature.v}</p>
             </div>
-          </div>
-
-          <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-            <h2 className="text-lg font-semibold text-slate-900">How it works</h2>
-            <ol className="mt-3 space-y-3">
-              {[
-                ['1. Learn', 'Short teaching + live examples.'],
-                ['2. Build', 'Students implement small parts and combine them.'],
-                ['3. Submit', 'Code submissions go into the portal for review.'],
-                ['4. Improve', 'Feedback updates help the next attempt get better.'],
-              ].map(([title, text]) => (
-                <li key={title} className="flex gap-3">
-                    <span
-                      className="mt-1 inline-flex h-8 w-8 items-center justify-center rounded-full text-white text-sm font-bold"
-                      style={{ background: 'var(--app-brand)' }}
-                    >
-                    {title.split('.')[0]}
-                  </span>
-                  <div>
-                    <p className="text-sm font-semibold text-slate-900">{title}</p>
-                    <p className="text-sm text-slate-600">{text}</p>
-                  </div>
-                </li>
-              ))}
-            </ol>
-            <div className="mt-5 rounded-xl bg-slate-900 p-4 text-white">
-              <p className="text-sm font-semibold">Ready to start?</p>
-              <p className="mt-1 text-sm text-white/80">Sign in and use “Register + Pay” on the homepage.</p>
+            <div className="mt-4 rounded-xl border border-[#f5d8d1] bg-[var(--vivi-light)] p-4">
+              <p className="text-sm font-bold text-[var(--vivi-dark)]">Mission & Vision</p>
+              <p className="mt-2 text-sm text-slate-700"><strong>Mission:</strong> {SCHOOL_PROFILE.mission}</p>
+              <p className="mt-1 text-sm text-slate-700"><strong>Vision:</strong> {SCHOOL_PROFILE.vision}</p>
             </div>
           </div>
-        </section>
-      </main>
 
-      <footer className="border-t border-slate-200 bg-white px-4 py-10 text-sm text-slate-600">
-        <div className="mx-auto max-w-7xl">
-          <p className="font-semibold text-slate-900">Mandakh Coding School</p>
-          <p className="mt-2">© {new Date().getFullYear()} All rights reserved.</p>
-        </div>
-      </footer>
+          <div className="scroll-reveal scroll-reveal--zoom vivi-card rounded-2xl p-5">
+            <h2 className="text-lg font-semibold text-slate-900">Overview</h2>
+            <div className="mt-3 grid gap-3 sm:grid-cols-2">
+              {[
+                { k: 'Founded', v: OVERVIEW_FACTS.foundedWhere },
+                { k: 'Audience', v: OVERVIEW_FACTS.audience },
+                { k: 'Facility', v: OVERVIEW_FACTS.facilitySqFt },
+                { k: 'Goal', v: OVERVIEW_FACTS.goal },
+              ].map((it) => (
+                <div key={it.k} className="rounded-xl border border-slate-200 bg-white p-4">
+                  <p className="text-xs font-black uppercase tracking-[0.22em] text-slate-500">{it.k}</p>
+                  <p className="mt-2 text-sm font-semibold text-slate-900">{it.v}</p>
+                </div>
+              ))}
+            </div>
+            <div className="mt-4 rounded-xl border border-slate-200 bg-slate-50 p-4">
+              <p className="text-sm font-bold text-slate-900">Facility highlights</p>
+              <ul className="mt-2 list-disc space-y-1 pl-5 text-sm text-slate-700">
+                {OVERVIEW_FACTS.facilityPoints.map((p) => (
+                  <li key={p}>{p}</li>
+                ))}
+              </ul>
+            </div>
+          </div>
+          </section>
+
+          <section className="mt-10 grid gap-6 lg:grid-cols-2">
+            <div className="scroll-reveal scroll-reveal--up vivi-card rounded-2xl p-5">
+              <h2 className="text-lg font-semibold text-slate-900">Academic offerings</h2>
+              <p className="mt-2 text-sm text-slate-600">Age-appropriate pathways from foundations to advanced innovation.</p>
+              <div className="mt-4 overflow-hidden rounded-xl border border-slate-200 bg-white">
+                <table className="w-full text-left text-sm">
+                  <thead className="bg-slate-50 text-xs font-black uppercase tracking-wider text-slate-600">
+                    <tr>
+                      <th className="px-4 py-3">Age</th>
+                      <th className="px-4 py-3">Focus</th>
+                      <th className="px-4 py-3">Skills</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-200">
+                    {ACADEMIC_OFFERINGS_TABLE.map((row) => (
+                      <tr key={row.age}>
+                        <td className="px-4 py-3 font-semibold text-slate-900">{row.age}</td>
+                        <td className="px-4 py-3 text-slate-700">{row.focus}</td>
+                        <td className="px-4 py-3 text-slate-700">{row.skills}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <div className="scroll-reveal scroll-reveal--zoom vivi-card rounded-2xl p-5">
+              <h2 className="text-lg font-semibold text-slate-900">Milestones</h2>
+              <p className="mt-2 text-sm text-slate-600">Key moments since launch.</p>
+              <ol className="mt-4 space-y-3">
+                {MILESTONES.map((m) => (
+                  <li key={m.year} className="flex gap-3">
+                    <span className="mt-1 h-2.5 w-2.5 rounded-full bg-[var(--anvil-cyan)]" aria-hidden />
+                    <div>
+                      <p className="text-sm font-bold text-slate-900">{m.year}</p>
+                      <p className="mt-1 text-sm text-slate-700">{m.text}</p>
+                    </div>
+                  </li>
+                ))}
+              </ol>
+            </div>
+          </section>
+
+          <section className="mt-10 grid gap-6 lg:grid-cols-2">
+            <div className="scroll-reveal scroll-reveal--up vivi-card rounded-2xl p-5">
+              <h2 className="text-lg font-semibold text-slate-900">Unique differentiators</h2>
+              <ul className="mt-3 list-disc space-y-1.5 pl-5 text-sm text-slate-700">
+                {VALUE_DIFFERENTIATORS.why.map((x) => (
+                  <li key={x}>{x}</li>
+                ))}
+              </ul>
+              <div className="mt-4 rounded-xl bg-slate-50 p-4">
+                <p className="text-sm font-bold text-slate-900">Curriculum trends</p>
+                <ul className="mt-2 list-disc space-y-1 pl-5 text-sm text-slate-700">
+                  {VALUE_DIFFERENTIATORS.trends.map((x) => (
+                    <li key={x}>{x}</li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+
+            <div className="scroll-reveal scroll-reveal--zoom vivi-card rounded-2xl p-5">
+              <h2 className="text-lg font-semibold text-slate-900">Faculty & learning environment</h2>
+              <div className="mt-3 space-y-3">
+                <div className="rounded-xl border border-slate-200 bg-white p-4">
+                  <p className="text-sm font-bold text-slate-900">Faculty excellence</p>
+                  <ul className="mt-2 list-disc space-y-1 pl-5 text-sm text-slate-700">
+                    {FACULTY_AND_ENVIRONMENT.faculty.map((f) => (
+                      <li key={f.label}>
+                        <strong>{f.label}:</strong> {f.text}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+                <div className="rounded-xl border border-slate-200 bg-white p-4">
+                  <p className="text-sm font-bold text-slate-900">Facilities</p>
+                  <ul className="mt-2 list-disc space-y-1 pl-5 text-sm text-slate-700">
+                    {FACULTY_AND_ENVIRONMENT.facilities.map((f) => (
+                      <li key={f.label}>
+                        <strong>{f.label}:</strong> {f.text}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <section className="mt-10 grid gap-6 lg:grid-cols-2">
+            <div className="scroll-reveal scroll-reveal--up vivi-card rounded-2xl p-5">
+              <h2 className="text-lg font-semibold text-slate-900">Student success & outcomes</h2>
+              <div className="mt-3 rounded-xl bg-slate-50 p-4">
+                <p className="text-sm font-bold text-slate-900">Highlights</p>
+                <ul className="mt-2 list-disc space-y-1 pl-5 text-sm text-slate-700">
+                  {STUDENT_SUCCESS.achievements.map((x) => (
+                    <li key={x}>{x}</li>
+                  ))}
+                </ul>
+              </div>
+              <div className="mt-4 rounded-xl border border-slate-200 bg-white p-4">
+                <p className="text-sm font-bold text-slate-900">Progress tracking</p>
+                <ul className="mt-2 list-disc space-y-1 pl-5 text-sm text-slate-700">
+                  {STUDENT_SUCCESS.progress.map((x) => (
+                    <li key={x}>{x}</li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+
+            <div className="scroll-reveal scroll-reveal--zoom vivi-card rounded-2xl p-5">
+              <h2 className="text-lg font-semibold text-slate-900">Signature programs</h2>
+              <div className="mt-3 space-y-3">
+                {SIGNATURE_PROGRAMS.map((p) => (
+                  <div key={p.title} className="rounded-xl border border-slate-200 bg-white p-4">
+                    <p className="text-sm font-bold text-slate-900">{p.title}</p>
+                    <p className="mt-2 text-sm text-slate-700">{p.text}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </section>
+
+          <section className="mt-10 scroll-reveal scroll-reveal--up vivi-card rounded-2xl p-5">
+            <h2 className="text-lg font-semibold text-slate-900">Community engagement & partnerships</h2>
+            <div className="mt-4 grid gap-4 lg:grid-cols-2">
+              {COMMUNITY_PARTNERSHIPS.map((p) => (
+                <div key={p.name} className="rounded-xl border border-slate-200 bg-white p-4">
+                  <p className="text-sm font-bold text-slate-900">{p.name}</p>
+                  <p className="mt-2 text-sm text-slate-700">{p.text}</p>
+                </div>
+              ))}
+              <div className="rounded-xl border border-slate-200 bg-slate-50 p-4">
+                <p className="text-sm font-bold text-slate-900">Partnership objectives</p>
+                <ul className="mt-2 list-disc space-y-1 pl-5 text-sm text-slate-700">
+                  {PARTNERSHIP_OBJECTIVES.map((x) => (
+                    <li key={x}>{x}</li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+          </section>
+
+          <section className="mt-10 grid gap-6 lg:grid-cols-2">
+            <div className="scroll-reveal scroll-reveal--up rounded-xl bg-[var(--anvil-card-faint)] p-5">
+              <h2 className="text-lg font-semibold text-slate-900">Our Focus</h2>
+              <p className="mt-2 text-sm text-slate-700">
+                We focus on children and teenagers aged {SCHOOL_PROFILE.focusAges}, with age-appropriate programs that
+                progressively build skills from beginner to advanced levels.
+              </p>
+              <p className="mt-3 text-sm text-slate-700">
+                Our mission is to empower the next generation with problem-solving, creativity, innovation, and confidence
+                through hands-on technology education.
+              </p>
+            </div>
+            <div className="scroll-reveal scroll-reveal--zoom rounded-xl bg-[var(--anvil-card-faint)] p-5">
+              <h2 className="text-lg font-semibold text-slate-900">Why Choose Anvil</h2>
+              <ul className="mt-3 list-disc space-y-1.5 pl-5 text-sm text-slate-700">
+                {WHY_CHOOSE_ANVIL.map((x) => (
+                  <li key={x}>{x}</li>
+                ))}
+              </ul>
+            </div>
+          </section>
+
+          <section className="mt-10 rounded-xl bg-[var(--anvil-card-faint)] p-5">
+            <h2 className="text-lg font-semibold text-slate-900">Course Pathway Snapshot</h2>
+            <div className="mt-4 grid gap-3 md:grid-cols-2">
+              {CLIENT2_COURSES.slice(0, 6).map((c) => (
+                <article key={c.title} className="rounded-xl bg-white p-4">
+                  <h3 className="text-sm font-black text-[var(--anvil-navy)]">{c.title}</h3>
+                  <p className="mt-2 text-sm text-slate-700">{c.text}</p>
+                </article>
+              ))}
+            </div>
+          </section>
+        </main>
+        <ViviFooter galleryImages={FOOTER_GALLERY_IMAGES} />
+      </div>
     </div>
   )
 }

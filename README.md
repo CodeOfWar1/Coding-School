@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # School Management System (React + Tailwind + Supabase)
 
 This project is now frontend-first and runs from `school_management_app` as a React + Tailwind app.
@@ -35,3 +36,6 @@ Supabase integration can be added on top of this converted React app when needed
 
 The old Django runtime config under `school_management_system` and old Django app files are superseded by the React stack. Reference copies are kept under `legacy-django`.
 Do not use `python manage.py runserver` for the migrated UI workflow.
+=======
+# Coding-School
+>>>>>>> 29d19ffe6c0f003e902eaf4b686913134ea7cabd

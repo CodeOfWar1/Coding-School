@@ -1,4 +1,5 @@
 import { useAuth } from '../state/AuthContext'
+import { isDemoMode, supabase } from '../lib/supabase'
 import {
   ArcElement,
   BarElement,
@@ -9,6 +10,7 @@ import {
   Tooltip,
 } from 'chart.js'
 import { Bar, Doughnut, Pie } from 'react-chartjs-2'
+import { useEffect, useState } from 'react'
 
 ChartJS.register(ArcElement, BarElement, CategoryScale, LinearScale, Tooltip, Legend)
 
@@ -28,6 +30,13 @@ function Card({ title, items }) {
 export default function DashboardPage() {
   const { user, logout } = useAuth()
   const dark = user?.role === 'hod'
+  const isAdmin = user?.role === 'admin'
+  const [landingForm, setLandingForm] = useState({
+    hero_title: '',
+    hero_text: '',
+    hero_image_url: '',
+  })
+  const [saveMsg, setSaveMsg] = useState('')
 
   const pieData = {
     labels: ['Students', 'Teachers', 'Parents'],
@@ -43,6 +52,49 @@ export default function DashboardPage() {
   const donutData = {
     labels: ['Program-1', 'Program-2'],
     datasets: [{ data: [68, 32], backgroundColor: ['#16b8e6', '#d4d8e2'] }],
+  }
+
+  useEffect(() => {
+    const loadLanding = async () => {
+      if (!isAdmin) return
+      if (isDemoMode) {
+        const raw = localStorage.getItem('landing_content_override')
+        if (!raw) return
+        try {
+          const parsed = JSON.parse(raw)
+          setLandingForm((p) => ({ ...p, ...parsed }))
+        } catch {
+          // ignore invalid local demo data
+        }
+        return
+      }
+      const { data } = await supabase.from('landing_content').select('*').eq('id', 1).maybeSingle()
+      if (data) {
+        setLandingForm({
+          hero_title: data.hero_title ?? '',
+          hero_text: data.hero_text ?? '',
+          hero_image_url: data.hero_image_url ?? '',
+        })
+      }
+    }
+    loadLanding()
+  }, [isAdmin])
+
+  const saveLandingContent = async (e) => {
+    e.preventDefault()
+    if (!isAdmin) return
+    if (isDemoMode) {
+      localStorage.setItem('landing_content_override', JSON.stringify(landingForm))
+      setSaveMsg('Landing content saved for demo mode.')
+      return
+    }
+    const { error } = await supabase.from('landing_content').upsert({
+      id: 1,
+      hero_title: landingForm.hero_title,
+      hero_text: landingForm.hero_text,
+      hero_image_url: landingForm.hero_image_url || null,
+    })
+    setSaveMsg(error ? `Could not save: ${error.message}` : 'Landing content saved successfully.')
   }
 
   return (
@@ -108,6 +160,41 @@ export default function DashboardPage() {
             <Card title="Staff Modules" items={['Take attendance', 'Update attendance', 'Add results', 'Apply leave', 'Profile & notifications']} />
             <Card title="Student/Parent Modules" items={['Attendance & results', 'Feedback and news comments', 'Notifications', 'Profile management']} />
           </div>
+          {isAdmin && (
+            <section className={`rounded-lg p-4 ${dark ? 'bg-slate-800' : 'bg-white'} shadow`}>
+              <h2 className="mb-2 text-xl font-semibold">Landing page content control</h2>
+              <p className="mb-4 text-sm text-slate-500">
+                Admin can update home hero content shown on the landing page.
+              </p>
+              <form onSubmit={saveLandingContent} className="grid gap-3 md:grid-cols-2">
+                <input
+                  className="rounded border border-slate-300 p-2 text-sm"
+                  placeholder="Hero title"
+                  value={landingForm.hero_title}
+                  onChange={(e) => setLandingForm((p) => ({ ...p, hero_title: e.target.value }))}
+                />
+                <input
+                  className="rounded border border-slate-300 p-2 text-sm"
+                  placeholder="Hero image URL"
+                  value={landingForm.hero_image_url}
+                  onChange={(e) => setLandingForm((p) => ({ ...p, hero_image_url: e.target.value }))}
+                />
+                <textarea
+                  className="rounded border border-slate-300 p-2 text-sm md:col-span-2"
+                  rows={3}
+                  placeholder="Hero text"
+                  value={landingForm.hero_text}
+                  onChange={(e) => setLandingForm((p) => ({ ...p, hero_text: e.target.value }))}
+                />
+                <div className="md:col-span-2">
+                  <button type="submit" className="rounded bg-indigo-600 px-4 py-2 text-sm font-semibold text-white">
+                    Save landing content
+                  </button>
+                  {saveMsg && <span className="ml-3 text-sm text-slate-600">{saveMsg}</span>}
+                </div>
+              </form>
+            </section>
+          )}
         </section>
       </main>
     </div>

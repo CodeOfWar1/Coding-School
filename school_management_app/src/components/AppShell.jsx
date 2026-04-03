@@ -1,8 +1,7 @@
-import { Link } from 'react-router-dom'
 import { useAuth } from '../state/AuthContext'
 
 export default function AppShell({ title, children }) {
-  const { profile, logout, isDemoMode } = useAuth()
+  const { profile, logout } = useAuth()
   return (
     <div className="min-h-screen bg-slate-100">
       <header className="border-b bg-white">
@@ -12,11 +11,7 @@ export default function AppShell({ title, children }) {
             <h1 className="text-xl font-bold">{title}</h1>
           </div>
           <div className="flex items-center gap-3 text-sm">
-            {isDemoMode && <span className="rounded bg-amber-100 px-2 py-1 text-amber-800">DEMO</span>}
             <span className="rounded bg-indigo-100 px-2 py-1 font-semibold text-indigo-700">{profile?.role}</span>
-            <Link to="/" className="underline">
-              Home
-            </Link>
             <button className="rounded bg-slate-900 px-3 py-2 text-white" onClick={logout}>
               Sign out
             </button>

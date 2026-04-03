@@ -1,5 +1,17 @@
 import { useMemo, useState } from 'react'
 import SiteNavbar from '../components/SiteNavbar'
+import { SCHOOL_IMAGES, SCHOOL_PROFILE } from '../content/siteProfile'
+import { useScrollReveal } from '../hooks/useScrollReveal'
+import ViviFooter from '../components/ViviFooter'
+
+import assetHowToStart from '../assets/school/how-to-start-a-kids-coding-camp.jpg'
+import assetImages5 from '../assets/school/images (5).jpg'
+import assetIStock128 from '../assets/school/iStock-1288615417.jpg'
+import assetIStock825 from '../assets/school/iStock-825187856-b-scaled.jpg'
+import assetMG3836 from '../assets/school/MG_3836-scaled.jpg'
+import assetSocial from '../assets/school/social_image.webp'
+
+const FOOTER_GALLERY_IMAGES = [assetMG3836, assetIStock825, assetImages5, assetIStock128, assetHowToStart, assetSocial]
 
 const POSTS = [
   {
@@ -33,12 +45,26 @@ export default function BlogPage() {
     return POSTS.filter((p) => `${p.title} ${p.tag} ${p.excerpt}`.toLowerCase().includes(q))
   }, [query])
 
+  const revealRef = useScrollReveal({ rootMargin: '0px 0px -10% 0px', threshold: 0.06 })
+
   return (
-    <div className="min-h-screen bg-[var(--app-bg-page)] text-[var(--app-text-primary)]">
-      <SiteNavbar variant="light" sticky showRegisterPay={false} />
-      <main className="mx-auto max-w-7xl px-4 py-10 sm:px-6">
+    <div ref={revealRef} className="vivi-page min-h-screen bg-[var(--vivi-light)] text-[var(--app-text-primary)]">
+      <div className="mx-auto w-full max-w-7xl overflow-hidden bg-white shadow-sm">
+        <SiteNavbar variant="light" sticky showRegisterPay={false} />
+        <header className="vivi-page-header">
+          <div className="relative h-[220px]">
+            <img src={SCHOOL_IMAGES.hero} alt="Blog" className="h-full w-full object-cover" />
+            <div className="absolute inset-0 bg-[rgba(16,55,65,0.55)]" />
+            <div className="absolute inset-0 flex items-center">
+              <div className="px-4 sm:px-6">
+                <h1 className="vivi-heading text-4xl text-white">Blog</h1>
+              </div>
+            </div>
+          </div>
+        </header>
+        <main className="px-4 py-4 sm:px-6">
         <div className="mb-6">
-          <h1 className="text-3xl font-black tracking-tight text-slate-900">Blog</h1>
+          <h1 className="vivi-heading text-3xl tracking-tight text-slate-900">Blog</h1>
           <p className="mt-2 max-w-2xl text-sm text-slate-600">
             Resources for students and parents — learning tips, project ideas, and feedback best practices.
           </p>
@@ -54,10 +80,11 @@ export default function BlogPage() {
         </div>
 
         <div className="grid gap-5 lg:grid-cols-3">
-          {filtered.map((p) => (
+          {filtered.map((p, idx) => (
             <article
               key={p.id}
-              className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
+              className="scroll-reveal scroll-reveal--up vivi-card rounded-2xl p-5 transition hover:-translate-y-0.5 hover:shadow-md"
+              style={{ '--reveal-delay': `${idx * 70}ms` }}
             >
               <p className="text-xs font-bold uppercase tracking-widest text-sky-700">{p.tag}</p>
               <h2 className="mt-2 text-lg font-black text-slate-900">{p.title}</h2>
@@ -67,8 +94,7 @@ export default function BlogPage() {
               </p>
               <button
                 type="button"
-                className="mt-4 rounded-xl px-4 py-2 text-sm font-bold text-white shadow hover:brightness-110"
-                style={{ background: 'var(--app-brand)' }}
+                className="vivi-btn vivi-btn-primary mt-4 rounded-full px-4 py-2 text-sm font-bold text-white shadow"
                 onClick={() => alert('Demo blog page — wire to real posts when Supabase is connected.')}
               >
                 Read more
@@ -76,14 +102,9 @@ export default function BlogPage() {
             </article>
           ))}
         </div>
-      </main>
-
-      <footer className="border-t border-slate-200 bg-white px-4 py-10 text-sm text-slate-600">
-        <div className="mx-auto max-w-7xl">
-          <p className="font-semibold text-slate-900">Mandakh Coding School</p>
-          <p className="mt-2">© {new Date().getFullYear()} All rights reserved.</p>
-        </div>
-      </footer>
+        </main>
+        <ViviFooter galleryImages={FOOTER_GALLERY_IMAGES} />
+      </div>
     </div>
   )
 }

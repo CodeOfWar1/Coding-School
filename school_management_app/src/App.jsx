@@ -1,8 +1,9 @@
 import { Navigate, Route, Routes } from 'react-router-dom'
 import { useAuth } from './state/AuthContext.jsx'
 import LoginPage from './views/LoginPage.jsx'
-import LandingPage from './views/LandingPage.jsx'
+import ViviLandingPage from './views/ViviLandingPage.jsx'
 import ProtectedRoute from './components/ProtectedRoute.jsx'
+import PublicOnlyRoute from './components/PublicOnlyRoute.jsx'
 import RegisterPaymentPage from './views/RegisterPaymentPage.jsx'
 import StudentDashboard from './views/StudentDashboard.jsx'
 import ParentDashboard from './views/ParentDashboard.jsx'
@@ -12,6 +13,7 @@ import ProgramsPage from './views/ProgramsPage.jsx'
 import AboutPage from './views/AboutPage.jsx'
 import BlogPage from './views/BlogPage.jsx'
 import FAQPage from './views/FAQPage.jsx'
+import ContactPage from './views/ContactPage.jsx'
 
 const DASHBOARD_ROLES = ['student', 'parent', 'finance', 'admin']
 
@@ -25,12 +27,20 @@ function RoleHome() {
 export default function App() {
   return (
     <Routes>
-      <Route path="/" element={<LandingPage />} />
-      <Route path="/login" element={<LoginPage />} />
+      <Route path="/" element={<ViviLandingPage />} />
+      <Route
+        path="/login"
+        element={
+          <PublicOnlyRoute>
+            <LoginPage />
+          </PublicOnlyRoute>
+        }
+      />
       <Route path="/programs" element={<ProgramsPage />} />
       <Route path="/about" element={<AboutPage />} />
       <Route path="/blog" element={<BlogPage />} />
       <Route path="/faq" element={<FAQPage />} />
+      <Route path="/contact" element={<ContactPage />} />
       <Route
         path="/register"
         element={

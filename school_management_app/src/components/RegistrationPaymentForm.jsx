@@ -63,30 +63,30 @@ export default function RegistrationPaymentForm({ onSuccess, className = '' }) {
     <div className={className}>
       <form onSubmit={onSubmit} className="space-y-4">
         <div className="grid gap-3 sm:grid-cols-2">
-          <label className="block text-xs font-semibold uppercase tracking-wide text-slate-500">
+          <label className="block text-sm font-semibold uppercase tracking-wide text-slate-600">
             Student name
             <input
-              className="mt-1.5 w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 shadow-sm outline-none ring-sky-500/30 transition focus:border-sky-400 focus:ring-2"
+              className="mt-1.5 w-full rounded-xl border border-[var(--anvil-royal)]/20 bg-white px-4 py-3 text-base text-slate-900 shadow-sm outline-none ring-[var(--anvil-cyan)]/30 transition focus:border-[var(--anvil-cyan)] focus:ring-2"
               placeholder="Full name"
               value={form.studentName}
               onChange={(e) => setValue('studentName', e.target.value)}
               required
             />
           </label>
-          <label className="block text-xs font-semibold uppercase tracking-wide text-slate-500">
+          <label className="block text-sm font-semibold uppercase tracking-wide text-slate-600">
             Parent / guardian name
             <input
-              className="mt-1.5 w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 shadow-sm outline-none ring-sky-500/30 transition focus:border-sky-400 focus:ring-2"
+              className="mt-1.5 w-full rounded-xl border border-[var(--anvil-royal)]/20 bg-white px-4 py-3 text-base text-slate-900 shadow-sm outline-none ring-[var(--anvil-cyan)]/30 transition focus:border-[var(--anvil-cyan)] focus:ring-2"
               placeholder="Full name"
               value={form.parentName}
               onChange={(e) => setValue('parentName', e.target.value)}
               required
             />
           </label>
-          <label className="block text-xs font-semibold uppercase tracking-wide text-slate-500 sm:col-span-2">
+          <label className="block text-sm font-semibold uppercase tracking-wide text-slate-600 sm:col-span-2">
             Contact email
             <input
-              className="mt-1.5 w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 shadow-sm outline-none ring-sky-500/30 transition focus:border-sky-400 focus:ring-2"
+              className="mt-1.5 w-full rounded-xl border border-[var(--anvil-royal)]/20 bg-white px-4 py-3 text-base text-slate-900 shadow-sm outline-none ring-[var(--anvil-cyan)]/30 transition focus:border-[var(--anvil-cyan)] focus:ring-2"
               placeholder="parent@email.com"
               type="email"
               value={form.parentEmail}
@@ -94,10 +94,10 @@ export default function RegistrationPaymentForm({ onSuccess, className = '' }) {
               required
             />
           </label>
-          <label className="block text-xs font-semibold uppercase tracking-wide text-slate-500">
+          <label className="block text-sm font-semibold uppercase tracking-wide text-slate-600">
             Amount (USD)
             <input
-              className="mt-1.5 w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 shadow-sm outline-none ring-sky-500/30 transition focus:border-sky-400 focus:ring-2"
+              className="mt-1.5 w-full rounded-xl border border-[var(--anvil-royal)]/20 bg-white px-4 py-3 text-base text-slate-900 shadow-sm outline-none ring-[var(--anvil-cyan)]/30 transition focus:border-[var(--anvil-cyan)] focus:ring-2"
               placeholder="0.00"
               type="number"
               min="0"
@@ -107,10 +107,10 @@ export default function RegistrationPaymentForm({ onSuccess, className = '' }) {
               required
             />
           </label>
-          <label className="block text-xs font-semibold uppercase tracking-wide text-slate-500">
+          <label className="block text-sm font-semibold uppercase tracking-wide text-slate-600">
             Method
             <select
-              className="mt-1.5 w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 shadow-sm outline-none ring-sky-500/30 transition focus:border-sky-400 focus:ring-2"
+              className="mt-1.5 w-full rounded-xl border border-[var(--anvil-royal)]/20 bg-white px-4 py-3 text-base text-slate-900 shadow-sm outline-none ring-[var(--anvil-cyan)]/30 transition focus:border-[var(--anvil-cyan)] focus:ring-2"
               value={form.method}
               onChange={(e) => setValue('method', e.target.value)}
             >
@@ -126,7 +126,7 @@ export default function RegistrationPaymentForm({ onSuccess, className = '' }) {
         <button
           type="submit"
           disabled={busy}
-          className="w-full rounded-xl bg-gradient-to-r from-sky-600 to-indigo-600 px-4 py-3.5 text-sm font-bold text-white shadow-lg shadow-sky-900/20 transition hover:from-sky-500 hover:to-indigo-500 disabled:cursor-not-allowed disabled:opacity-60"
+          className="w-full rounded-xl bg-gradient-to-r from-[var(--anvil-cyan)] to-[var(--anvil-royal)] px-4 py-3.5 text-base font-bold text-white shadow-lg shadow-sky-900/20 transition hover:brightness-105 disabled:cursor-not-allowed disabled:opacity-60"
         >
           {busy ? 'Processing…' : 'Submit payment'}
         </button>

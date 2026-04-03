@@ -1,47 +1,53 @@
 import { useMemo, useState } from 'react'
 import SiteNavbar from '../components/SiteNavbar'
+import { FAQ_ITEMS, SCHOOL_IMAGES, SCHOOL_PROFILE } from '../content/siteProfile'
+import { useScrollReveal } from '../hooks/useScrollReveal'
+import ViviFooter from '../components/ViviFooter'
 
-const FAQS = [
-  {
-    q: 'What age groups do you teach?',
-    a: 'We work with school students of different levels. In demo mode you can preview the UI without needing real course enrollment.',
-  },
-  {
-    q: 'How do students submit work?',
-    a: 'Assignments appear in the Student portal. Students submit code, and instructors grade through Admin tools.',
-  },
-  {
-    q: 'Can parents track progress?',
-    a: 'Yes. Parents can select a linked child and view grades, skill balance, schedule highlights, payments, and receipts.',
-  },
-  {
-    q: 'Where do events appear?',
-    a: 'Admins publish event dates. Students and parents see them highlighted in their Schedule calendars.',
-  },
-  {
-    q: 'Is messaging available?',
-    a: 'Admin can create announcements in the Messages tab for now. The UI is ready for Supabase-based messaging later.',
-  },
-]
+import assetHowToStart from '../assets/school/how-to-start-a-kids-coding-camp.jpg'
+import assetImages5 from '../assets/school/images (5).jpg'
+import assetIStock128 from '../assets/school/iStock-1288615417.jpg'
+import assetIStock825 from '../assets/school/iStock-825187856-b-scaled.jpg'
+import assetMG3836 from '../assets/school/MG_3836-scaled.jpg'
+import assetSocial from '../assets/school/social_image.webp'
+
+const FOOTER_GALLERY_IMAGES = [assetMG3836, assetIStock825, assetImages5, assetIStock128, assetHowToStart, assetSocial]
 
 export default function FAQPage() {
-  const [open, setOpen] = useState(FAQS[0]?.q ?? '')
-  const items = useMemo(() => FAQS, [])
+  const [open, setOpen] = useState(FAQ_ITEMS[0]?.q ?? '')
+  const items = useMemo(() => FAQ_ITEMS, [])
+  const revealRef = useScrollReveal({ rootMargin: '0px 0px -10% 0px', threshold: 0.06 })
 
   return (
-    <div className="min-h-screen bg-[var(--app-bg-page)] text-[var(--app-text-primary)]">
-      <SiteNavbar variant="light" sticky showRegisterPay={false} />
-      <main className="mx-auto max-w-7xl px-4 py-10 sm:px-6">
+    <div ref={revealRef} className="vivi-page min-h-screen bg-[var(--vivi-light)] text-[var(--app-text-primary)]">
+      <div className="mx-auto w-full max-w-7xl overflow-hidden bg-white shadow-sm">
+        <SiteNavbar variant="light" sticky showRegisterPay={false} />
+        <header className="vivi-page-header">
+          <div className="relative h-[220px]">
+            <img src={SCHOOL_IMAGES.lab} alt="FAQ" className="h-full w-full object-cover" />
+            <div className="absolute inset-0 bg-[rgba(16,55,65,0.55)]" />
+            <div className="absolute inset-0 flex items-center">
+              <div className="px-4 sm:px-6">
+                <h1 className="vivi-heading text-4xl text-white">FAQ</h1>
+              </div>
+            </div>
+          </div>
+        </header>
+        <main className="px-4 py-4 sm:px-6">
         <div className="mb-6">
-          <h1 className="text-3xl font-black tracking-tight text-slate-900">FAQ</h1>
+          <h1 className="vivi-heading text-3xl tracking-tight text-slate-900">FAQ</h1>
           <p className="mt-2 max-w-2xl text-sm text-slate-600">Quick answers about programs, portals, grading, and events.</p>
         </div>
 
         <div className="mx-auto max-w-3xl space-y-3">
-          {items.map((it) => {
+          {items.map((it, idx) => {
             const isOpen = open === it.q
             return (
-              <section key={it.q} className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+              <section
+                key={it.q}
+                className="scroll-reveal scroll-reveal--up vivi-card rounded-2xl p-4"
+                style={{ '--reveal-delay': `${idx * 60}ms` }}
+              >
                 <button
                   type="button"
                   onClick={() => setOpen(isOpen ? '' : it.q)}
@@ -57,14 +63,9 @@ export default function FAQPage() {
             )
           })}
         </div>
-      </main>
-
-      <footer className="border-t border-slate-200 bg-white px-4 py-10 text-sm text-slate-600">
-        <div className="mx-auto max-w-7xl">
-          <p className="font-semibold text-slate-900">Mandakh Coding School</p>
-          <p className="mt-2">© {new Date().getFullYear()} All rights reserved.</p>
-        </div>
-      </footer>
+        </main>
+        <ViviFooter galleryImages={FOOTER_GALLERY_IMAGES} />
+      </div>
     </div>
   )
 }
