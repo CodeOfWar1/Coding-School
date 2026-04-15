@@ -1,3 +1,4 @@
+@import url('https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Nunito:wght@400;600;700;800&display=swap');
 @import "tailwindcss";
 
 /* Site-wide theme — Mandakh Coding School */
@@ -66,6 +67,7 @@
   /* Brochure / profile palette (Anvil Coding Academy) */
   --anvil-navy: #1f2a44;
   --anvil-navy-deep: #121b2e;
+  --anvil-red: #c02028;
   --anvil-royal: #3b4cc0;
   --anvil-royal-deep: #2f3ea6;
   --anvil-cyan: #2b8cff;
@@ -89,7 +91,7 @@
 body {
   margin: 0;
   @apply bg-slate-50 text-slate-800;
-  font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+  font-family: Nunito, Inter, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
 }
 
 a,
@@ -189,10 +191,22 @@ select {
 }
 
 .vivi-heading {
-  font-family: "Lobster Two", cursive;
+  font-family: "Baloo 2", Nunito, cursive;
   font-weight: 700;
   letter-spacing: 0.01em;
   color: var(--vivi-dark);
+}
+
+@keyframes partnerFloat {
+  from {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-6px);
+  }
+  to {
+    transform: translateY(0);
+  }
 }
 
 .vivi-section {

@@ -77,12 +77,12 @@ export default function SiteNavbar({
             />
           </div>
           <div className="min-w-0">
-            <p className={`text-xs font-medium uppercase tracking-wide ${variant === 'light' ? 'text-[var(--vivi-primary)]' : 'text-white/75'}`}>
+            <p className={`text-xs font-medium uppercase tracking-wide ${variant === 'light' ? 'text-(--anvil-red)' : 'text-white/75'}`}>
               Anvil
             </p>
             <p
               className={`truncate text-lg font-extrabold tracking-tight ${
-                variant === 'light' ? 'text-slate-900' : 'text-white'
+                variant === 'light' ? 'text-(--anvil-red)' : 'text-white'
               }`}
             >
               Coding Academy
@@ -168,14 +168,20 @@ export default function SiteNavbar({
                   : 'bg-white text-sky-900 hover:bg-white/95'
               }`}
             >
-              Register + Pay
+              Register
             </button>
           )}
+          <a
+            href="/#appointment"
+            className={`rounded-lg px-3 py-2 text-sm font-semibold transition ${navItemCls}`}
+          >
+            Book an Appointment
+          </a>
           <Link
             to="/login"
             className={`btn-theme-secondary px-4 py-2 text-sm ${
               variant === 'light'
-                ? 'text-[var(--vivi-dark)]'
+                ? 'text-(--vivi-dark)'
                 : 'border border-white/35 bg-white/5 text-white hover:bg-white/15'
             }`}
           >
