@@ -1,5 +1,3 @@
-import { createClient } from '@supabase/supabase-js'
-
 const url = import.meta.env.VITE_SUPABASE_URL
 const key = import.meta.env.VITE_SUPABASE_ANON_KEY
 const placeholder = !url || !key || url.includes('YOUR_PROJECT_ID') || key.includes('YOUR_SUPABASE_ANON_KEY')
@@ -48,4 +46,6 @@ const demoClient = {
   from: () => mockBuilder(),
 }
 
-export const supabase = isDemoMode ? demoClient : createClient(url, key)
+export const supabase = isDemoMode
+  ? demoClient
+  : (await import('@supabase/supabase-js')).createClient(url, key)

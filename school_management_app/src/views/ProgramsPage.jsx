@@ -5,7 +5,7 @@ import BrochureProgramsSection from '../components/BrochureProgramsSection'
 import { useState } from 'react'
 import { useScrollReveal } from '../hooks/useScrollReveal'
 import ViviFooter from '../components/ViviFooter'
-import PaymentRegistrationModal from '../components/PaymentRegistrationModal'
+import RegisterModal from '../components/RegisterModal'
 
 import assetHowToStart from '../assets/school/how-to-start-a-kids-coding-camp.jpg'
 import assetImages5 from '../assets/school/images (5).jpg'
@@ -25,7 +25,7 @@ export default function ProgramsPage() {
       ref={revealRef}
       className="vivi-page min-h-screen bg-[var(--vivi-light)] text-[var(--app-text-primary)]"
     >
-      <PaymentRegistrationModal open={paymentOpen} onClose={() => setPaymentOpen(false)} />
+      <RegisterModal open={paymentOpen} onClose={() => setPaymentOpen(false)} />
       <div className="mx-auto w-full max-w-7xl overflow-hidden bg-white shadow-sm">
         <SiteNavbar variant="light" sticky showRegisterPay={false} />
         <header className="vivi-page-header">
@@ -104,9 +104,6 @@ export default function ProgramsPage() {
           >
             Register now
           </button>
-          <Link to="/login" className="vivi-btn inline-flex rounded-full border border-[var(--anvil-royal)]/20 bg-white px-6 py-3 text-sm font-bold text-[var(--anvil-royal)]">
-            Sign in
-          </Link>
         </div>
         </main>
         <ViviFooter galleryImages={FOOTER_GALLERY_IMAGES} />

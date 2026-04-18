@@ -1,11 +1,10 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { isDemoMode, supabase } from '../lib/supabase'
-import PaymentRegistrationModal from '../components/PaymentRegistrationModal'
+import RegisterModal from '../components/RegisterModal'
 import SiteNavbar from '../components/SiteNavbar'
 import ViviFooter from '../components/ViviFooter'
 import { useScrollReveal } from '../hooks/useScrollReveal'
-import { CULTURE_POINTS, FACILITIES, SCHOOL_PROFILE } from '../content/siteProfile'
+import { FACILITIES, NEWSLETTER_CONTENT, SCHOOL_PROFILE } from '../content/siteProfile'
 import heroAsset from '../assets/hero.png'
 import assetHowToStart from '../assets/school/how-to-start-a-kids-coding-camp.jpg'
 import assetImages5 from '../assets/school/images (5).jpg'
@@ -30,13 +29,6 @@ const DEFAULT_HERO = {
   hero_title: SCHOOL_PROFILE.heroTitle,
   hero_text: SCHOOL_PROFILE.heroSubtitle,
   hero_image_url: ASSET_IMAGES.hero,
-}
-
-const FACILITY_ICON = {
-  projects: '💡',
-  mentor: '👩‍🏫',
-  community: '🤝',
-  innovation: '🤖',
 }
 
 const FACILITY_IMAGE_BY_ID = {
@@ -114,6 +106,36 @@ const GALLERY_SHOWCASE = [
 
 const PARTNER_SCHOOLS = ['Pestalosi', 'Leaks', 'Cherry International', 'Learning Ladder', 'Rose Garden', 'Best Buddies']
 
+/** Hero titles that use brand red (others stay white for contrast on the photo). */
+const HERO_RED_TITLES = new Set([
+  'The Best Coding School For Your Child',
+  'Make A Brighter Future For Your Child',
+])
+
+/** Home “About” teaser — images + short value lines (mirrors academy pillars). */
+const ABOUT_TEASER_VALUES = [
+  {
+    title: 'Hands-on learning',
+    text: 'Projects, not just slides — build real skills from day one.',
+    img: assetMG3836,
+  },
+  {
+    title: 'Mentorship',
+    text: 'Coaches who guide, encourage, and celebrate progress.',
+    img: assetIStock128,
+  },
+  {
+    title: 'Inclusive community',
+    text: 'Welcoming every background; we grow better together.',
+    img: assetSocial,
+  },
+  {
+    title: 'Innovation & robotics',
+    text: 'Robotics, code, and creative problem-solving for ages 5–19.',
+    img: assetIStock825,
+  },
+]
+
 const INITIAL_PARENT_FEEDBACK = [
   { name: 'Parent - Grade 6', text: 'The project-based lessons helped my child become confident with technology.' },
   { name: 'Guardian - Teen Program', text: 'Communication is clear, and we can see strong improvement every term.' },
@@ -129,29 +151,13 @@ export default function ViviLandingPage() {
   const [paymentOpen, setPaymentOpen] = useState(false)
   const [hero, setHero] = useState(DEFAULT_HERO)
   const [slide, setSlide] = useState(0)
-  const [heroNonce, setHeroNonce] = useState(0)
   const [feedbackList, setFeedbackList] = useState(INITIAL_PARENT_FEEDBACK)
   const [feedbackForm, setFeedbackForm] = useState({ name: '', message: '' })
 
   const revealRef = useScrollReveal({ rootMargin: '0px 0px -10% 0px', threshold: 0.06 })
 
   useEffect(() => {
-    if (isDemoMode) return
-    let cancelled = false
-
-    ;(async () => {
-      const { data } = await supabase.from('landing_content').select('*').eq('id', 1).maybeSingle()
-      if (cancelled || !data) return
-      setHero({
-        hero_title: data.hero_title || DEFAULT_HERO.hero_title,
-        hero_text: data.hero_text || DEFAULT_HERO.hero_text,
-        hero_image_url: data.hero_image_url || DEFAULT_HERO.hero_image_url,
-      })
-    })()
-
-    return () => {
-      cancelled = true
-    }
+    setHero(DEFAULT_HERO)
   }, [])
 
   const heroSlides = useMemo(
@@ -175,19 +181,13 @@ export default function ViviLandingPage() {
   )
 
   useEffect(() => {
-    const id = window.setInterval(() => setSlide((s) => (s + 1) % heroSlides.length), 5200)
+    const id = window.setInterval(() => setSlide((s) => (s + 1) % heroSlides.length), 9000)
     return () => window.clearInterval(id)
   }, [heroSlides.length])
 
-  useEffect(() => {
-    // Forces a remount so the hero text animation replays on each slide change.
-    const t = window.setTimeout(() => setHeroNonce((n) => n + 1), 0)
-    return () => window.clearTimeout(t)
-  }, [slide])
-
   return (
     <div ref={revealRef} className="vivi-page min-h-screen bg-[var(--vivi-light)]">
-      <PaymentRegistrationModal open={paymentOpen} onClose={() => setPaymentOpen(false)} />
+      <RegisterModal open={paymentOpen} onClose={() => setPaymentOpen(false)} />
       <div className="mx-auto w-full max-w-7xl overflow-hidden bg-white shadow-sm">
         <SiteNavbar variant="light" onRegisterPay={() => setPaymentOpen(true)} sticky showRegisterPay />
 
@@ -196,10 +196,16 @@ export default function ViviLandingPage() {
         {heroSlides.map((s, idx) => (
           <div
             key={idx}
-            className={`absolute inset-0 transition-opacity duration-700 ${idx === slide ? 'opacity-100' : 'opacity-0'}`}
+            className={`absolute inset-0 transition-opacity duration-[1400ms] ease-in-out ${idx === slide ? 'opacity-100' : 'pointer-events-none opacity-0'}`}
             aria-hidden={idx !== slide}
           >
-            <img src={s.image} alt="" className="h-full w-full object-cover" />
+            <img
+              src={s.image}
+              alt=""
+              className={`h-full w-full object-cover transition-transform duration-[9000ms] ease-out ${
+                idx === slide ? 'scale-105' : 'scale-100'
+              }`}
+            />
             <div className="absolute inset-0 bg-[rgba(16,55,65,0.45)]" />
           </div>
         ))}
@@ -212,41 +218,50 @@ export default function ViviLandingPage() {
         />
         <div className="absolute inset-0 z-10 flex items-center">
           <div className="mx-auto w-full max-w-7xl px-4 sm:px-6">
-            <div key={heroNonce} className="max-w-xl">
-              <p
-                className="vivi-hero-anim-down text-xs font-bold uppercase tracking-[0.25em] text-[var(--anvil-cyan-bright)]"
-                style={{ '--hero-delay': '40ms' }}
-              >
-                {SCHOOL_PROFILE.tagline}
-              </p>
-              <h1
-                className="vivi-heading vivi-hero-anim-down mt-3 text-4xl leading-tight text-[var(--anvil-red)] sm:text-5xl lg:text-6xl"
-                style={{ '--hero-delay': '110ms' }}
-              >
-                {heroSlides[slide]?.title}
-              </h1>
-              <p
-                className="vivi-hero-anim-left mt-4 text-base leading-relaxed text-white/90"
-                style={{ '--hero-delay': '180ms' }}
-              >
-                {heroSlides[slide]?.text}
-              </p>
+            <div className="max-w-xl">
+              <p className="text-xs font-bold uppercase tracking-[0.25em] text-[var(--anvil-cyan-bright)]">{SCHOOL_PROFILE.tagline}</p>
+
+              <div className="relative mt-3 min-h-[11rem] sm:min-h-[12.5rem]">
+                {heroSlides.map((s, idx) => (
+                  <div
+                    key={idx}
+                    aria-hidden={idx !== slide}
+                    className={`transition-opacity duration-[1200ms] ease-in-out ${
+                      idx === slide ? 'relative z-10 opacity-100' : 'pointer-events-none absolute inset-x-0 top-0 z-0 opacity-0'
+                    }`}
+                  >
+                    <h1
+                      className={`vivi-heading text-4xl leading-tight sm:text-5xl lg:text-6xl ${
+                        HERO_RED_TITLES.has(s.title) ? '!text-[var(--anvil-red)]' : '!text-white'
+                      }`}
+                    >
+                      {s.title}
+                    </h1>
+                    <p className="mt-4 text-base leading-relaxed text-white/90">{s.text}</p>
+                  </div>
+                ))}
+              </div>
 
               <div className="mt-8 flex flex-wrap gap-3">
                 <Link
                   to="/about"
-                  className="vivi-btn vivi-hero-anim-left rounded-full bg-[var(--anvil-cyan)] px-7 py-3 text-sm font-bold text-white shadow-lg transition hover:brightness-105"
-                  style={{ '--hero-delay': '240ms' }}
+                  className="vivi-btn rounded-full bg-[var(--anvil-cyan)] px-6 py-3 text-sm font-bold text-white shadow-lg transition hover:brightness-105 sm:px-7"
                 >
-                  {heroSlides[slide]?.primaryCta}
+                  Learn more
                 </Link>
                 <Link
                   to="/programs"
-                  className="vivi-btn vivi-hero-anim-right rounded-full border-2 border-white/80 bg-white/10 px-7 py-3 text-sm font-bold text-white backdrop-blur-sm transition hover:bg-white/20"
-                  style={{ '--hero-delay': '280ms' }}
+                  className="vivi-btn rounded-full border-2 border-white/80 bg-white/10 px-6 py-3 text-sm font-bold text-white backdrop-blur-sm transition hover:bg-white/20 sm:px-7"
                 >
-                  {heroSlides[slide]?.secondaryCta}
+                  Our classes
                 </Link>
+                <button
+                  type="button"
+                  onClick={() => setPaymentOpen(true)}
+                  className="vivi-btn rounded-full border-2 border-white/90 bg-white px-6 py-3 text-sm font-bold text-[var(--anvil-navy)] shadow-md transition hover:bg-white/95 sm:px-7"
+                >
+                  Register
+                </button>
               </div>
             </div>
           </div>
@@ -301,75 +316,41 @@ export default function ViviLandingPage() {
           </div>
         </section>
 
-        {/* About Start */}
-        <section className="py-14">
+        {/* About teaser — visual values + link to full About page */}
+        <section className="py-12 sm:py-14">
           <div className="px-4 sm:px-6">
-            <div className="rounded-xl bg-[var(--anvil-card-faint)] p-6 sm:p-8">
+            <div className="overflow-hidden rounded-2xl border border-[color:color-mix(in_srgb,var(--anvil-royal)_12%,white)] bg-gradient-to-br from-[var(--anvil-card-faint)] via-white to-[var(--vivi-light)] p-6 shadow-sm sm:p-8 lg:p-10">
               <div className="grid items-center gap-10 lg:grid-cols-2">
                 <div>
-                  <div className="scroll-reveal scroll-reveal--left">
-                    <p className="inline-flex rounded-full bg-[var(--vivi-light)] px-4 py-1.5 text-xs font-black uppercase tracking-[0.22em] text-[var(--anvil-red)]">
-                      About Us
-                    </p>
-                    <h2 className="vivi-heading mt-3 text-3xl text-[var(--anvil-red)]">Mission, inclusivity, and community impact</h2>
-                  </div>
-                  <div className="mt-4 space-y-3 scroll-reveal scroll-reveal--right">
-                    <p className="text-sm leading-relaxed text-[var(--vivi-muted)]">{SCHOOL_PROFILE.mission}</p>
-                    <p className="text-sm leading-relaxed text-[var(--vivi-muted)]">
-                      We are passionate about helping every learner grow through practical tech education, mentorship, and meaningful project work.
-                    </p>
-                    <p className="text-sm leading-relaxed text-[var(--vivi-muted)]">
-                      Inclusivity is non-negotiable: our programs welcome all cultures, backgrounds, and learning styles without bias.
-                    </p>
-                    <p className="text-sm leading-relaxed text-[var(--vivi-muted)]">
-                      We also run community engagement activities, including a three-month girls training program with certification and graduation.
-                    </p>
-                  </div>
-
-                  <div className="mt-6 grid gap-3 sm:grid-cols-2">
-                    {[...CULTURE_POINTS, 'All programs serve learners aged 5-19 years.'].slice(0, 5).map((pt, idx) => (
-                      <div
-                        key={pt}
-                        className="scroll-reveal scroll-reveal--zoom rounded-xl bg-white/80 p-4 text-sm text-[var(--vivi-muted)] transition hover:-translate-y-0.5"
-                        style={{ '--reveal-delay': `${idx * 60}ms` }}
-                      >
-                        <p className="text-xs font-black uppercase tracking-[0.24em] text-[var(--anvil-red)]">Community</p>
-                        <p className="mt-2 font-semibold text-[var(--anvil-red)]">{pt}</p>
-                      </div>
-                    ))}
-                  </div>
+                  <p className="text-xs font-black uppercase tracking-[0.22em] text-[var(--anvil-red)]">About us</p>
+                  <h2 className="vivi-heading mt-2 text-3xl text-[var(--anvil-red)] sm:text-4xl">Anvil Coding Academy</h2>
+                  <p className="mt-3 text-sm leading-relaxed text-[var(--vivi-muted)]">{SCHOOL_PROFILE.aboutLead}</p>
+                  <p className="mt-3 text-sm font-semibold text-[var(--anvil-navy)]">
+                    Programs for learners aged <span className="text-[var(--anvil-red)]">5–19</span> — project-based tech
+                    education with heart.
+                  </p>
+                  <Link
+                    to="/about"
+                    className="btn-theme-primary mt-6 inline-flex rounded-full px-8 py-3 text-sm shadow-md"
+                  >
+                    Read our full story
+                  </Link>
                 </div>
-
-                <div className="relative">
-                  <div className="scroll-reveal scroll-reveal--right overflow-hidden rounded-xl bg-[var(--anvil-card-faint)] p-4">
-                    <div className="grid gap-4 sm:grid-cols-2">
-                      <div className="relative overflow-hidden rounded-xl">
-                        <img src={ASSET_IMAGES.hero} alt="Coding class in session" className="h-44 w-full object-cover" />
-                        <div className="absolute inset-0 bg-gradient-to-t from-[rgba(16,55,65,0.35)] via-transparent to-transparent" />
+                <div className="grid grid-cols-2 gap-3 sm:gap-4">
+                  {ABOUT_TEASER_VALUES.map((v, idx) => (
+                    <article
+                      key={v.title}
+                      className="scroll-reveal scroll-reveal--up group relative overflow-hidden rounded-2xl bg-white shadow-md ring-1 ring-slate-200/60"
+                      style={{ '--reveal-delay': `${idx * 75}ms` }}
+                    >
+                      <div className="relative h-28 sm:h-32">
+                        <img src={v.img} alt="" className="h-full w-full object-cover transition duration-500 group-hover:scale-105" />
+                        <div className="absolute inset-0 bg-gradient-to-t from-[rgba(31,42,68,0.85)] via-[rgba(31,42,68,0.35)] to-transparent" />
+                        <p className="absolute bottom-2 left-3 right-3 text-sm font-black text-white drop-shadow-sm">{v.title}</p>
                       </div>
-                      <div className="relative overflow-hidden rounded-xl">
-                        <img src={ASSET_IMAGES.classB} alt="Students learning together" className="h-44 w-full object-cover" />
-                        <div className="absolute inset-0 bg-gradient-to-t from-[rgba(16,55,65,0.25)] via-transparent to-transparent" />
-                      </div>
-                      <div className="relative overflow-hidden rounded-xl sm:col-span-2">
-                        <img src={ASSET_IMAGES.classA} alt="Girls graduation and certification activity" className="h-52 w-full object-cover" />
-                        <div className="absolute inset-0 bg-gradient-to-t from-[rgba(16,55,65,0.32)] via-transparent to-transparent" />
-                      </div>
-                    </div>
-
-                    <div className="mt-4 grid gap-3 sm:grid-cols-3">
-                      {[
-                        { k: 'Ages', v: '5-19 years' },
-                        { k: 'Inclusion', v: 'All backgrounds' },
-                        { k: 'Community', v: 'Certified programs' },
-                      ].map((it) => (
-                        <div key={it.k} className="rounded-xl bg-white/90 p-4 text-center">
-                          <p className="text-[11px] font-black uppercase tracking-[0.24em] text-[var(--anvil-red)]">{it.k}</p>
-                          <p className="mt-2 text-sm font-extrabold text-[var(--anvil-red)]">{it.v}</p>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
+                      <p className="p-3 text-xs leading-snug text-[var(--vivi-muted)] sm:p-3.5 sm:text-sm">{v.text}</p>
+                    </article>
+                  ))}
                 </div>
               </div>
             </div>
@@ -667,36 +648,54 @@ export default function ViviLandingPage() {
           </div>
         </section>
 
-        {/* Quick Links + Newsletter */}
+        {/* Newsletter teaser + quick links */}
         <section className="pb-12">
           <div className="px-4 sm:px-6">
-            <div className="grid gap-6 rounded-xl bg-[var(--anvil-card-faint)] p-6 sm:p-8 lg:grid-cols-2">
-              <div>
-                <h3 className="vivi-heading text-2xl text-[var(--anvil-red)]">Quick Links</h3>
-                <div className="mt-4 grid gap-2 text-sm">
-                  {[
-                    { to: '/about', label: 'About Us' },
-                    { to: '/programs', label: 'Classes' },
-                    { to: '/contact', label: 'Contact' },
-                    { to: '/faq', label: 'FAQs' },
-                  ].map((it) => (
-                    <Link key={it.to} to={it.to} className="rounded-lg bg-white px-4 py-2 font-semibold text-[var(--anvil-red)] transition hover:bg-red-50">
-                      {it.label}
+            <div className="overflow-hidden rounded-2xl border border-red-100/80 bg-gradient-to-br from-white via-white to-[var(--anvil-card-faint)] p-6 shadow-sm sm:p-8">
+              <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_280px] lg:items-center">
+                <div>
+                  <p className="text-xs font-bold uppercase tracking-wide text-(--anvil-red)">Stay in the loop</p>
+                  <h2 className="vivi-heading mt-2 text-3xl text-[var(--anvil-red)]">{NEWSLETTER_CONTENT.headline}</h2>
+                  <p className="mt-3 max-w-xl text-sm text-[var(--vivi-muted)]">{NEWSLETTER_CONTENT.lead}</p>
+                  <div className="mt-4 flex flex-wrap gap-2">
+                    {NEWSLETTER_CONTENT.topics.map((t) => (
+                      <span
+                        key={t.label}
+                        className="rounded-full bg-white px-3 py-1 text-xs font-bold text-[var(--anvil-red)] shadow-sm ring-1 ring-red-100/60"
+                      >
+                        {t.label}
+                      </span>
+                    ))}
+                  </div>
+                  <p className="mt-3 text-xs text-[var(--vivi-muted)]">{NEWSLETTER_CONTENT.cadence}</p>
+                  <div className="mt-6">
+                    <Link
+                      to="/newsletter"
+                      className="vivi-btn vivi-btn-primary inline-flex items-center justify-center px-6 py-3 text-sm font-semibold text-white"
+                    >
+                      Newsletter & subscribe
                     </Link>
-                  ))}
+                  </div>
                 </div>
-              </div>
-              <div>
-                <h3 className="vivi-heading text-2xl text-[var(--anvil-red)]">Newsletter</h3>
-                <p className="mt-3 text-sm text-[var(--vivi-muted)]">
-                  Monthly content includes program updates, event announcements, student highlights, and partner activity news.
-                </p>
-                <div className="mt-4 flex flex-wrap gap-2 text-xs font-bold">
-                  {['Program highlights', 'Event calendar', 'Student showcases', 'Community updates'].map((item) => (
-                    <span key={item} className="rounded-full bg-white px-3 py-1 text-[var(--anvil-red)]">
-                      {item}
-                    </span>
-                  ))}
+                <div className="rounded-xl bg-[var(--anvil-card-faint)] p-6 ring-1 ring-slate-200/60">
+                  <h3 className="vivi-heading text-lg text-[var(--anvil-red)]">Quick links</h3>
+                  <div className="mt-4 grid gap-2 text-sm">
+                    {[
+                      { to: '/about', label: 'About Us' },
+                      { to: '/programs', label: 'Classes' },
+                      { to: '/newsletter', label: 'Newsletter' },
+                      { to: '/contact', label: 'Contact' },
+                      { to: '/faq', label: 'FAQs' },
+                    ].map((it) => (
+                      <Link
+                        key={it.to}
+                        to={it.to}
+                        className="rounded-lg bg-white px-4 py-2 font-semibold text-[var(--anvil-red)] transition hover:bg-red-50"
+                      >
+                        {it.label}
+                      </Link>
+                    ))}
+                  </div>
                 </div>
               </div>
             </div>

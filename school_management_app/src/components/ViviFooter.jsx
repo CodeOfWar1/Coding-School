@@ -161,6 +161,7 @@ export default function ViviFooter({ galleryImages = [], showBackToTop = true })
                   <div className="space-y-2 text-sm text-white/60">
                     {[
                       { to: '/about', label: 'About Us', type: 'link' },
+                      { to: '/newsletter', label: 'Newsletter', type: 'link' },
                       { to: '/contact', label: 'Contact Us', type: 'link' },
                       { to: '#', label: 'Our Services', type: 'a' },
                       { to: '#', label: 'Privacy Policy', type: 'a' },
@@ -201,7 +202,12 @@ export default function ViviFooter({ galleryImages = [], showBackToTop = true })
 
                 <div>
                   <h3 className="vivi-heading mb-4 text-2xl text-white">Newsletter</h3>
-                  <p className="mb-4 text-sm text-white/60">Get updates about new courses and holiday bootcamps.</p>
+                  <p className="mb-4 text-sm text-white/60">
+                    Get updates about new courses and holiday bootcamps.{' '}
+                    <Link to="/newsletter" className="font-semibold text-white/90 underline-offset-2 hover:text-white hover:underline">
+                      What we send
+                    </Link>
+                  </p>
                   <form
                     className="relative mx-auto"
                     onSubmit={(e) => {

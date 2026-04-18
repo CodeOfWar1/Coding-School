@@ -72,7 +72,7 @@ export const COURSE_BROCHURE_COLUMNS = [
       {
         title: 'Python Level 2',
         ages: '14–17',
-        desc: 'Mobile apps, Django backends, and machine learning—building like professionals.',
+        desc: 'Mobile apps, modern web skills, and machine learning—building like professionals.',
       },
     ],
   },
@@ -184,7 +184,7 @@ export const FACULTY_AND_ENVIRONMENT = {
   facilities: [
     { label: 'Dynamic classrooms', text: 'Reconfigurable spaces for individual and group work.' },
     { label: 'Maker labs', text: '3D printers, VR headsets, and robotics kits.' },
-    { label: 'Digital resources', text: 'LMS with coding platforms, video tutorials, and parent dashboards.' },
+    { label: 'Digital resources', text: 'Learning resources with coding platforms, video tutorials, and progress updates.' },
   ],
 }
 
@@ -273,7 +273,7 @@ export const PROGRAM_TRACKS = [
     id: 'python2',
     title: 'Python Level 2',
     level: 'Advanced',
-    desc: 'Mobile apps, Django backend development, and machine learning fundamentals.',
+    desc: 'Mobile apps, web development fundamentals, and machine learning basics.',
     age: '14-17 years',
   },
   {
@@ -400,6 +400,22 @@ export const CULTURE_POINTS = [
   'Learn to work in diverse teams, a key modern workplace skill.',
 ]
 
+/** Copy for the dedicated newsletter page and the home-page teaser. */
+export const NEWSLETTER_CONTENT = {
+  headline: 'The Anvil Briefing',
+  lead:
+    'Monthly updates for families and partners: programs, events, student wins, and community news—straight to your inbox.',
+  topics: [
+    { label: 'Program highlights', description: 'New tracks, levels, and spotlight courses.' },
+    { label: 'Event calendar', description: 'Open days, showcases, and holiday bootcamps.' },
+    { label: 'Student showcases', description: 'Projects and achievements from our learners.' },
+    { label: 'Community updates', description: 'Partners, grants, and ways to get involved.' },
+  ],
+  cadence: 'We send about one email per month. Unsubscribe anytime—we respect your inbox.',
+  privacy:
+    'We use your email only for this newsletter. We never sell addresses. Questions? Reach us on the contact page.',
+}
+
 export const FAQ_ITEMS = [
   {
     q: 'What makes Anvil Coding Academy different?',
@@ -415,7 +431,7 @@ export const FAQ_ITEMS = [
   },
   {
     q: 'How can parents follow student progress?',
-    a: 'Parents can sign in to the parent dashboard and track tasks, submissions, grades, and schedules.',
+    a: 'Parents can follow learner progress through regular updates, showcases, and structured feedback.',
   },
 ]
 

@@ -4,6 +4,7 @@ import {
   ACADEMIC_OFFERINGS_TABLE,
   CLIENT2_COURSES,
   COMMUNITY_PARTNERSHIPS,
+  CULTURE_POINTS,
   FACULTY_AND_ENVIRONMENT,
   MILESTONES,
   OVERVIEW_FACTS,
@@ -68,6 +69,80 @@ export default function AboutPage() {
           </div>
         </header>
         <main className="px-4 py-6 sm:px-6">
+          <section className="mb-10 rounded-xl bg-[var(--anvil-card-faint)] p-6 sm:p-8">
+            <div className="grid items-center gap-10 lg:grid-cols-2">
+              <div>
+                <div className="scroll-reveal scroll-reveal--left">
+                  <p className="inline-flex rounded-full bg-[var(--vivi-light)] px-4 py-1.5 text-xs font-black uppercase tracking-[0.22em] text-[var(--anvil-red)]">
+                    About Us
+                  </p>
+                  <h2 className="vivi-heading mt-3 text-3xl text-[var(--anvil-red)]">Mission, inclusivity, and community impact</h2>
+                </div>
+                <div className="mt-4 space-y-3 scroll-reveal scroll-reveal--right">
+                  <p className="text-sm leading-relaxed text-[var(--vivi-muted)]">{SCHOOL_PROFILE.mission}</p>
+                  <p className="text-sm leading-relaxed text-[var(--vivi-muted)]">
+                    We are passionate about helping every learner grow through practical tech education, mentorship, and
+                    meaningful project work.
+                  </p>
+                  <p className="text-sm leading-relaxed text-[var(--vivi-muted)]">
+                    Inclusivity is non-negotiable: our programs welcome all cultures, backgrounds, and learning styles
+                    without bias.
+                  </p>
+                  <p className="text-sm leading-relaxed text-[var(--vivi-muted)]">
+                    We also run community engagement activities, including a three-month girls training program with
+                    certification and graduation.
+                  </p>
+                </div>
+                <div className="mt-6 grid gap-3 sm:grid-cols-2">
+                  {[...CULTURE_POINTS, 'All programs serve learners aged 5–19 years.'].slice(0, 5).map((pt, idx) => (
+                    <div
+                      key={pt}
+                      className="scroll-reveal scroll-reveal--zoom rounded-xl bg-white/80 p-4 text-sm text-[var(--vivi-muted)] transition hover:-translate-y-0.5"
+                      style={{ '--reveal-delay': `${idx * 60}ms` }}
+                    >
+                      <p className="text-xs font-black uppercase tracking-[0.24em] text-[var(--anvil-red)]">Community</p>
+                      <p className="mt-2 font-semibold text-[var(--anvil-red)]">{pt}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+              <div className="relative">
+                <div className="scroll-reveal scroll-reveal--right overflow-hidden rounded-xl bg-[var(--anvil-card-faint)] p-4">
+                  <div className="grid gap-4 sm:grid-cols-2">
+                    <div className="relative overflow-hidden rounded-xl">
+                      <img src={assetMG3836} alt="Coding class in session" className="h-44 w-full object-cover" />
+                      <div className="absolute inset-0 bg-gradient-to-t from-[rgba(16,55,65,0.35)] via-transparent to-transparent" />
+                    </div>
+                    <div className="relative overflow-hidden rounded-xl">
+                      <img src={assetIStock128} alt="Students learning together" className="h-44 w-full object-cover" />
+                      <div className="absolute inset-0 bg-gradient-to-t from-[rgba(16,55,65,0.25)] via-transparent to-transparent" />
+                    </div>
+                    <div className="relative overflow-hidden rounded-xl sm:col-span-2">
+                      <img
+                        src={assetImages5}
+                        alt="Girls training cohort — certification and graduation"
+                        className="h-52 w-full object-cover"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-[rgba(16,55,65,0.32)] via-transparent to-transparent" />
+                    </div>
+                  </div>
+                  <div className="mt-4 grid gap-3 sm:grid-cols-3">
+                    {[
+                      { k: 'Ages', v: '5–19 years' },
+                      { k: 'Inclusion', v: 'All backgrounds' },
+                      { k: 'Community', v: 'Certified programs' },
+                    ].map((it) => (
+                      <div key={it.k} className="rounded-xl bg-white/90 p-4 text-center">
+                        <p className="text-[11px] font-black uppercase tracking-[0.24em] text-[var(--anvil-red)]">{it.k}</p>
+                        <p className="mt-2 text-sm font-extrabold text-[var(--anvil-red)]">{it.v}</p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+
           <section className="mb-10">
             <p className="text-xs font-black uppercase tracking-[0.22em] text-[var(--anvil-royal)]">Profile</p>
             <h1 className="vivi-heading mt-2 text-3xl tracking-tight text-slate-900">{SCHOOL_PROFILE.name}</h1>

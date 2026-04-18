@@ -14,6 +14,7 @@ import AboutPage from './views/AboutPage.jsx'
 import BlogPage from './views/BlogPage.jsx'
 import FAQPage from './views/FAQPage.jsx'
 import ContactPage from './views/ContactPage.jsx'
+import NewsletterPage from './views/NewsletterPage.jsx'
 
 const DASHBOARD_ROLES = ['student', 'parent', 'finance', 'admin']
 
@@ -40,6 +41,7 @@ export default function App() {
       <Route path="/about" element={<AboutPage />} />
       <Route path="/blog" element={<BlogPage />} />
       <Route path="/faq" element={<FAQPage />} />
+      <Route path="/newsletter" element={<NewsletterPage />} />
       <Route path="/contact" element={<ContactPage />} />
       <Route
         path="/register"

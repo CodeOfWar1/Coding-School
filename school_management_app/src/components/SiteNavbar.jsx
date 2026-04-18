@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { useAuth } from '../state/AuthContext'
 
 /**
  * Public site navigation — Mandakh Coding School branding, aligned with dashboard theme.
@@ -12,11 +11,6 @@ export default function SiteNavbar({
   sticky = true,
   showRegisterPay = true,
 }) {
-  const { user, profile } = useAuth()
-  void user
-  void profile
-  const signInLabel = 'Sign in'
-
   const [infoOpen, setInfoOpen] = useState(false)
   const infoRef = useRef(null)
 
@@ -99,18 +93,6 @@ export default function SiteNavbar({
           >
             Home
           </Link>
-          <Link
-            to="/about"
-            className={`rounded-lg px-3 py-2 text-sm font-semibold transition ${navItemCls}`}
-          >
-            About Us
-          </Link>
-          <Link
-            to="/programs"
-            className={`rounded-lg px-3 py-2 text-sm font-semibold transition ${navItemCls}`}
-          >
-            Classes
-          </Link>
 
           <div ref={infoRef} className="relative">
             <button
@@ -130,8 +112,10 @@ export default function SiteNavbar({
               >
                 <div className="p-2">
                   {[
+                    { to: '/about', label: 'About Us' },
+                    { to: '/programs', label: 'Classes' },
                     { to: '/faq', label: 'FAQ' },
-                    { to: '/contact', label: 'Contact Us' },
+                    { to: '/newsletter', label: 'Newsletter' },
                   ].map((it) => (
                     <Link
                       key={it.to}
@@ -152,10 +136,10 @@ export default function SiteNavbar({
             )}
           </div>
           <Link
-            to="/contact"
+            to="/login"
             className={`rounded-lg px-3 py-2 text-sm font-semibold transition ${navItemCls}`}
           >
-            Contact Us
+            Login
           </Link>
 
           {showRegisterPay && onRegisterPay && (
@@ -177,16 +161,6 @@ export default function SiteNavbar({
           >
             Book an Appointment
           </a>
-          <Link
-            to="/login"
-            className={`btn-theme-secondary px-4 py-2 text-sm ${
-              variant === 'light'
-                ? 'text-(--vivi-dark)'
-                : 'border border-white/35 bg-white/5 text-white hover:bg-white/15'
-            }`}
-          >
-            {signInLabel}
-          </Link>
         </nav>
         </div>
       </div>
