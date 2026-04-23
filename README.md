@@ -1,41 +1,24 @@
-<<<<<<< HEAD
-# School Management System (React + Tailwind + Supabase)
+# Coding School App (React + Tailwind + Supabase)
 
-This project is now frontend-first and runs from `school_management_app` as a React + Tailwind app.
-The old Django codebase is retained only as legacy reference.
+This app includes:
+- Landing page
+- Student registration + initial payment + auto receipt
+- Role-based login and dashboards (`student`, `parent`, `finance`, `admin`)
+- Task/submission/progress/deadline flow for students
+- Parent payment/receipt monitoring
+- Finance payment verification/report filtering
+- Admin user/task/landing-content management
 
-## Main App (Current)
-
-- Frontend: `school_management_app`
-- Converted system config folder: `school_management_system` (JS config modules)
-- Legacy Django reference files: `legacy-django/school_management_system_original`
-- Active UI source: `school_management_app/src`
-
-## Quick Start (Root)
+## Run
 
 ```bash
-npm run install:app
-npm run dev
-```
-
-This starts the React app from the root project without running Python.
-
-## Run Frontend
-
-```bash
-cd school_management_app
 npm install
+cp .env.example .env
 npm run dev
 ```
 
-## Supabase Setup
+## Supabase
 
-Supabase integration can be added on top of this converted React app when needed.
-
-## Migration Note
-
-The old Django runtime config under `school_management_system` and old Django app files are superseded by the React stack. Reference copies are kept under `legacy-django`.
-Do not use `python manage.py runserver` for the migrated UI workflow.
-=======
-# Coding-School
->>>>>>> 29d19ffe6c0f003e902eaf4b686913134ea7cabd
+- Configure `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` in `.env`
+- For UI-only demo without DB, keep `VITE_DEMO_MODE=true`
+- Apply DB schema from `supabase/schema.sql`
