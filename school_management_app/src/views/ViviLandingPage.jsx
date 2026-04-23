@@ -5,24 +5,16 @@ import SiteNavbar from '../components/SiteNavbar'
 import ViviFooter from '../components/ViviFooter'
 import { useScrollReveal } from '../hooks/useScrollReveal'
 import { FACILITIES, NEWSLETTER_CONTENT, SCHOOL_PROFILE } from '../content/siteProfile'
+import { FOOTER_GALLERY_IMAGES, PARTNER_LOGOS, PROGRAM_CARD_IMAGES, SCHOOL_MEDIA_IMAGES } from '../content/schoolMedia'
 import heroAsset from '../assets/hero.png'
-import assetHowToStart from '../assets/school/how-to-start-a-kids-coding-camp.jpg'
-import assetImages5 from '../assets/school/images (5).jpg'
-import assetIStock128 from '../assets/school/iStock-1288615417.jpg'
-import assetIStock825 from '../assets/school/iStock-825187856-b-scaled.jpg'
-import assetMG3836 from '../assets/school/MG_3836-scaled.jpg'
-import assetSocial from '../assets/school/social_image.webp'
-import team1 from '../assets/school/team-1.jpg'
-import team2 from '../assets/school/team-2.jpg'
-import team3 from '../assets/school/team-3.jpg'
 
 const ASSET_IMAGES = {
-  hero: assetMG3836,
-  lab: assetIStock825,
-  classA: assetImages5,
-  classB: assetIStock128,
-  classC: assetHowToStart,
-  social: assetSocial,
+  hero: SCHOOL_MEDIA_IMAGES.hero,
+  lab: SCHOOL_MEDIA_IMAGES.lab,
+  classA: SCHOOL_MEDIA_IMAGES.classA,
+  classB: SCHOOL_MEDIA_IMAGES.classB,
+  classC: SCHOOL_MEDIA_IMAGES.classC,
+  social: SCHOOL_MEDIA_IMAGES.social,
 }
 
 const DEFAULT_HERO = {
@@ -32,7 +24,7 @@ const DEFAULT_HERO = {
 }
 
 const FACILITY_IMAGE_BY_ID = {
-  projects: ASSET_IMAGES.classA,
+  projects: SCHOOL_MEDIA_IMAGES.projectBased,
   mentor: ASSET_IMAGES.classB,
   community: ASSET_IMAGES.social,
   innovation: ASSET_IMAGES.lab,
@@ -41,47 +33,28 @@ const FACILITY_IMAGE_BY_ID = {
 const slideButtonClass =
   'h-2.5 rounded-full transition-all focus:outline-none focus:ring-2 focus:ring-[var(--anvil-cyan)]/40'
 
-const SCREENSHOT_IMAGES = {
-  teacher: team1,
-  student: '/media/Screenshots/student.png',
-  parent: '/media/Screenshots/parent.png',
-  news: '/media/Screenshots/news.png',
-}
-
 const TESTIMONIALS = [
   {
     name: 'Parent',
     text: 'Clear progress tracking and supportive tutors. My child is excited to learn.',
-    img: SCREENSHOT_IMAGES.parent,
   },
   {
     name: 'Student',
     text: 'I built my first game and learned how to debug. Now I want to build more.',
-    img: SCREENSHOT_IMAGES.student,
   },
   {
     name: 'Guardian',
     text: 'Great environment and practical learning. The portfolio projects are impressive.',
-    img: SCREENSHOT_IMAGES.teacher,
   },
 ]
 
 const TEAM = [
-  { name: 'Ms. Nawa', role: 'Lead Instructor', img: team1 },
-  { name: 'Mr. Zulu', role: 'Robotics Mentor', img: team2 },
-  { name: 'Mrs. Chanda', role: 'Web Development Coach', img: team3 },
-  { name: 'Tapiwa', role: 'Web Development', img: team3 },
-  { name: 'Sivogwani', role: 'Robotics / Python', img: team2 },
-  { name: 'Mwango', role: 'Digital Literacy', img: team1 },
-]
-
-const FOOTER_GALLERY_IMAGES = [
-  assetMG3836,
-  assetIStock825,
-  assetImages5,
-  assetIStock128,
-  assetHowToStart,
-  assetSocial,
+  { name: 'Ms. Nawa', role: 'Lead Instructor', img: SCHOOL_MEDIA_IMAGES.team1 },
+  { name: 'Mr. Zulu', role: 'Robotics Mentor', img: SCHOOL_MEDIA_IMAGES.team2 },
+  { name: 'Mrs. Chanda', role: 'Web Development Coach', img: SCHOOL_MEDIA_IMAGES.team3 },
+  { name: 'Tapiwa', role: 'Web Development', img: SCHOOL_MEDIA_IMAGES.team3 },
+  { name: 'Sivogwani', role: 'Robotics / Python', img: SCHOOL_MEDIA_IMAGES.team2 },
+  { name: 'Mwango', role: 'Digital Literacy', img: SCHOOL_MEDIA_IMAGES.team1 },
 ]
 
 const CORE_CLASS_OFFERINGS = [
@@ -96,15 +69,13 @@ const CORE_CLASS_OFFERINGS = [
 ]
 
 const GALLERY_SHOWCASE = [
-  { title: 'Coding Projects', text: 'Students showcasing websites, apps, and coding challenges.', img: assetMG3836 },
-  { title: 'Robotics Build Day', text: 'Hands-on robotics labs and collaborative prototype sessions.', img: assetIStock825 },
-  { title: 'Girls Tech Cohort', text: 'Three-month girls training program with graduation certificates.', img: assetImages5 },
-  { title: 'Community Outreach', text: 'Parent engagement, digital literacy talks, and youth workshops.', img: assetSocial },
-  { title: 'Game Design Studio', text: 'Creative storytelling and interactive game development.', img: assetIStock128 },
-  { title: 'Classroom Events', text: 'Hack-day activities, showcases, and celebration events.', img: assetHowToStart },
+  { title: 'Coding Projects', text: 'Students showcasing websites, apps, and coding challenges.', img: SCHOOL_MEDIA_IMAGES.hero },
+  { title: 'Robotics Build Day', text: 'Hands-on robotics labs and collaborative prototype sessions.', img: SCHOOL_MEDIA_IMAGES.lab },
+  { title: 'Girls Tech Cohort', text: 'Three-month girls training program with graduation certificates.', img: SCHOOL_MEDIA_IMAGES.classA },
+  { title: 'Community Outreach', text: 'Parent engagement, digital literacy talks, and youth workshops.', img: SCHOOL_MEDIA_IMAGES.social },
+  { title: 'Game Design Studio', text: 'Creative storytelling and interactive game development.', img: SCHOOL_MEDIA_IMAGES.classB },
+  { title: 'Classroom Events', text: 'Hack-day activities, showcases, and celebration events.', img: SCHOOL_MEDIA_IMAGES.classC },
 ]
-
-const PARTNER_SCHOOLS = ['Pestalosi', 'Leaks', 'Cherry International', 'Learning Ladder', 'Rose Garden', 'Best Buddies']
 
 /** Hero titles that use brand red (others stay white for contrast on the photo). */
 const HERO_RED_TITLES = new Set([
@@ -117,22 +88,22 @@ const ABOUT_TEASER_VALUES = [
   {
     title: 'Hands-on learning',
     text: 'Projects, not just slides — build real skills from day one.',
-    img: assetMG3836,
+    img: SCHOOL_MEDIA_IMAGES.hero,
   },
   {
     title: 'Mentorship',
     text: 'Coaches who guide, encourage, and celebrate progress.',
-    img: assetIStock128,
+    img: SCHOOL_MEDIA_IMAGES.classB,
   },
   {
     title: 'Inclusive community',
     text: 'Welcoming every background; we grow better together.',
-    img: assetSocial,
+    img: SCHOOL_MEDIA_IMAGES.social,
   },
   {
     title: 'Innovation & robotics',
     text: 'Robotics, code, and creative problem-solving for ages 5–19.',
-    img: assetIStock825,
+    img: SCHOOL_MEDIA_IMAGES.lab,
   },
 ]
 
@@ -142,9 +113,17 @@ const INITIAL_PARENT_FEEDBACK = [
 ]
 
 function getTrackImage(trackId) {
-  if (trackId === 'python' || trackId === 'python2' || trackId === 'web') return ASSET_IMAGES.classB
-  if (trackId === 'robotics' || trackId === 'ai') return ASSET_IMAGES.lab
-  return ASSET_IMAGES.classA
+  const imageByTrack = {
+    'digital-literacy': PROGRAM_CARD_IMAGES.digitalLiteracy,
+    python: PROGRAM_CARD_IMAGES.python,
+    robotics: PROGRAM_CARD_IMAGES.robotics,
+    'visual-programming': PROGRAM_CARD_IMAGES.visualProgramming,
+    'game-design': PROGRAM_CARD_IMAGES.gameDesign,
+    'web-development': PROGRAM_CARD_IMAGES.webDevelopment,
+    cybersecurity: PROGRAM_CARD_IMAGES.cybersecurity,
+    ai: PROGRAM_CARD_IMAGES.ai,
+  }
+  return imageByTrack[trackId] ?? ASSET_IMAGES.classA
 }
 
 export default function ViviLandingPage() {
@@ -165,7 +144,8 @@ export default function ViviLandingPage() {
       {
         title: hero.hero_title,
         text: hero.hero_text,
-        image: ASSET_IMAGES.hero,
+        image: SCHOOL_MEDIA_IMAGES.bookAppointment,
+        objectPosition: 'center 25%',
         primaryCta: 'Learn More',
         secondaryCta: 'Our Classes',
       },
@@ -202,6 +182,7 @@ export default function ViviLandingPage() {
             <img
               src={s.image}
               alt=""
+              style={{ objectPosition: s.objectPosition ?? 'center' }}
               className={`h-full w-full object-cover transition-transform duration-[9000ms] ease-out ${
                 idx === slide ? 'scale-105' : 'scale-100'
               }`}
@@ -364,7 +345,7 @@ export default function ViviLandingPage() {
             <div className="grid lg:grid-cols-2">
               <div className="relative min-h-[320px] overflow-hidden rounded-xl bg-white">
                 <img
-                  src={ASSET_IMAGES.classC}
+                  src={SCHOOL_MEDIA_IMAGES.chooseNextStep}
                   alt="Our teacher"
                   className="absolute inset-0 h-full w-full object-cover"
                 />
@@ -413,7 +394,7 @@ export default function ViviLandingPage() {
                 <div className="px-4 pt-6 pb-2">
                   <div className="mx-auto w-40 max-w-[90%] rounded-xl bg-white p-2">
                     <img
-                      src={getTrackImage(t.id === 'visual-programming' ? 'scratch' : t.id)}
+                      src={getTrackImage(t.id)}
                       alt={t.title}
                       className="aspect-square w-full rounded-xl object-cover"
                     />
@@ -468,7 +449,7 @@ export default function ViviLandingPage() {
               </div>
               <div className="relative min-h-[320px] overflow-hidden rounded-xl bg-white">
                 <img
-                  src={ASSET_IMAGES.lab}
+                  src={SCHOOL_MEDIA_IMAGES.bookAppointment}
                   alt="Appointment"
                   className="absolute inset-0 h-full w-full object-cover"
                 />
@@ -544,16 +525,9 @@ export default function ViviLandingPage() {
                 className="scroll-reveal scroll-reveal--zoom rounded-xl bg-[var(--anvil-card-faint)] p-6"
                 style={{ '--reveal-delay': `${idx * 80}ms` }}
               >
-                <div className="flex items-center gap-3">
-                  <img
-                    src={t.img}
-                    alt={t.name}
-                    className="h-12 w-12 rounded-2xl object-cover"
-                  />
-                  <div>
-                    <p className="text-sm font-bold text-[var(--anvil-red)]">{t.name}</p>
-                    <p className="text-xs font-bold uppercase tracking-widest text-[var(--anvil-cyan-bright)]">Feedback</p>
-                  </div>
+                <div>
+                  <p className="text-sm font-bold text-[var(--anvil-red)]">{t.name}</p>
+                  <p className="text-xs font-bold uppercase tracking-widest text-[var(--anvil-cyan-bright)]">Feedback</p>
                 </div>
                 <p className="mt-4 text-sm leading-relaxed text-[var(--vivi-muted)]">“{t.text}”</p>
               </article>
@@ -566,7 +540,7 @@ export default function ViviLandingPage() {
               const name = feedbackForm.name.trim()
               const message = feedbackForm.message.trim()
               if (!name || !message) return
-              setFeedbackList((prev) => [{ name, text: message, img: SCREENSHOT_IMAGES.parent }, ...prev].slice(0, 8))
+              setFeedbackList((prev) => [{ name, text: message }, ...prev].slice(0, 8))
               setFeedbackForm({ name: '', message: '' })
             }}
           >
@@ -619,6 +593,11 @@ export default function ViviLandingPage() {
               </div>
             ))}
           </div>
+          <div className="mt-6 text-center">
+            <Link to="/gallery" className="vivi-btn vivi-btn-primary inline-flex rounded-full px-7 py-3 text-sm font-bold text-white">
+              View full gallery
+            </Link>
+          </div>
           </div>
           </div>
         </section>
@@ -633,16 +612,25 @@ export default function ViviLandingPage() {
                   Schools and institutions collaborating with our learning programs.
                 </p>
               </div>
-              <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-                {PARTNER_SCHOOLS.map((name, idx) => (
-                    <span
-                      key={name}
-                      className="inline-flex items-center justify-center rounded-full bg-white px-6 py-3 text-sm font-bold text-[var(--anvil-red)] shadow-sm animate-[partnerFloat_3.6s_ease-in-out_infinite]"
-                      style={{ animationDelay: `${idx * 140}ms` }}
-                    >
-                      {name}
-                    </span>
-                  ))}
+              <div className="grid gap-5 grid-cols-2 sm:grid-cols-2 lg:grid-cols-4">
+                {PARTNER_LOGOS.map((partner, idx) => (
+                  <article
+                    key={partner.name}
+                    className="scroll-reveal scroll-reveal--up group flex flex-col items-center justify-center gap-3 p-2 sm:p-3 transition duration-300 hover:-translate-y-0.5"
+                    style={{ '--reveal-delay': `${idx * 80}ms` }}
+                  >
+                    <div className="flex w-full items-center justify-center">
+                      <img
+                        src={partner.src}
+                        alt={partner.name}
+                        className="h-20 w-full object-contain transition duration-300 group-hover:scale-[1.04] sm:h-24 lg:h-28"
+                      />
+                    </div>
+                    <p className="text-center text-[10px] font-bold uppercase tracking-[0.16em] text-[var(--anvil-red)] sm:text-[11px]">
+                      {partner.name}
+                    </p>
+                  </article>
+                ))}
               </div>
             </div>
           </div>

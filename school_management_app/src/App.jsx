@@ -3,7 +3,6 @@ import { useAuth } from './state/AuthContext.jsx'
 import LoginPage from './views/LoginPage.jsx'
 import ViviLandingPage from './views/ViviLandingPage.jsx'
 import ProtectedRoute from './components/ProtectedRoute.jsx'
-import PublicOnlyRoute from './components/PublicOnlyRoute.jsx'
 import RegisterPaymentPage from './views/RegisterPaymentPage.jsx'
 import StudentDashboard from './views/StudentDashboard.jsx'
 import ParentDashboard from './views/ParentDashboard.jsx'
@@ -15,6 +14,7 @@ import BlogPage from './views/BlogPage.jsx'
 import FAQPage from './views/FAQPage.jsx'
 import ContactPage from './views/ContactPage.jsx'
 import NewsletterPage from './views/NewsletterPage.jsx'
+import GalleryPage from './views/GalleryPage.jsx'
 
 const DASHBOARD_ROLES = ['student', 'parent', 'finance', 'admin']
 
@@ -31,15 +31,12 @@ export default function App() {
       <Route path="/" element={<ViviLandingPage />} />
       <Route
         path="/login"
-        element={
-          <PublicOnlyRoute>
-            <LoginPage />
-          </PublicOnlyRoute>
-        }
+        element={<LoginPage />}
       />
       <Route path="/programs" element={<ProgramsPage />} />
       <Route path="/about" element={<AboutPage />} />
       <Route path="/blog" element={<BlogPage />} />
+      <Route path="/gallery" element={<GalleryPage />} />
       <Route path="/faq" element={<FAQPage />} />
       <Route path="/newsletter" element={<NewsletterPage />} />
       <Route path="/contact" element={<ContactPage />} />

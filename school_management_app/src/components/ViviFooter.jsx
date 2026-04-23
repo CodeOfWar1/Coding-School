@@ -209,21 +209,21 @@ export default function ViviFooter({ galleryImages = [], showBackToTop = true })
                     </Link>
                   </p>
                   <form
-                    className="relative mx-auto"
+                    className="mx-auto flex flex-col gap-3 sm:relative sm:block"
                     onSubmit={(e) => {
                       e.preventDefault()
                       alert('Thanks for subscribing!')
                     }}
                   >
                     <input
-                      className="w-full rounded-full border border-white/25 bg-transparent px-5 py-3 text-sm text-white placeholder:text-white/40 outline-none"
+                      className="w-full rounded-full border border-white/25 bg-transparent px-5 py-3 text-sm text-white placeholder:text-white/40 outline-none sm:pr-28"
                       placeholder="Your email"
                       type="email"
                       required
                     />
                     <button
                       type="submit"
-                      className="absolute right-2 top-1/2 -translate-y-1/2 inline-flex h-10 items-center justify-center rounded-full bg-[#FE5D37] px-6 text-sm font-bold text-white"
+                      className="inline-flex h-10 w-full items-center justify-center rounded-full bg-blue-600 px-6 text-sm font-bold text-white sm:absolute sm:right-2 sm:top-1/2 sm:w-auto sm:-translate-y-1/2"
                     >
                       SignUp
                     </button>

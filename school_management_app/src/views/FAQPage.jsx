@@ -3,15 +3,7 @@ import SiteNavbar from '../components/SiteNavbar'
 import { FAQ_ITEMS, SCHOOL_IMAGES, SCHOOL_PROFILE } from '../content/siteProfile'
 import { useScrollReveal } from '../hooks/useScrollReveal'
 import ViviFooter from '../components/ViviFooter'
-
-import assetHowToStart from '../assets/school/how-to-start-a-kids-coding-camp.jpg'
-import assetImages5 from '../assets/school/images (5).jpg'
-import assetIStock128 from '../assets/school/iStock-1288615417.jpg'
-import assetIStock825 from '../assets/school/iStock-825187856-b-scaled.jpg'
-import assetMG3836 from '../assets/school/MG_3836-scaled.jpg'
-import assetSocial from '../assets/school/social_image.webp'
-
-const FOOTER_GALLERY_IMAGES = [assetMG3836, assetIStock825, assetImages5, assetIStock128, assetHowToStart, assetSocial]
+import { FOOTER_GALLERY_IMAGES } from '../content/schoolMedia'
 
 export default function FAQPage() {
   const [open, setOpen] = useState(FAQ_ITEMS[0]?.q ?? '')

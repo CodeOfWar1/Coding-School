@@ -19,15 +19,7 @@ import {
 } from '../content/siteProfile'
 import { useScrollReveal } from '../hooks/useScrollReveal'
 import ViviFooter from '../components/ViviFooter'
-
-import assetHowToStart from '../assets/school/how-to-start-a-kids-coding-camp.jpg'
-import assetImages5 from '../assets/school/images (5).jpg'
-import assetIStock128 from '../assets/school/iStock-1288615417.jpg'
-import assetIStock825 from '../assets/school/iStock-825187856-b-scaled.jpg'
-import assetMG3836 from '../assets/school/MG_3836-scaled.jpg'
-import assetSocial from '../assets/school/social_image.webp'
-
-const FOOTER_GALLERY_IMAGES = [assetMG3836, assetIStock825, assetImages5, assetIStock128, assetHowToStart, assetSocial]
+import { FOOTER_GALLERY_IMAGES, SCHOOL_MEDIA_IMAGES } from '../content/schoolMedia'
 
 const FEATURES = [
   {
@@ -45,6 +37,24 @@ const FEATURES = [
   {
     k: 'Supportive community',
     v: 'Small cohorts, respectful learning, and motivation that lasts.',
+  },
+]
+
+const ABOUT_STORY_BLOCKS = [
+  {
+    title: 'Project-based classrooms',
+    text: 'Students learn by building websites, robotics prototypes, and practical coding projects with mentor guidance.',
+    image: SCHOOL_MEDIA_IMAGES.classA,
+  },
+  {
+    title: 'Creative technology exposure',
+    text: 'Learners combine coding with design thinking, communication, and collaboration to solve meaningful challenges.',
+    image: SCHOOL_MEDIA_IMAGES.classC,
+  },
+  {
+    title: 'Community and confidence',
+    text: 'Our environment helps students present their work, support peers, and grow confidence in their technical abilities.',
+    image: SCHOOL_MEDIA_IMAGES.social,
   },
 ]
 
@@ -110,16 +120,16 @@ export default function AboutPage() {
                 <div className="scroll-reveal scroll-reveal--right overflow-hidden rounded-xl bg-[var(--anvil-card-faint)] p-4">
                   <div className="grid gap-4 sm:grid-cols-2">
                     <div className="relative overflow-hidden rounded-xl">
-                      <img src={assetMG3836} alt="Coding class in session" className="h-44 w-full object-cover" />
+                      <img src={SCHOOL_MEDIA_IMAGES.hero} alt="Coding class in session" className="h-44 w-full object-cover" />
                       <div className="absolute inset-0 bg-gradient-to-t from-[rgba(16,55,65,0.35)] via-transparent to-transparent" />
                     </div>
                     <div className="relative overflow-hidden rounded-xl">
-                      <img src={assetIStock128} alt="Students learning together" className="h-44 w-full object-cover" />
+                      <img src={SCHOOL_MEDIA_IMAGES.classB} alt="Students learning together" className="h-44 w-full object-cover" />
                       <div className="absolute inset-0 bg-gradient-to-t from-[rgba(16,55,65,0.25)] via-transparent to-transparent" />
                     </div>
                     <div className="relative overflow-hidden rounded-xl sm:col-span-2">
                       <img
-                        src={assetImages5}
+                        src={SCHOOL_MEDIA_IMAGES.classA}
                         alt="Girls training cohort — certification and graduation"
                         className="h-52 w-full object-cover"
                       />
@@ -164,6 +174,40 @@ export default function AboutPage() {
                 <p className="mt-2 text-sm font-semibold text-[var(--anvil-navy)]">{SCHOOL_PROFILE.pricing.duration}</p>
                 <p className="mt-1 text-xs text-slate-600">Per course</p>
               </div>
+            </div>
+          </section>
+
+          <section className="mb-10 rounded-2xl bg-[var(--anvil-card-faint)] p-5 sm:p-7">
+            <div className="mb-5 text-center">
+              <p className="text-xs font-black uppercase tracking-[0.22em] text-[var(--anvil-royal)]">Campus Life</p>
+              <h2 className="vivi-heading mt-2 text-3xl text-[var(--anvil-red)]">Learning moments around the academy</h2>
+            </div>
+            <div className="space-y-4">
+              {ABOUT_STORY_BLOCKS.map((story, idx) => (
+                <article key={story.title} className="overflow-hidden rounded-xl bg-white shadow-sm">
+                  <div className={`grid items-center gap-0 md:grid-cols-2 ${idx % 2 === 1 ? 'md:[&>*:first-child]:order-2' : ''}`}>
+                    <div className="h-56 md:h-full">
+                      <img src={story.image} alt={story.title} className="h-full w-full object-cover" />
+                    </div>
+                    <div className="p-5 sm:p-6">
+                      <p className="text-xs font-black uppercase tracking-[0.22em] text-[var(--anvil-red)]">Story {idx + 1}</p>
+                      <h3 className="mt-2 text-xl font-black text-[var(--anvil-navy)]">{story.title}</h3>
+                      <p className="mt-2 text-sm leading-relaxed text-slate-700">{story.text}</p>
+                    </div>
+                  </div>
+                </article>
+              ))}
+            </div>
+          </section>
+
+          <section className="mb-10 overflow-hidden rounded-2xl bg-[var(--anvil-card-faint)] p-5 sm:p-7">
+            <div className="mb-5 text-center">
+              <p className="text-xs font-black uppercase tracking-[0.22em] text-[var(--anvil-royal)]">Our Team</p>
+              <h2 className="vivi-heading mt-2 text-3xl text-[var(--anvil-red)]">Meet the team</h2>
+              <p className="mt-2 text-sm text-[var(--vivi-muted)]">Mentors and staff supporting learners across every program.</p>
+            </div>
+            <div className="overflow-hidden rounded-xl bg-white shadow-sm">
+              <img src={SCHOOL_MEDIA_IMAGES.meetTheTeam} alt="Meet the team" className="h-[320px] w-full object-cover sm:h-[420px]" />
             </div>
           </section>
 

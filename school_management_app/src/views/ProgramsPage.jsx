@@ -6,15 +6,7 @@ import { useState } from 'react'
 import { useScrollReveal } from '../hooks/useScrollReveal'
 import ViviFooter from '../components/ViviFooter'
 import RegisterModal from '../components/RegisterModal'
-
-import assetHowToStart from '../assets/school/how-to-start-a-kids-coding-camp.jpg'
-import assetImages5 from '../assets/school/images (5).jpg'
-import assetIStock128 from '../assets/school/iStock-1288615417.jpg'
-import assetIStock825 from '../assets/school/iStock-825187856-b-scaled.jpg'
-import assetMG3836 from '../assets/school/MG_3836-scaled.jpg'
-import assetSocial from '../assets/school/social_image.webp'
-
-const FOOTER_GALLERY_IMAGES = [assetMG3836, assetIStock825, assetImages5, assetIStock128, assetHowToStart, assetSocial]
+import { FOOTER_GALLERY_IMAGES } from '../content/schoolMedia'
 
 export default function ProgramsPage() {
   const [paymentOpen, setPaymentOpen] = useState(false)

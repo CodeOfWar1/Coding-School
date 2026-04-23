@@ -1,15 +1,11 @@
-import heroImg from '../assets/school/MG_3836-scaled.jpg'
-import labImg from '../assets/school/iStock-825187856-b-scaled.jpg'
-import classAImg from '../assets/school/images (5).jpg'
-import classBImg from '../assets/school/iStock-1288615417.jpg'
-import classCImg from '../assets/school/how-to-start-a-kids-coding-camp.jpg'
+import { SCHOOL_MEDIA_IMAGES } from './schoolMedia'
 
 export const SCHOOL_IMAGES = {
-  hero: heroImg,
-  lab: labImg,
-  classA: classAImg,
-  classB: classBImg,
-  classC: classCImg,
+  hero: SCHOOL_MEDIA_IMAGES.hero,
+  lab: SCHOOL_MEDIA_IMAGES.lab,
+  classA: SCHOOL_MEDIA_IMAGES.classA,
+  classB: SCHOOL_MEDIA_IMAGES.classB,
+  classC: SCHOOL_MEDIA_IMAGES.classC,
 }
 
 /**
