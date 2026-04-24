@@ -13,20 +13,37 @@ export function useScrollReveal(options = {}) {
 
     const elements = root.querySelectorAll(selector)
     if (!elements.length) return
+    let scrollDirection = 'down'
+    let lastY = window.scrollY
+    const onScroll = () => {
+      const currentY = window.scrollY
+      scrollDirection = currentY >= lastY ? 'down' : 'up'
+      lastY = currentY
+    }
+    window.addEventListener('scroll', onScroll, { passive: true })
 
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
-          if (!entry.isIntersecting) return
-          entry.target.classList.add('is-visible')
-          if (once) observer.unobserve(entry.target)
+          if (entry.isIntersecting) {
+            entry.target.classList.remove('is-from-up', 'is-from-down')
+            entry.target.classList.add('is-visible', scrollDirection === 'up' ? 'is-from-up' : 'is-from-down')
+            if (once) observer.unobserve(entry.target)
+            return
+          }
+          if (!once) {
+            entry.target.classList.remove('is-visible', 'is-from-up', 'is-from-down')
+          }
         })
       },
       { root: null, rootMargin, threshold },
     )
 
     elements.forEach((el) => observer.observe(el))
-    return () => observer.disconnect()
+    return () => {
+      window.removeEventListener('scroll', onScroll)
+      observer.disconnect()
+    }
   }, [selector, rootMargin, threshold, once])
 
   return containerRef

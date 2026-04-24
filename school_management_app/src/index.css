@@ -4,29 +4,29 @@
 /* Site-wide theme — Mandakh Coding School */
 :root {
   /* Brand + accents */
-  --app-brand: #2563eb;
-  --app-brand-hover: #1d4ed8;
-  --app-brand-soft: #eff6ff;
-  --app-accent: #db2777;
-  --app-accent-soft: #fce7f3;
+  --app-brand: #176d7a;
+  --app-brand-hover: #145a63;
+  --app-brand-soft: #e2f0f2;
+  --app-accent: #d9822b;
+  --app-accent-soft: #f6e6d5;
 
   /* Surfaces + borders */
-  --app-surface: #f8fafc;
+  --app-surface: #eef2f5;
   --app-surface-elevated: #ffffff;
   --app-border: #e2e8f0;
-  --app-sidebar: #1e293b;
-  --app-sidebar-active: #2563eb;
+  --app-sidebar: #1b2a38;
+  --app-sidebar-active: #176d7a;
 
   /* App backgrounds (use for landing + marketing pages) */
-  --app-bg-page: #f8fafc; /* slate-50-ish */
-  --app-bg-hero: #0f172a; /* slate-900 */
-  --app-bg-hero-deep: #020617; /* slate-950 */
+  --app-bg-page: #eef2f5;
+  --app-bg-hero: #1b2a38;
+  --app-bg-hero-deep: #111d28;
   --app-bg-hero-overlay: rgba(2, 6, 23, 0.5);
   --app-bg-section-dark: rgba(15, 23, 42, 0.8);
 
   /* Text colors */
-  --app-text-primary: #0f172a; /* slate-900 */
-  --app-text-muted: #475569; /* slate-600 */
+  --app-text-primary: #1f2933;
+  --app-text-muted: #4b5563;
   --app-text-on-dark: rgba(226, 232, 240, 0.9);
 
   /* Key gradients */
@@ -65,32 +65,35 @@
   --app-container: 80rem; /* max-w-7xl */
 
   /* Brochure / profile palette (Anvil Coding Academy) */
-  --anvil-navy: #1f2a44;
-  --anvil-navy-deep: #121b2e;
-  --anvil-red: #c02028;
-  --anvil-royal: #3b4cc0;
-  --anvil-royal-deep: #2f3ea6;
-  --anvil-cyan: #2b8cff;
-  --anvil-cyan-bright: #5aa9ff;
-  --anvil-periwinkle: #cfd9ff;
-  --anvil-periwinkle-soft: #eef2ff;
-  --anvil-teal: #00838f;
-  --anvil-slate: #eceff1;
+  --anvil-navy: #1b2a38;
+  --anvil-navy-deep: #111d28;
+  --anvil-red: #5da9c6;
+  --anvil-royal: #176d7a;
+  --anvil-royal-deep: #145a63;
+  --anvil-cyan: #176d7a;
+  --anvil-cyan-bright: #5da9c6;
+  --anvil-periwinkle: #cbe1eb;
+  --anvil-periwinkle-soft: #eef2f5;
+  --anvil-teal: #176d7a;
+  --anvil-slate: #eef2f5;
   /* Brochure-style faint panel (cards / class headers) */
-  --anvil-card-faint: #f0f2fd;
-  --anvil-accent-warm: #fe5d37;
+  --anvil-card-faint: #d9ebf2;
+  --anvil-accent-warm: #d9822b;
+  --anvil-highlight: #c9a23a;
+  --anvil-alert: #b8323c;
 
   /* Public site (maps to brochure) */
   --vivi-primary: var(--anvil-royal);
   --vivi-primary-hover: var(--anvil-royal-deep);
   --vivi-light: var(--anvil-periwinkle-soft);
   --vivi-dark: var(--anvil-navy);
-  --vivi-muted: #546e7a;
+  --vivi-muted: #4f5d6b;
 }
 
 body {
   margin: 0;
-  @apply bg-slate-50 text-slate-800;
+  background: var(--app-surface);
+  color: var(--app-text-primary);
   font-family: Nunito, Inter, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
 }
 
@@ -105,35 +108,35 @@ select {
 
 .app-btn-primary {
   @apply rounded-xl px-4 py-2.5 text-sm font-bold text-white shadow-md transition;
-  background: linear-gradient(135deg, var(--app-brand) 0%, #4f46e5 100%);
+  background: var(--anvil-accent-warm);
 }
 .app-btn-primary:hover {
-  filter: brightness(1.05);
+  background: #b96f22;
 }
 
 .btn-theme-primary {
   border-radius: 0.75rem;
-  background: linear-gradient(135deg, var(--anvil-cyan) 0%, var(--anvil-royal) 100%);
+  background: var(--anvil-accent-warm);
   color: #fff;
   font-weight: 700;
   transition: 0.2s ease;
 }
 
 .btn-theme-primary:hover {
-  filter: brightness(1.04);
+  background: #b96f22;
 }
 
 .btn-theme-secondary {
   border-radius: 0.75rem;
-  border: 1px solid color-mix(in srgb, var(--anvil-royal) 20%, white);
-  background: #fff;
-  color: var(--anvil-royal);
+  border: 1px solid color-mix(in srgb, var(--anvil-cyan) 40%, white);
+  background: var(--anvil-cyan);
+  color: #fff;
   font-weight: 700;
   transition: 0.2s ease;
 }
 
 .btn-theme-secondary:hover {
-  background: var(--anvil-periwinkle-soft);
+  background: var(--anvil-royal-deep);
 }
 
 .app-card {
@@ -184,6 +187,13 @@ select {
   color: var(--vivi-dark);
 }
 
+.anvil-dynamic-bg {
+  background:
+    radial-gradient(circle at 8% 10%, color-mix(in srgb, var(--anvil-cyan-bright) 22%, transparent) 0%, transparent 40%),
+    radial-gradient(circle at 92% 18%, color-mix(in srgb, var(--anvil-red) 18%, transparent) 0%, transparent 36%),
+    linear-gradient(180deg, #f8fafc 0%, var(--vivi-light) 55%, #ffffff 100%);
+}
+
 .vivi-container {
   margin-inline: auto;
   max-width: var(--app-container);
@@ -224,6 +234,18 @@ select {
   box-shadow: 0 12px 40px rgba(44, 62, 80, 0.08);
 }
 
+.big-card-motion {
+  transition:
+    transform 0.5s cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 0.5s ease;
+  animation: bigCardBreath 7s ease-in-out infinite;
+}
+
+.big-card-motion:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 20px 42px rgba(17, 29, 40, 0.14);
+}
+
 .vivi-btn {
   border-radius: 9999px;
   font-weight: 700;
@@ -231,34 +253,35 @@ select {
 }
 
 .vivi-btn-primary {
-  background: var(--vivi-primary);
+  background: var(--anvil-accent-warm);
   color: #fff;
 }
 
 .vivi-btn-primary:hover {
-  filter: brightness(0.96);
+  background: #b96f22;
 }
 
 .vivi-btn-dark {
-  background: var(--vivi-dark);
+  background: var(--anvil-cyan);
   color: #fff;
 }
 
 .vivi-btn-dark:hover {
-  filter: brightness(1.08);
+  background: var(--anvil-royal-deep);
 }
 
 .vivi-nav {
-  background: #fff;
+  background: #1b2a38;
+  border: none;
 }
 
 .vivi-nav-link {
-  color: var(--vivi-dark);
+  color: rgba(255, 255, 255, 0.92);
   font-weight: 600;
 }
 
 .vivi-nav-link:hover {
-  color: var(--vivi-primary);
+  color: #7ec8e3;
 }
 
 /* template-like motion helpers */
@@ -384,6 +407,14 @@ select {
   filter: blur(0px);
 }
 
+.scroll-reveal.is-visible.is-from-up {
+  animation: scrollPulseUp 420ms ease-out;
+}
+
+.scroll-reveal.is-visible.is-from-down {
+  animation: scrollPulseDown 420ms ease-out;
+}
+
 /* Direction / style variants */
 .scroll-reveal--up {
   --reveal-x: 0px;
@@ -402,11 +433,43 @@ select {
   --reveal-y: 18px;
 }
 
+@keyframes scrollPulseUp {
+  0% {
+    transform: translate3d(0, 16px, 0) scale(0.985);
+  }
+  100% {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+}
+
+@keyframes scrollPulseDown {
+  0% {
+    transform: translate3d(0, -16px, 0) scale(0.985);
+  }
+  100% {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+}
+
+@keyframes bigCardBreath {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-2px);
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .scroll-reveal {
     opacity: 1;
     transform: none;
     filter: none;
+    transition: none;
+  }
+  .big-card-motion {
+    animation: none;
     transition: none;
   }
 }

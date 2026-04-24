@@ -34,12 +34,12 @@ export default function SiteNavbar({
 
   const navItemCls =
     variant === 'light'
-      ? 'vivi-nav-link hover:bg-[var(--vivi-light)]'
+      ? 'vivi-nav-link hover:bg-white/10'
       : 'border border-white/20 bg-white/5 text-white hover:bg-white/10'
 
   const dropdownShellCls =
     variant === 'light'
-      ? 'bg-white/95 border-slate-200/90 shadow-lg'
+      ? 'border-[color:color-mix(in_srgb,var(--anvil-cyan)_34%,white)] bg-white shadow-lg'
       : 'bg-slate-950/55 border-white/15 shadow-xl'
 
   const stickyCls = sticky ? 'sticky top-0 z-50' : ''
@@ -50,33 +50,33 @@ export default function SiteNavbar({
 
   return (
     <header className={shell}>
-      <div className="mx-auto w-full max-w-7xl px-4 py-3 sm:px-6">
+      <div className="mx-auto w-full max-w-7xl px-0 py-0">
         <div
-          className={`flex w-full flex-wrap items-center justify-between gap-3 px-4 py-3 shadow-sm sm:px-6 ${
+          className={`flex w-full flex-wrap items-center justify-between gap-3 px-4 py-3 sm:px-6 ${
             variant === 'light'
-              ? 'vivi-nav bg-white/95 backdrop-blur-md'
+              ? 'vivi-nav backdrop-blur-md'
               : 'bg-slate-950/45 backdrop-blur-xl'
           }`}
         >
         <Link to="/" className="flex min-w-0 items-center gap-3 text-left transition hover:opacity-95">
           <div
             className={`h-10 w-10 shrink-0 overflow-hidden rounded-lg ring-1 ${
-              variant === 'light' ? 'bg-white ring-slate-200' : 'bg-white/10 ring-white/20'
+              variant === 'light' ? 'bg-white/95 ring-[color:color-mix(in_srgb,var(--anvil-cyan)_35%,white)]' : 'bg-white/10 ring-white/20'
             }`}
           >
             <img
-              src="/Screenshot%202026-04-03%20164428.png"
+              src="/main%20logo/anvil-logo.png"
               alt="Anvil logo"
               className="h-full w-full object-cover"
             />
           </div>
           <div className="min-w-0">
-            <p className={`text-xs font-medium uppercase tracking-wide ${variant === 'light' ? 'text-(--anvil-red)' : 'text-white/75'}`}>
+            <p className={`text-xs font-medium uppercase tracking-wide ${variant === 'light' ? 'text-white/75' : 'text-white/75'}`}>
               Anvil
             </p>
             <p
               className={`truncate text-lg font-extrabold tracking-tight ${
-                variant === 'light' ? 'text-(--anvil-red)' : 'text-white'
+                variant === 'light' ? 'text-white' : 'text-white'
               }`}
             >
               Coding Academy

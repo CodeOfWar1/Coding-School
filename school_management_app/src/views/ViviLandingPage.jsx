@@ -77,12 +77,6 @@ const GALLERY_SHOWCASE = [
   { title: 'Classroom Events', text: 'Hack-day activities, showcases, and celebration events.', img: SCHOOL_MEDIA_IMAGES.classC },
 ]
 
-/** Hero titles that use brand red (others stay white for contrast on the photo). */
-const HERO_RED_TITLES = new Set([
-  'The Best Coding School For Your Child',
-  'Make A Brighter Future For Your Child',
-])
-
 /** Home “About” teaser — images + short value lines (mirrors academy pillars). */
 const ABOUT_TEASER_VALUES = [
   {
@@ -133,7 +127,7 @@ export default function ViviLandingPage() {
   const [feedbackList, setFeedbackList] = useState(INITIAL_PARENT_FEEDBACK)
   const [feedbackForm, setFeedbackForm] = useState({ name: '', message: '' })
 
-  const revealRef = useScrollReveal({ rootMargin: '0px 0px -10% 0px', threshold: 0.06 })
+  const revealRef = useScrollReveal({ rootMargin: '0px 0px -10% 0px', threshold: 0.06, once: false })
 
   useEffect(() => {
     setHero(DEFAULT_HERO)
@@ -166,13 +160,13 @@ export default function ViviLandingPage() {
   }, [heroSlides.length])
 
   return (
-    <div ref={revealRef} className="vivi-page min-h-screen bg-[var(--vivi-light)]">
+    <div ref={revealRef} className="vivi-page anvil-dynamic-bg min-h-screen bg-[var(--vivi-light)]">
       <RegisterModal open={paymentOpen} onClose={() => setPaymentOpen(false)} />
-      <div className="mx-auto w-full max-w-7xl overflow-hidden bg-white shadow-sm">
+      <div className="mx-auto w-full max-w-7xl overflow-hidden bg-white shadow-[0_18px_55px_rgba(26,50,82,0.14)] ring-1 ring-[color:color-mix(in_srgb,var(--anvil-cyan)_24%,white)]">
         <SiteNavbar variant="light" onRegisterPay={() => setPaymentOpen(true)} sticky showRegisterPay />
 
         {/* Carousel Start (vivi/index.html) */}
-        <section className="relative h-[560px] lg:h-[640px] overflow-hidden">
+        <section className="relative h-[560px] overflow-hidden lg:h-[640px]">
         {heroSlides.map((s, idx) => (
           <div
             key={idx}
@@ -187,7 +181,7 @@ export default function ViviLandingPage() {
                 idx === slide ? 'scale-105' : 'scale-100'
               }`}
             />
-            <div className="absolute inset-0 bg-[rgba(16,55,65,0.45)]" />
+            <div className="absolute inset-0 bg-[rgba(16,34,52,0.46)]" />
           </div>
         ))}
 
@@ -212,9 +206,7 @@ export default function ViviLandingPage() {
                     }`}
                   >
                     <h1
-                      className={`vivi-heading text-4xl leading-tight sm:text-5xl lg:text-6xl ${
-                        HERO_RED_TITLES.has(s.title) ? '!text-[var(--anvil-red)]' : '!text-white'
-                      }`}
+                      className="vivi-heading text-4xl leading-tight !text-white sm:text-5xl lg:text-6xl"
                     >
                       {s.title}
                     </h1>
@@ -300,7 +292,7 @@ export default function ViviLandingPage() {
         {/* About teaser — visual values + link to full About page */}
         <section className="py-12 sm:py-14">
           <div className="px-4 sm:px-6">
-            <div className="overflow-hidden rounded-2xl border border-[color:color-mix(in_srgb,var(--anvil-royal)_12%,white)] bg-gradient-to-br from-[var(--anvil-card-faint)] via-white to-[var(--vivi-light)] p-6 shadow-sm sm:p-8 lg:p-10">
+            <div className="big-card-motion overflow-hidden rounded-2xl border border-[color:color-mix(in_srgb,var(--anvil-royal)_12%,white)] bg-gradient-to-br from-[var(--anvil-card-faint)] via-white to-[var(--vivi-light)] p-6 shadow-sm sm:p-8 lg:p-10">
               <div className="grid items-center gap-10 lg:grid-cols-2">
                 <div>
                   <p className="text-xs font-black uppercase tracking-[0.22em] text-[var(--anvil-red)]">About us</p>
@@ -341,7 +333,7 @@ export default function ViviLandingPage() {
         {/* Call To Action Start */}
         <section className="py-14">
           <div className="px-4 sm:px-6">
-          <div className="overflow-hidden bg-[var(--anvil-card-faint)]">
+          <div className="big-card-motion overflow-hidden bg-[var(--anvil-card-faint)]">
             <div className="grid lg:grid-cols-2">
               <div className="relative min-h-[320px] overflow-hidden rounded-xl bg-white">
                 <img
@@ -351,7 +343,7 @@ export default function ViviLandingPage() {
                 />
                 <div className="absolute inset-0 bg-[rgba(16,55,65,0.25)]" />
               </div>
-              <div className="bg-[var(--anvil-card-faint)] p-8 lg:p-10">
+              <div className="big-card-motion bg-[var(--anvil-card-faint)] p-8 lg:p-10">
                 <div className="scroll-reveal scroll-reveal--zoom">
                   <h2 className="vivi-heading text-3xl text-[var(--anvil-red)]">Choose the right next step</h2>
                   <p className="mt-3 text-sm leading-relaxed text-[var(--vivi-muted)]">
@@ -375,7 +367,7 @@ export default function ViviLandingPage() {
         {/* Classes Start */}
         <section className="py-14">
           <div className="px-4 sm:px-6">
-          <div className="rounded-xl bg-[var(--anvil-card-faint)] p-6 sm:p-8">
+          <div className="big-card-motion rounded-xl bg-[var(--anvil-card-faint)] p-6 sm:p-8">
           <div className="mx-auto mb-10 max-w-2xl text-center">
             <p className="text-xs font-bold uppercase tracking-[0.2em] text-[var(--anvil-red)]">School Classes</p>
             <h2 className="vivi-heading mt-2 text-3xl text-[var(--anvil-red)]">Programs for ages 5-19 years</h2>
@@ -421,9 +413,9 @@ export default function ViviLandingPage() {
         {/* Appointment Start */}
         <section id="appointment" className="py-14">
           <div className="px-4 sm:px-6">
-          <div className="overflow-hidden bg-[var(--anvil-card-faint)]">
+          <div className="big-card-motion overflow-hidden bg-[var(--anvil-card-faint)]">
             <div className="grid lg:grid-cols-2">
-              <div className="bg-[var(--anvil-card-faint)] p-8 lg:p-10">
+              <div className="big-card-motion bg-[var(--anvil-card-faint)] p-8 lg:p-10">
                 <div className="scroll-reveal scroll-reveal--left">
                   <h2 className="vivi-heading text-3xl text-[var(--anvil-red)]">Book an Appointment</h2>
                   <p className="mt-3 text-sm text-[var(--vivi-muted)]">
@@ -462,7 +454,7 @@ export default function ViviLandingPage() {
         {/* Team Start (Popular Teachers) */}
         <section className="py-14">
           <div className="px-4 sm:px-6">
-            <div className="rounded-xl bg-[var(--anvil-card-faint)] p-6 sm:p-8">
+            <div className="big-card-motion rounded-xl bg-[var(--anvil-card-faint)] p-6 sm:p-8">
           <div className="mx-auto mb-10 max-w-2xl text-center">
             <p className="text-xs font-bold uppercase tracking-[0.2em] text-[var(--anvil-red)]">Popular Teachers</p>
             <h2 className="vivi-heading mt-2 text-3xl text-[var(--anvil-red)]">Meet our mentors</h2>
@@ -566,7 +558,7 @@ export default function ViviLandingPage() {
         {/* Photo Gallery */}
         <section className="py-12">
           <div className="px-4 sm:px-6">
-          <div className="rounded-xl bg-[var(--anvil-card-faint)] p-6 sm:p-8">
+          <div className="big-card-motion rounded-xl bg-[var(--anvil-card-faint)] p-6 sm:p-8">
           <div className="mx-auto mb-10 max-w-2xl text-center">
             <h2 className="vivi-heading text-3xl text-[var(--anvil-red)]">Activity Gallery</h2>
             <p className="mt-3 text-sm text-[var(--vivi-muted)]">
@@ -605,7 +597,7 @@ export default function ViviLandingPage() {
         {/* Partners */}
         <section className="py-12">
           <div className="px-4 sm:px-6">
-            <div className="rounded-xl bg-[var(--anvil-card-faint)] p-6 sm:p-8">
+            <div className="big-card-motion rounded-xl bg-[var(--anvil-card-faint)] p-6 sm:p-8">
               <div className="mx-auto mb-8 max-w-2xl text-center">
                 <h2 className="vivi-heading text-3xl text-[var(--anvil-red)]">Partners</h2>
                 <p className="mt-3 text-sm text-[var(--vivi-muted)]">
@@ -639,7 +631,7 @@ export default function ViviLandingPage() {
         {/* Newsletter teaser + quick links */}
         <section className="pb-12">
           <div className="px-4 sm:px-6">
-            <div className="overflow-hidden rounded-2xl border border-red-100/80 bg-gradient-to-br from-white via-white to-[var(--anvil-card-faint)] p-6 shadow-sm sm:p-8">
+            <div className="big-card-motion overflow-hidden rounded-2xl border border-red-100/80 bg-gradient-to-br from-white via-white to-[var(--anvil-card-faint)] p-6 shadow-sm sm:p-8">
               <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_280px] lg:items-center">
                 <div>
                   <p className="text-xs font-bold uppercase tracking-wide text-(--anvil-red)">Stay in the loop</p>
@@ -665,7 +657,7 @@ export default function ViviLandingPage() {
                     </Link>
                   </div>
                 </div>
-                <div className="rounded-xl bg-[var(--anvil-card-faint)] p-6 ring-1 ring-slate-200/60">
+                <div className="big-card-motion rounded-xl bg-[var(--anvil-card-faint)] p-6 ring-1 ring-slate-200/60">
                   <h3 className="vivi-heading text-lg text-[var(--anvil-red)]">Quick links</h3>
                   <div className="mt-4 grid gap-2 text-sm">
                     {[
