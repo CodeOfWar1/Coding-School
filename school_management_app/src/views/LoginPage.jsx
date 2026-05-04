@@ -1,124 +1,150 @@
-import { useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { useState, useEffect } from 'react'
+import { useNavigate, Link } from 'react-router-dom'
+import { supabase } from '../lib/supabase'
 import { useAuth } from '../state/AuthContext'
-import { isDemoMode, supabase } from '../lib/supabase'
-import SiteNavbar from '../components/SiteNavbar'
+import { FaEnvelope, FaLock, FaArrowRight } from 'react-icons/fa'
+import logoImage from '../assets/logo.png'
 
 export default function LoginPage() {
-  const navigate = useNavigate()
-  const { login } = useAuth()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
-  const [role, setRole] = useState('student')
   const [error, setError] = useState('')
-  const [submitting, setSubmitting] = useState(false)
+  const [loading, setLoading] = useState(false)
+  const [showPassword, setShowPassword] = useState(false)
 
-  const onSubmit = async (e) => {
+  const navigate = useNavigate()
+  const { user, profile } = useAuth()
+
+useEffect(() => {
+  if (!user || !profile) return
+
+  if (!user.email_confirmed_at) return
+
+  if (profile.role === 'student') {
+    navigate('/dashboard/student', { replace: true })
+  } else if (profile.role === 'parent') {
+    navigate('/dashboard/parent', { replace: true })
+  } else if (profile.role === 'admin') {
+    navigate('/dashboard/admin', { replace: true })
+  }
+}, [user, profile])
+
+  const handleLogin = async (e) => {
     e.preventDefault()
+    setLoading(true)
     setError('')
-    setSubmitting(true)
-    if (isDemoMode) {
-      login({ email, role })
-      navigate('/dashboard')
-      setSubmitting(false)
+
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    })
+
+    if (error) {
+      setError(error.message)
+      setLoading(false)
       return
     }
-    try {
-      const { error: signInError } = await supabase.auth.signInWithPassword({ email, password })
-      if (signInError) {
-        setError(signInError.message)
-        setSubmitting(false)
-        return
-      }
-      const { data: profileData } = await supabase.from('profiles').select('role').eq('id', (await supabase.auth.getUser()).data.user?.id).maybeSingle()
-      if (!profileData?.role) {
-        setError('Account authenticated, but no role profile exists yet. Contact admin.')
-        setSubmitting(false)
-        return
-      }
-      navigate('/dashboard')
-    } catch {
-      setError('Unable to reach Supabase.')
-    } finally {
-      setSubmitting(false)
+
+    // Email not verified
+    if (data.user && !data.user.email_confirmed_at) {
+      setError('Please verify your email before logging in. Check your inbox!')
+      await supabase.auth.signOut()
+      setLoading(false)
+      return
     }
+
+    // Success - let AuthContext handle the redirect
+    setLoading(false)
   }
 
   return (
-    <div className="vivi-page min-h-screen bg-[var(--vivi-light)]">
-      <div className="mx-auto w-full max-w-7xl overflow-hidden bg-white shadow-sm">
-        <SiteNavbar variant="light" sticky showRegisterPay={false} />
-      <div className="flex items-center justify-center px-4 pb-16 pt-8">
-        <form
-          onSubmit={onSubmit}
-          className="w-full max-w-md rounded-xl bg-[var(--anvil-card-faint)] p-8"
-        >
-          <h1 className="vivi-heading text-center text-3xl tracking-tight text-slate-900">Sign in</h1>
-          <p className="mt-2 text-center text-sm text-slate-600">
-            Access your Anvil portal securely. Use your registered email and password.
-          </p>
-          {isDemoMode && (
-            <p className="mt-4 rounded-xl border border-amber-200 bg-amber-50 px-3 py-2 text-xs text-amber-900">
-              Demo mode: pick a role to preview dashboards — no password check.
-            </p>
-          )}
-          <label className="mt-6 block text-xs font-semibold uppercase tracking-wide text-slate-500">
-            Email
-            <input
-              className="mt-1.5 w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-900 outline-none ring-sky-500/25 focus:ring-2"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              type="email"
-              required
-            />
-          </label>
-          {!isDemoMode && (
-            <label className="mt-4 block text-xs font-semibold uppercase tracking-wide text-slate-500">
-              Password
-              <input
-                className="mt-1.5 w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-900 outline-none ring-sky-500/25 focus:ring-2"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                type="password"
-                required
-              />
-            </label>
-          )}
-          {isDemoMode && (
-            <label className="mt-4 block text-xs font-semibold uppercase tracking-wide text-slate-500">
-              Role (demo preview)
-              <select
-                className="mt-1.5 w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm font-medium text-slate-900 outline-none ring-sky-500/25 focus:ring-2"
-                value={role}
-                onChange={(e) => setRole(e.target.value)}
-              >
-                <option value="admin">Admin</option>
-                <option value="finance">Finance</option>
-                <option value="student">Student</option>
-                <option value="parent">Parent</option>
-              </select>
-            </label>
-          )}
-          {error && (
-            <p className="mt-4 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-800">{error}</p>
-          )}
-          <button
-            type="submit"
-            className="vivi-btn vivi-btn-primary mt-6 w-full rounded-full py-3.5 text-sm font-bold text-white shadow-lg"
-            disabled={submitting}
-          >
-            {submitting ? 'Signing in...' : 'Sign in'}
-          </button>
-          <p className="mt-6 text-center text-sm text-slate-600">
-            <Link
-              to="/"
-              className="font-semibold text-[var(--app-brand)] hover:text-[var(--app-brand-hover)] hover:underline"
-            >
-              ← Back to home
-            </Link>
-          </p>
-        </form>
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-50 to-gray-100 py-12 px-4 sm:px-6 lg:px-8">
+      <div className="absolute inset-0 overflow-hidden">
+        <div className="absolute -top-40 -right-40 w-80 h-80 bg-[#faa853]/10 rounded-full blur-3xl"></div>
+        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-[#2d3f5d]/10 rounded-full blur-3xl"></div>
       </div>
+
+      <div className="max-w-md w-full relative">
+        {/* Logo */}
+        <div className="text-center mb-8">
+          <div className="flex justify-center mb-4">
+            <img src={logoImage} alt="Logo" className="h-20 w-auto" />
+          </div>
+          <p className="mt-2 text-gray-500">Welcome back! Please sign in to continue</p>
+        </div>
+
+        <div className="bg-white rounded-2xl shadow-xl p-8">
+          <form onSubmit={handleLogin} className="space-y-6">
+            {error && (
+              <div className="bg-red-50 border-l-4 border-red-500 text-red-700 px-4 py-3 rounded-lg text-sm">
+                <p className="font-medium">Error</p>
+                <p>{error}</p>
+              </div>
+            )}
+
+            {/* Email */}
+            <div>
+              <label className="block text-sm font-semibold text-[#2d3f5d] mb-2">
+                Email Address
+              </label>
+              <div className="relative">
+                <FaEnvelope className="absolute left-3 top-3 text-gray-400" />
+                <input
+                  type="email"
+                  required
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="w-full pl-10 py-3 border rounded-xl focus:ring-2 focus:ring-[#faa853] focus:border-transparent outline-none"
+                  placeholder="you@example.com"
+                />
+              </div>
+            </div>
+
+            {/* Password */}
+            <div>
+              <label className="block text-sm font-semibold text-[#2d3f5d] mb-2">
+                Password
+              </label>
+              <div className="relative">
+                <FaLock className="absolute left-3 top-3 text-gray-400" />
+                <input
+                  type={showPassword ? 'text' : 'password'}
+                  required
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="w-full pl-10 py-3 border rounded-xl focus:ring-2 focus:ring-[#faa853] focus:border-transparent outline-none"
+                  placeholder="••••••••"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-3 text-sm text-gray-500 hover:text-[#faa853]"
+                >
+                  {showPassword ? 'Hide' : 'Show'}
+                </button>
+              </div>
+            </div>
+
+            {/* Submit */}
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full flex items-center justify-center gap-2 py-3 bg-[#faa853] text-white rounded-xl font-semibold hover:bg-[#e89235] transition-all disabled:opacity-50"
+            >
+              {loading ? 'Signing in...' : (
+                <>
+                  Sign In <FaArrowRight />
+                </>
+              )}
+            </button>
+
+            <div className="text-center">
+              <Link to="/" className="text-[#faa853] font-semibold hover:text-[#e89235]">
+                Register Now
+              </Link>
+            </div>
+          </form>
+        </div>
       </div>
     </div>
   )

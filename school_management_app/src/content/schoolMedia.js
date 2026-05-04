@@ -1,5 +1,5 @@
 // Use encodeURI so spaces are encoded but filename characters like "&" and parentheses remain resolvable by Vite static serving.
-const mediaPath = (fileName) => `/media/school%20img/${encodeURI(fileName)}`
+const mediaPath = (fileName) => `/media/gallery/${encodeURI(fileName)}`
 const partnerLogoPath = (fileName) => `/media/partner%20logos/${encodeURI(fileName)}`
 
 export const SCHOOL_MEDIA_IMAGES = {
