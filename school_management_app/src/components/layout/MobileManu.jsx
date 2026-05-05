@@ -1,6 +1,5 @@
 import { useEffect } from 'react'
 import { FaSchool, FaChalkboardTeacher, FaLaptopCode, FaUsers, FaImage, FaEnvelope, FaHandshake } from 'react-icons/fa'
-import { useNavigate } from 'react-router-dom'
 
 const MOBILE_NAV_ITEMS = [
   { id: 'home', label: 'Home', icon: FaSchool },
@@ -13,13 +12,7 @@ const MOBILE_NAV_ITEMS = [
 ]
 
 export default function MobileMenu({ isOpen, onClose, scrollToSection, onRegisterClick, onLoginClick, activeSection }) {
-  const navigate = useNavigate()
-
   const handleNavClick = (sectionId) => {
-    if (sectionId === 'about') {
-      navigate('/about')
-      return
-    }
     scrollToSection(sectionId)
   }
 
@@ -39,7 +32,7 @@ export default function MobileMenu({ isOpen, onClose, scrollToSection, onRegiste
       <div className="absolute right-0 top-0 bottom-0 w-64 bg-white shadow-xl">
         <div className="flex flex-col h-full">
           <div className="p-6 border-b border-gray-100">
-            <h2 className="text-xl font-black text-[#2d3f5d]">Menu</h2>
+            <h2 className="text-xl font-black text-secondary">Menu</h2>
           </div>
           
           <div className="flex-1 py-6">
@@ -51,8 +44,8 @@ export default function MobileMenu({ isOpen, onClose, scrollToSection, onRegiste
                   onClick={() => handleNavClick(item.id)}
                   className={`w-full flex items-center gap-3 px-6 py-3 text-left transition-all duration-300 ${
                     activeSection === item.id
-                      ? 'bg-[#faa853]/10 text-[#faa853] border-l-4 border-[#faa853]'
-                      : 'text-[#2d3f5d] hover:bg-gray-50'
+                      ? 'bg-primary/10 text-primary border-l-4 border-primary'
+                      : 'text-secondary hover:bg-gray-50'
                   }`}
                   style={{ animationDelay: `${idx * 50}ms` }}
                 >
@@ -66,13 +59,13 @@ export default function MobileMenu({ isOpen, onClose, scrollToSection, onRegiste
           <div className="p-6 border-t border-gray-100 space-y-3">
             <button
               onClick={onLoginClick}
-              className="w-full py-3 rounded-full border-2 border-[#faa853] text-[#faa853] font-semibold hover:bg-[#faa853] hover:text-white transition-all"
+              className="w-full py-3 rounded-full border-2 border-primary text-primary font-semibold hover:bg-primary hover:text-white transition-all"
             >
               Login
             </button>
             <button
               onClick={onRegisterClick}
-              className="w-full py-3 rounded-full bg-[#faa853] text-white font-semibold hover:bg-[#faa853]/90 transition-all"
+              className="w-full py-3 rounded-full bg-primary text-white font-semibold hover:bg-primary/90 transition-all"
             >
               Register Now
             </button>

@@ -40,10 +40,6 @@ export default function Navbar({ activeSection, scrollToSection, onRegisterClick
   }
 
   const handleNavClick = (itemId) => {
-    if (itemId === 'about') {
-      navigate('/about')
-      return
-    }
     scrollToSection(itemId)
   }
 
@@ -74,13 +70,13 @@ export default function Navbar({ activeSection, scrollToSection, onRegisterClick
                   onClick={() => handleNavClick(item.id)}
                   className={`px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-300 relative group ${
                     activeSection === item.id
-                      ? 'text-[#faa853]'
-                      : 'text-[#2d3f5d] hover:text-[#faa853]'
+                      ? 'text-primary'
+                      : 'text-secondary hover:text-primary'
                   }`}
                 >
                   {item.label}
                   {activeSection === item.id && (
-                    <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-6 h-0.5 bg-[#faa853] rounded-full animate-fade-in" />
+                    <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-6 h-0.5 bg-primary rounded-full animate-fade-in" />
                   )}
                 </button>
               ))}
@@ -90,13 +86,13 @@ export default function Navbar({ activeSection, scrollToSection, onRegisterClick
             <div className="hidden md:flex items-center gap-3">
               <button
                 onClick={handleLogin}
-                className="px-6 py-2 rounded-full border-2 border-[#faa853] text-[#faa853] font-semibold text-sm hover:bg-[#faa853] hover:text-white transition-all hover:scale-105"
+                className="px-6 py-2 rounded-full border-2 border-primary text-primary font-semibold text-sm hover:bg-primary hover:text-white transition-all hover:scale-105"
               >
                 Login
               </button>
               <button
                 onClick={onRegisterClick}
-                className="px-6 py-2 rounded-full bg-[#faa853] text-white font-semibold text-sm hover:bg-[#faa853]/90 transition-all hover:scale-105 shadow-md hover:shadow-lg"
+                className="px-6 py-2 rounded-full bg-primary text-white font-semibold text-sm hover:bg-primary/90 transition-all hover:scale-105 shadow-md hover:shadow-lg"
               >
                 Register Now
               </button>
@@ -105,7 +101,7 @@ export default function Navbar({ activeSection, scrollToSection, onRegisterClick
             {/* Mobile Menu Button */}
             <button
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              className="md:hidden p-2 rounded-lg text-[#2d3f5d] hover:bg-[#faa853]/10 transition-colors"
+              className="md:hidden p-2 rounded-lg text-secondary hover:bg-primary/10 transition-colors"
             >
               {isMobileMenuOpen ? <FaTimes size={24} /> : <FaBars size={24} />}
             </button>

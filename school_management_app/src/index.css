@@ -2,6 +2,15 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Brand palette — mirrors tailwind `primary` / `secondary` / `primary-hover` */
+@layer base {
+  :root {
+    --color-primary: #faa853;
+    --color-primary-hover: #e89235;
+    --color-secondary: #2d3f5d;
+  }
+}
+
 /* Your existing animations - KEEP THEM AS IS */
 @keyframes slideInUp {
   from {
@@ -129,6 +138,16 @@
   transition: all 0.6s ease-out;
 }
 
+.scroll-reveal--left {
+  opacity: 0;
+  transform: translateX(-28px);
+}
+
+.scroll-reveal--right {
+  opacity: 0;
+  transform: translateX(28px);
+}
+
 .scroll-reveal.revealed {
   opacity: 1;
   transform: translateY(0);
@@ -142,6 +161,20 @@
 .scroll-reveal--right.revealed {
   opacity: 1;
   transform: translateX(0);
+}
+
+/* About page: first “Who we are” card — stronger scroll-in */
+.scroll-reveal.scroll-reveal--about-hero {
+  opacity: 0;
+  transform: translateY(36px) scale(0.98);
+  transition:
+    opacity 0.75s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.75s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.scroll-reveal.scroll-reveal--about-hero.revealed {
+  opacity: 1;
+  transform: translateY(0) scale(1);
 }
 
 /* Hover Effects */
@@ -166,12 +199,12 @@
   }
   
   .scrollbar-thin::-webkit-scrollbar-thumb {
-    background: #faa853;
+    background: var(--color-primary);
     border-radius: 3px;
   }
   
   .scrollbar-thin::-webkit-scrollbar-thumb:hover {
-    background: #e89235;
+    background: var(--color-primary-hover);
   }
 }
 

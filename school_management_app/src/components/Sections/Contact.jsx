@@ -1,7 +1,18 @@
-import { forwardRef } from 'react'
-import { MdOutlineEmail, MdPhone, MdLocationOn } from 'react-icons/md'
+import { forwardRef, useState } from 'react'
+import { MdOutlineEmail, MdPhone, MdLocationOn, MdKeyboardArrowDown } from 'react-icons/md'
 
 const Contact = forwardRef((_, ref) => {
+  const [interestMenuOpen, setInterestMenuOpen] = useState(false)
+  const [selectedInterest, setSelectedInterest] = useState('')
+
+  const interestOptions = [
+    'Events',
+    'Director',
+    'Administrator',
+    'Partnerships',
+    'Job Interviews',
+  ]
+
   const handleSubmit = (e) => {
     e.preventDefault()
     alert('Thanks! We will contact you shortly.')
@@ -81,14 +92,45 @@ const Contact = forwardRef((_, ref) => {
                 className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#faa853] transition-all"
                 required
               />
-              <select className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#faa853] transition-all">
-                <option>Select Program Interest</option>
-                <option>Digital Literacy</option>
-                <option>Python Programming</option>
-                <option>Robotics</option>
-                <option>Web Development</option>
-                <option>Game Design</option>
-              </select>
+              <div className="relative">
+                <button
+                  type="button"
+                  onClick={() => setInterestMenuOpen((prev) => !prev)}
+                  className="w-full flex items-center justify-between px-4 py-3 rounded-2xl bg-[#1f3157] text-white font-semibold shadow-md focus:outline-none focus:ring-2 focus:ring-[#faa853] transition-all"
+                >
+                  <span>{selectedInterest || 'Area of Interest'}</span>
+                  <span className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center">
+                    <MdKeyboardArrowDown
+                      className={`text-2xl text-[#faa853] transition-transform ${interestMenuOpen ? 'rotate-180' : ''}`}
+                    />
+                  </span>
+                </button>
+
+                {interestMenuOpen && (
+                  <div className="absolute z-20 mt-2 w-full rounded-2xl border border-gray-200 bg-[#f7f7f9] shadow-xl p-3">
+                    <p className="text-sm font-semibold text-gray-500 mb-2 px-1">Choose what to view</p>
+                    <div className="grid grid-cols-2 gap-2">
+                    {interestOptions.map((option) => (
+                      <button
+                        key={option}
+                        type="button"
+                        onClick={() => {
+                          setSelectedInterest(option)
+                          setInterestMenuOpen(false)
+                        }}
+                        className={`w-full text-center px-3 py-2.5 rounded-xl text-sm font-semibold transition-colors ${
+                          selectedInterest === option
+                            ? 'bg-[#f2a24b] text-white'
+                            : 'bg-[#e8e9ed] text-[#2d3f5d] hover:bg-[#dfe1e7]'
+                        }`}
+                      >
+                        {option}
+                      </button>
+                    ))}
+                    </div>
+                  </div>
+                )}
+              </div>
               <button
                 type="submit"
                 className="w-full py-3 rounded-full bg-[#faa853] text-white font-semibold hover:bg-[#faa853]/90 transition-all"

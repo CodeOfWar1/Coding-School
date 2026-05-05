@@ -1,14 +1,14 @@
 import { useState, useEffect, useRef } from 'react'
 import Navbar from '../components/layout/Navbar'
 import Footer from '../components/layout/Footer'
-import Hero from '../components/sections/Hero'
-import About from '../components/sections/About'
-import Classes from '../components/sections/Classes'
-import Team from '../components/sections/Team'
-import Gallery from '../components/sections/Gallery'
-import Partners from '../components/sections/Partners'
-import Testimonials from '../components/sections/Testimonials'
-import Contact from '../components/sections/Contact'
+import Hero from '../components/Sections/Hero'
+import About from '../components/Sections/About'
+import Classes from '../components/Sections/Classes'
+import Team from '../components/Sections/Team'
+import Gallery from '../components/Sections/Gallery'
+import Partners from '../components/Sections/Partners'
+import Testimonials from '../components/Sections/Testimonials'
+import Contact from '../components/Sections/Contact'
 import { SCHOOL_PROFILE } from '../content/siteProfile'
 import { SCHOOL_MEDIA_IMAGES } from '../content/schoolMedia'
 import RegisterModal from '../components/registration/RegisterModal'
@@ -83,7 +83,7 @@ export default function ViviLandingPage() {
       <button
         type="button"
         onClick={() => setSignUp(true)}
-        className="md:hidden fixed bottom-5 right-5 z-[70] px-5 py-3 rounded-full bg-[#faa853] text-white font-bold text-sm shadow-lg hover:bg-[#e89235] active:scale-95 transition-all"
+        className="md:hidden fixed bottom-5 right-5 z-[70] px-5 py-3 rounded-full bg-primary text-white font-bold text-sm shadow-lg hover:bg-primary-hover active:scale-95 transition-all"
       >
         Register
       </button>
