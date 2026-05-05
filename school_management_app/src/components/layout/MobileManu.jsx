@@ -1,16 +1,28 @@
 import { useEffect } from 'react'
-import { FaSchool, FaChalkboardTeacher, FaLaptopCode, FaUsers, FaImage, FaEnvelope } from 'react-icons/fa'
+import { FaSchool, FaChalkboardTeacher, FaLaptopCode, FaUsers, FaImage, FaEnvelope, FaHandshake } from 'react-icons/fa'
+import { useNavigate } from 'react-router-dom'
 
 const MOBILE_NAV_ITEMS = [
   { id: 'home', label: 'Home', icon: FaSchool },
-  { id: 'about', label: 'About', icon: FaChalkboardTeacher },
+  { id: 'about', label: 'About Us', icon: FaChalkboardTeacher },
   { id: 'classes', label: 'Classes', icon: FaLaptopCode },
   { id: 'team', label: 'Team', icon: FaUsers },
   { id: 'gallery', label: 'Gallery', icon: FaImage },
+  { id: 'partners', label: 'Partners', icon: FaHandshake },
   { id: 'contact', label: 'Contact', icon: FaEnvelope },
 ]
 
 export default function MobileMenu({ isOpen, onClose, scrollToSection, onRegisterClick, onLoginClick, activeSection }) {
+  const navigate = useNavigate()
+
+  const handleNavClick = (sectionId) => {
+    if (sectionId === 'about') {
+      navigate('/about')
+      return
+    }
+    scrollToSection(sectionId)
+  }
+
   useEffect(() => {
     if (isOpen) {
       document.body.style.overflow = 'hidden'
@@ -36,7 +48,7 @@ export default function MobileMenu({ isOpen, onClose, scrollToSection, onRegiste
               return (
                 <button
                   key={item.id}
-                  onClick={() => scrollToSection(item.id)}
+                  onClick={() => handleNavClick(item.id)}
                   className={`w-full flex items-center gap-3 px-6 py-3 text-left transition-all duration-300 ${
                     activeSection === item.id
                       ? 'bg-[#faa853]/10 text-[#faa853] border-l-4 border-[#faa853]'

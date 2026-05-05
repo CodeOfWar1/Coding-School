@@ -2,11 +2,12 @@ import { useState } from 'react'
 import { supabase } from '../../lib/supabase'
 import { FaEye, FaEyeSlash, FaCheckCircle, FaExclamationCircle } from 'react-icons/fa'
 
+const SYSTEM_STUDENT_EMAIL_DOMAIN = 'student.anvilcodingacademy.local'
+
 export default function StudentSignupForm({ onSuccess }) {
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
-    email: '',
     password: '',
     confirmPassword: '',
   })
@@ -30,14 +31,6 @@ export default function StudentSignupForm({ onSuccess }) {
       setError('Last name is required')
       return false
     }
-    if (!formData.email.trim()) {
-      setError('Email is required')
-      return false
-    }
-    if (!/\S+@\S+\.\S+/.test(formData.email)) {
-      setError('Please enter a valid email address')
-      return false
-    }
     if (!formData.password) {
       setError('Password is required')
       return false
@@ -53,6 +46,13 @@ export default function StudentSignupForm({ onSuccess }) {
     return true
   }
 
+  const buildStudentEmail = () => {
+    const first = formData.firstName.trim().toLowerCase().replace(/\s+/g, '')
+    const last = formData.lastName.trim().toLowerCase().replace(/\s+/g, '')
+    const stamp = Date.now()
+    return `${first}.${last}.${stamp}@${SYSTEM_STUDENT_EMAIL_DOMAIN}`
+  }
+
   const handleSubmit = async (e) => {
     e.preventDefault()
     if (!validateForm()) return
@@ -63,7 +63,7 @@ export default function StudentSignupForm({ onSuccess }) {
     try {
       // Sign up with Supabase
       const { data: authData, error: authError } = await supabase.auth.signUp({
-        email: formData.email,
+        email: buildStudentEmail(),
         password: formData.password,
         options: {
           data: {
@@ -76,6 +76,11 @@ export default function StudentSignupForm({ onSuccess }) {
       })
 
       if (authError) throw authError
+
+      // Best effort: clear profile email if backend trigger created one.
+      if (authData?.user?.id) {
+        await supabase.from('profiles').update({ email: null }).eq('id', authData.user.id)
+      }
 
       setSuccess(true)
     } catch (err) {
@@ -93,7 +98,7 @@ export default function StudentSignupForm({ onSuccess }) {
         </div>
         <h3 className="text-2xl font-bold text-[#2d3f5d] mb-2">Registration Successful!</h3>
         <p className="text-gray-600 mb-6">
-          Welcome to AnvilTech Academy, {formData.firstName}! Please check your email to verify your account.
+          Welcome to AnvilCodingAcademy, {formData.firstName}! Your student account has been created.
         </p>
         <button
           onClick={onSuccess}
@@ -139,22 +144,6 @@ export default function StudentSignupForm({ onSuccess }) {
               required
             />
           </div>
-        </div>
-
-        {/* Email */}
-        <div>
-          <label className="block text-sm font-semibold text-[#2d3f5d] mb-2">
-            Email Address *
-          </label>
-          <input
-            type="email"
-            name="email"
-            value={formData.email}
-            onChange={handleChange}
-            className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-[#faa853] focus:ring-2 focus:ring-[#faa853]/20 transition-all outline-none"
-            placeholder="you@example.com"
-            required
-          />
         </div>
 
         {/* Password */}

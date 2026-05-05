@@ -6,10 +6,11 @@ import logoImage from "../../assets/logo.png";
 
 const NAV_ITEMS = [
   { id: 'home', label: 'Home' },
-  { id: 'about', label: 'About' },
+  { id: 'about', label: 'About Us' },
   { id: 'classes', label: 'Classes' },
   { id: 'team', label: 'Team' },
   { id: 'gallery', label: 'Gallery' },
+  { id: 'partners', label: 'Partners' },
   { id: 'contact', label: 'Contact' },
 ]
 
@@ -38,6 +39,14 @@ export default function Navbar({ activeSection, scrollToSection, onRegisterClick
     navigate('/login')
   }
 
+  const handleNavClick = (itemId) => {
+    if (itemId === 'about') {
+      navigate('/about')
+      return
+    }
+    scrollToSection(itemId)
+  }
+
   return (
     <>
       <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
@@ -53,7 +62,7 @@ export default function Navbar({ activeSection, scrollToSection, onRegisterClick
               <img 
                 src={logoImage} 
                 alt="AnvilCoding Academy Logo" 
-                className="h-10 w-auto md:h-12 object-contain"
+                className="h-14 w-auto md:h-16 object-contain"
               />
             </button>
 
@@ -62,7 +71,7 @@ export default function Navbar({ activeSection, scrollToSection, onRegisterClick
               {NAV_ITEMS.map((item) => (
                 <button
                   key={item.id}
-                  onClick={() => scrollToSection(item.id)}
+                  onClick={() => handleNavClick(item.id)}
                   className={`px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-300 relative group ${
                     activeSection === item.id
                       ? 'text-[#faa853]'

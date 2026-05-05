@@ -7,6 +7,7 @@ import StudentDashboard from './views/StudentDashboard'
 import ParentDashboard from './views/ParentDashboard'
 import AdminDashboard from './views/AdminDashboard'
 import Gallery from './views/Gallery'
+import AboutPage from './views/AboutPage'
 import DashboardRedirect from './views/DashboardRedirect'
 
 function RouteGuard({ children, allowedRoles = [] }) {
@@ -58,6 +59,7 @@ export default function App() {
       {/* Public */}
       <Route path="/" element={<ViviLandingPage />} />
       <Route path="/gallery" element={<Gallery />} />
+      <Route path="/about" element={<AboutPage />} />
       <Route path="/login" element={<LoginPage />} />
 
       {/* Protected */}

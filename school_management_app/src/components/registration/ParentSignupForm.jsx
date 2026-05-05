@@ -120,7 +120,7 @@ export default function ParentSignupForm({ onSuccess }) {
         </div>
         <h3 className="text-2xl font-bold text-[#2d3f5d] mb-2">Registration Successful!</h3>
         <p className="text-gray-600 mb-6">
-          Welcome to AnvilTech Academy! Please check your email to verify your account.
+          Welcome to AnvilCodingAcademy! Please check your email to verify your account.
         </p>
         <button
           onClick={onSuccess}

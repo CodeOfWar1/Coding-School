@@ -6,6 +6,7 @@ import About from '../components/sections/About'
 import Classes from '../components/sections/Classes'
 import Team from '../components/sections/Team'
 import Gallery from '../components/sections/Gallery'
+import Partners from '../components/sections/Partners'
 import Testimonials from '../components/sections/Testimonials'
 import Contact from '../components/sections/Contact'
 import { SCHOOL_PROFILE } from '../content/siteProfile'
@@ -22,6 +23,7 @@ export default function ViviLandingPage() {
     classes: useRef(null),
     team: useRef(null),
     gallery: useRef(null),
+    partners: useRef(null),
     contact: useRef(null),
   }
 
@@ -73,6 +75,7 @@ export default function ViviLandingPage() {
         <Classes ref={sectionRefs.classes} onRegisterClick={() => setSignUp(true)} />
         <Team ref={sectionRefs.team} />
         <Gallery ref={sectionRefs.gallery} />
+        <Partners ref={sectionRefs.partners} />
         <Testimonials />
         <Contact ref={sectionRefs.contact} />
       </main>

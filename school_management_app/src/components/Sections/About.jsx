@@ -1,5 +1,6 @@
 import { forwardRef } from 'react'
 import { FaUsers, FaChalkboardTeacher, FaBriefcase, FaHandshake, FaArrowRight } from 'react-icons/fa'
+import { Link } from 'react-router-dom'
 import { SCHOOL_PROFILE } from '../../content/siteProfile'
 import { SCHOOL_MEDIA_IMAGES } from '../../content/schoolMedia'
 
@@ -59,13 +60,22 @@ const About = forwardRef(({ scrollToSection }, ref) => {
               Programs for learners aged <span className="text-[#faa853] font-bold">5–19</span> — project-based tech education with heart.
             </p>
             
-            <button
-              onClick={() => scrollToSection('classes')}
-              className="inline-flex items-center gap-2 text-[#faa853] font-semibold hover:gap-3 transition-all group"
-            >
-              Explore our programs 
-              <FaArrowRight className="text-sm group-hover:translate-x-1 transition-transform" />
-            </button>
+            <div className="flex flex-wrap items-center gap-4">
+              <button
+                onClick={() => scrollToSection('classes')}
+                className="inline-flex items-center gap-2 text-[#faa853] font-semibold hover:gap-3 transition-all group"
+              >
+                Explore our programs 
+                <FaArrowRight className="text-sm group-hover:translate-x-1 transition-transform" />
+              </button>
+              <Link
+                to="/about"
+                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-[#2d3f5d] text-white text-sm font-semibold hover:bg-[#1a2542] transition-all shadow-sm"
+              >
+                Learn more about us
+                <FaArrowRight className="text-xs" />
+              </Link>
+            </div>
           </div>
         </div>
       </div>

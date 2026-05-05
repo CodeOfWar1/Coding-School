@@ -58,7 +58,7 @@ export default function RegisterModal({ open, onClose }) {
             <div className="bg-gradient-to-r from-[#2d3f5d] to-[#1a2542] p-8 text-white">
               <div className="flex justify-between items-start">
                 <div>
-                  <p className="text-sm font-bold uppercase tracking-wider text-[#faa853]">Welcome to AnvilTech</p>
+                  <p className="text-sm font-bold uppercase tracking-wider text-[#faa853]">Welcome to AnvilCodingAcademy</p>
                   <h2 className="mt-2 text-3xl font-black">Join Our Community</h2>
                   <p className="mt-2 text-white/80">Choose how you'd like to sign up</p>
                 </div>
