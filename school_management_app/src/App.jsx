@@ -1,4 +1,5 @@
-import { Navigate, Route, Routes } from 'react-router-dom'
+import { useEffect } from 'react'
+import { Navigate, Route, Routes, useLocation } from 'react-router-dom'
 import { useAuth } from './state/AuthContext'
 
 import LoginPage from './views/LoginPage'
@@ -9,6 +10,16 @@ import AdminDashboard from './views/AdminDashboard'
 import Gallery from './views/Gallery'
 import AboutPage from './views/AboutPage'
 import DashboardRedirect from './views/DashboardRedirect'
+
+function ScrollToTopOnRouteChange() {
+  const { pathname } = useLocation()
+
+  useEffect(() => {
+    window.scrollTo({ top: 0, left: 0, behavior: 'auto' })
+  }, [pathname])
+
+  return null
+}
 
 function RouteGuard({ children, allowedRoles = [] }) {
   const { user, profile, authLoading, profileLoading } = useAuth()
@@ -55,48 +66,51 @@ export default function App() {
   }
 
   return (
-    <Routes>
-      {/* Public */}
-      <Route path="/" element={<ViviLandingPage />} />
-      <Route path="/gallery" element={<Gallery />} />
-      <Route path="/about" element={<AboutPage />} />
-      <Route path="/login" element={<LoginPage />} />
+    <>
+      <ScrollToTopOnRouteChange />
+      <Routes>
+        {/* Public */}
+        <Route path="/" element={<ViviLandingPage />} />
+        <Route path="/gallery" element={<Gallery />} />
+        <Route path="/about" element={<AboutPage />} />
+        <Route path="/login" element={<LoginPage />} />
 
-      {/* Protected */}
-      <Route
-        path="/dashboard/student"
-        element={
-          <RouteGuard allowedRoles={['student']}>
-            <StudentDashboard />
-          </RouteGuard>
-        }
-      />
+        {/* Protected */}
+        <Route
+          path="/dashboard/student"
+          element={
+            <RouteGuard allowedRoles={['student']}>
+              <StudentDashboard />
+            </RouteGuard>
+          }
+        />
 
-      <Route
-        path="/dashboard/parent"
-        element={
-          <RouteGuard allowedRoles={['parent']}>
-            <ParentDashboard />
-          </RouteGuard>
-        }
-      />
+        <Route
+          path="/dashboard/parent"
+          element={
+            <RouteGuard allowedRoles={['parent']}>
+              <ParentDashboard />
+            </RouteGuard>
+          }
+        />
 
-      <Route
-        path="/dashboard/admin"
-        element={
-          <RouteGuard allowedRoles={['admin']}>
-            <AdminDashboard />
-          </RouteGuard>
-        }
-      />
+        <Route
+          path="/dashboard/admin"
+          element={
+            <RouteGuard allowedRoles={['admin']}>
+              <AdminDashboard />
+            </RouteGuard>
+          }
+        />
 
-      {/* SINGLE REDIRECT ENTRY POINT */}
-      <Route
-        path="/dashboard"
-        element={<DashboardRedirect />}
-      />
+        {/* SINGLE REDIRECT ENTRY POINT */}
+        <Route
+          path="/dashboard"
+          element={<DashboardRedirect />}
+        />
 
-      <Route path="*" element={<Navigate to="/" replace />} />
-    </Routes>
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
+    </>
   )
 }

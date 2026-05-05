@@ -1,11 +1,17 @@
+import { useState } from 'react'
 import { FaArrowLeft, FaBullseye, FaEye, FaCheckCircle } from 'react-icons/fa'
 import { Link } from 'react-router-dom'
 import { SCHOOL_PROFILE, MISSION_VISION_VALUES, WHY_CHOOSE_ANVIL, OVERVIEW_FACTS } from '../content/siteProfile'
 import { SCHOOL_MEDIA_IMAGES } from '../content/schoolMedia'
+import RegisterModal from '../components/registration/RegisterModal'
 
 export default function AboutPage() {
+  const [signUp, setSignUp] = useState(false)
+
   return (
     <div className="min-h-screen bg-gray-50">
+      <RegisterModal open={signUp} onClose={() => setSignUp(false)} />
+
       <div className="bg-gradient-to-r from-[#2d3f5d] to-[#1a2542] text-white py-12 md:py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <Link to="/" className="inline-flex items-center gap-2 text-white/80 hover:text-white mb-6 transition-colors">
@@ -80,6 +86,14 @@ export default function AboutPage() {
           </div>
         </section>
       </div>
+
+      <button
+        type="button"
+        onClick={() => setSignUp(true)}
+        className="md:hidden fixed bottom-5 right-5 z-[70] px-5 py-3 rounded-full bg-[#faa853] text-white font-bold text-sm shadow-lg hover:bg-[#e89235] active:scale-95 transition-all"
+      >
+        Register
+      </button>
     </div>
   )
 }

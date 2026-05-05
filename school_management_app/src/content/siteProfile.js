@@ -244,9 +244,11 @@ export const SCHOOL_PROFILE = {
     duration: '8 months',
   },
   contact: {
-    email: 'anvilacademysales@gmail.com',
-    phone: '0773823113 / 0766981783',
-    address: '100/735, American Embassy Road, Ibex Hill, Lusaka',
+    email: 'admission@anvilcodingacademy.com',
+    phone: '+260 773823113',
+    localPhone: '773823113',
+    address: 'Ibex hill American embassy road, plot 100/735, Lusaka, Zambia',
+    social: 'anvilcodingschool',
   },
 }
 

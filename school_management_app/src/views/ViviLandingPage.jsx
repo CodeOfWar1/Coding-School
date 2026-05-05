@@ -79,6 +79,14 @@ export default function ViviLandingPage() {
         <Testimonials />
         <Contact ref={sectionRefs.contact} />
       </main>
+
+      <button
+        type="button"
+        onClick={() => setSignUp(true)}
+        className="md:hidden fixed bottom-5 right-5 z-[70] px-5 py-3 rounded-full bg-[#faa853] text-white font-bold text-sm shadow-lg hover:bg-[#e89235] active:scale-95 transition-all"
+      >
+        Register
+      </button>
       
       <Footer />
     </div>

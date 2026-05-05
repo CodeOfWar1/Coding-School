@@ -19,15 +19,43 @@ const Contact = forwardRef((_, ref) => {
             <div className="space-y-4">
               <div className="flex items-center gap-3 group hover:translate-x-2 transition-transform">
                 <MdOutlineEmail className="text-2xl" />
-                <span>info@anvilcoding.com</span>
+                <a href="mailto:admission@anvilcodingacademy.com" className="underline-offset-4 hover:underline">
+                  admission@anvilcodingacademy.com
+                </a>
               </div>
               <div className="flex items-center gap-3 group hover:translate-x-2 transition-transform">
                 <MdPhone className="text-2xl" />
-                <span>+260 123 456 789</span>
+                <a href="tel:773823113" className="underline-offset-4 hover:underline">
+                  773823113
+                </a>
               </div>
               <div className="flex items-center gap-3 group hover:translate-x-2 transition-transform">
                 <MdLocationOn className="text-2xl" />
-                <span>Lusaka, Zambia</span>
+                <a
+                  href="https://maps.google.com/?q=Ibex+hill+American+embassy+road%2C+plot+100%2F735%2C+Lusaka%2C+Zambia"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="underline-offset-4 hover:underline"
+                >
+                  Ibex hill American embassy road, plot 100/735, Lusaka, Zambia
+                </a>
+              </div>
+              <div className="flex items-center gap-3 group hover:translate-x-2 transition-transform">
+                <MdPhone className="text-2xl" />
+                <a href="tel:+260773823113" className="underline-offset-4 hover:underline">
+                  +260 773823113
+                </a>
+              </div>
+              <div className="flex items-center gap-3 group hover:translate-x-2 transition-transform">
+                <MdOutlineEmail className="text-2xl" />
+                <a
+                  href="https://instagram.com/anvilcodingschool"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="underline-offset-4 hover:underline"
+                >
+                  anvilcodingschool
+                </a>
               </div>
             </div>
           </div>
