@@ -4,14 +4,15 @@ import { FaLaptopCode, FaRobot} from 'react-icons/fa'
 import { FaArrowRight } from "react-icons/fa";
 
 const CORE_CLASS_OFFERINGS = [
-  { id: 'digital-literacy', title: 'Digital Literacy', age: '5-19 years', summary: 'Computer basics, productivity tools, and safe online habits.', icon: FaLaptopCode },
-  { id: 'python', title: 'Python Programming', age: '10-19 years', summary: 'From beginner coding to app and automation projects.', icon: FaLaptopCode },
-  { id: 'robotics', title: 'Robotics Engineering', age: '8-19 years', summary: 'Build, program, and test robots in practical team projects.', icon: FaRobot },
-  { id: 'visual-programming', title: 'Visual Programming', age: '5-12 years', summary: 'Block-based coding that develops logic and sequencing skills.', icon: FaLaptopCode },
-  { id: 'game-design', title: 'Game Design Studio', age: '9-19 years', summary: 'Design and build interactive games while learning core coding concepts.', icon: FaLaptopCode },
-  { id: 'web-development', title: 'Web Development', age: '12-19 years', summary: 'Create modern websites with HTML, CSS, and JavaScript.', icon: FaLaptopCode },
-  { id: 'cybersecurity', title: 'Cybersecurity', age: '12-19 years', summary: 'Learn digital safety, threat awareness, and responsible security practices.', icon: FaLaptopCode },
-  { id: 'ai', title: 'Artificial Intelligence', age: '12-19 years', summary: 'Explore machine learning basics through child-friendly projects.', icon: FaRobot },
+  { id: 'scratch-jr', title: 'Programming in Scratch Jr', age: '5-7 years', summary: 'A playful first dive into algorithms and coding logic.', icon: FaLaptopCode },
+  { id: 'technology-literacy', title: 'Technology Literacy', age: '7-9 years', summary: 'Digital tools, communication skills, and online safety basics.', icon: FaLaptopCode },
+  { id: 'scratch', title: 'Programming in Scratch', age: '9-10 years', summary: 'Build games and cartoons while learning programming fundamentals.', icon: FaLaptopCode },
+  { id: 'web-development', title: 'Web Development Level 1', age: '15-18 years', summary: 'Create dynamic web pages with HTML, CSS, and JavaScript.', icon: FaLaptopCode },
+  { id: 'python-level-1', title: 'Python Level 1', age: '12-13 years', summary: 'Learn Python basics, chatbot logic, and creative Turtle graphics.', icon: FaLaptopCode },
+  { id: 'python-level-2', title: 'Python Level 2', age: '14-17 years', summary: 'Advance into app development, backend skills, and machine learning.', icon: FaLaptopCode },
+  { id: 'game-design', title: 'Programming in Game Design', age: '10-11 years', summary: 'Create interactive game experiences with Roblox Studio and Lua.', icon: FaLaptopCode },
+  { id: 'robotics', title: 'Robotics', age: '9-11 years', summary: 'Design, build, and program robots through practical projects.', icon: FaRobot },
+  { id: 'graphic-design', title: 'Graphic Design', age: '9-14 years', summary: 'Learn design tools to craft visuals that communicate clearly.', icon: FaLaptopCode },
 ]
 
 const Classes = forwardRef(({ onRegisterClick }, ref) => {
@@ -26,7 +27,7 @@ const Classes = forwardRef(({ onRegisterClick }, ref) => {
             Choose Your Learning Path
           </h2>
           <p className="text-base md:text-lg text-gray-600 max-w-2xl mx-auto animate-fade-in animation-delay-200">
-            Comprehensive programs designed for ages 5-19 to build future-ready skills
+            Comprehensive programs designed for ages 5-18 to build future-ready skills
           </p>
         </div>
 
