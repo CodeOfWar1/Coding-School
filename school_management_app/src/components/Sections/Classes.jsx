@@ -26,7 +26,7 @@ const Classes = forwardRef(({ onRegisterClick }, ref) => {
           <h2 className="text-3xl md:text-5xl font-black text-[#2d3f5d] mb-4 animate-slide-in-up">
             Choose Your Learning Path
           </h2>
-          <p className="text-base md:text-lg text-gray-600 max-w-2xl mx-auto animate-fade-in animation-delay-200">
+          <p className="text-lg md:text-xl text-gray-600 max-w-2xl mx-auto animate-fade-in animation-delay-200">
             Comprehensive programs designed for ages 5-18 to build future-ready skills
           </p>
         </div>
@@ -44,11 +44,11 @@ const Classes = forwardRef(({ onRegisterClick }, ref) => {
                   <Icon className="text-2xl text-[#faa853] group-hover:text-white transition-colors duration-300" />
                 </div>
                 <h3 className="text-lg md:text-xl font-bold text-[#2d3f5d] mb-2">{course.title}</h3>
-                <p className="text-sm text-[#faa853] font-semibold mb-3">Ages {course.age}</p>
-                <p className="text-gray-600 leading-relaxed mb-4 text-sm md:text-base">{course.summary}</p>
+                <p className="text-base md:text-lg text-[#faa853] font-semibold mb-3">Ages {course.age}</p>
+                <p className="text-gray-600 leading-relaxed mb-4 text-base md:text-lg">{course.summary}</p>
                 <button
                   onClick={onRegisterClick}
-                  className="text-[#faa853] font-semibold flex items-center gap-2 group-hover:gap-3 transition-all"
+                  className="text-base md:text-lg text-[#faa853] font-semibold flex items-center gap-2 group-hover:gap-3 transition-all"
                 >
                   Enroll Now <FaArrowRight className="text-sm" />
                 </button>

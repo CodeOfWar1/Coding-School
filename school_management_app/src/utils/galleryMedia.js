@@ -1,4 +1,18 @@
 /** Dynamic imports for files in public/media/gallery */
+function formatWhatsappFilenameTitle(filename) {
+  const baseTitle = filename.replace(/\.[^/.]+$/, '')
+  const match = baseTitle.match(
+    /^WhatsApp Image (\d{4})-(\d{2})-(\d{2}) at (\d{1,2})\.(\d{2})\.(\d{2}) (AM|PM)(?: \((\d+)\))?$/i,
+  )
+  if (!match) return null
+
+  const [, year, month, day, hourRaw, minute, _second, ampmRaw, variant] = match
+  const hour = Number(hourRaw)
+  const ampm = ampmRaw.toUpperCase()
+  const variantSuffix = variant ? ` (${variant})` : ''
+  return `Academy Activity Moment - ${day}/${month}/${year} at ${hour}:${minute} ${ampm}${variantSuffix}`
+}
+
 export function importAllImages() {
   try {
     const images = {}
@@ -6,7 +20,8 @@ export function importAllImages() {
 
     Object.entries(imageModules).forEach(([path, loader]) => {
       const filename = path.split('/').pop()
-      const title = filename.replace(/\.[^/.]+$/, '').replace(/-/g, ' ').replace(/_/g, ' ')
+      const whatsappTitle = formatWhatsappFilenameTitle(filename)
+      const title = whatsappTitle ?? filename.replace(/\.[^/.]+$/, '').replace(/-/g, ' ').replace(/_/g, ' ')
       images[filename] = { path, loader, title, filename }
     })
 

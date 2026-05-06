@@ -200,6 +200,12 @@ function prettifyGalleryTitle(fileName) {
   return { date, time, variant: variant ? String(variant) : '' }
 }
 
+function formatWhatsappTitle(whatsappMeta) {
+  if (!whatsappMeta) return 'Academy Activity Moment'
+  const variantSuffix = whatsappMeta.variant ? ` (${whatsappMeta.variant})` : ''
+  return `Academy Activity Moment - ${whatsappMeta.date} at ${whatsappMeta.time}${variantSuffix}`
+}
+
 function toTitleCase(text) {
   return text
     .split(' ')
@@ -230,7 +236,7 @@ export const GALLERY_IMAGES = ALL_SCHOOL_IMAGE_FILES.map((fileName, index) => {
   const named = NAMED_GALLERY_METADATA[fileName]
   const isWhatsapp = fileName.startsWith('WhatsApp Image')
   const whatsappMeta = isWhatsapp ? prettifyGalleryTitle(fileName) : null
-  const title = named?.title ?? (isWhatsapp ? '' : prettifyNonWhatsappTitle(fileName))
+  const title = named?.title ?? (isWhatsapp ? formatWhatsappTitle(whatsappMeta) : prettifyNonWhatsappTitle(fileName))
 
   return {
     id: `gallery-${index + 1}`,
@@ -244,18 +250,6 @@ export const GALLERY_IMAGES = ALL_SCHOOL_IMAGE_FILES.map((fileName, index) => {
         : 'A photo from our academy activities and learning sessions.'),
   }
 })
-
-// Re-label WhatsApp images with stable sequential "Activity photo X" titles.
-{
-  let counter = 0
-  for (const img of GALLERY_IMAGES) {
-    if (!img.title) {
-      counter += 1
-      img.title = `Activity photo ${counter}`
-      img.alt = img.title
-    }
-  }
-}
 
 export const PARTNER_LOGOS = [
   { name: 'Pestalozzi Academy', src: partnerLogoPath('pestalozzi Academy.jpeg') },
