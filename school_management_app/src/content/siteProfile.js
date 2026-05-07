@@ -433,3 +433,63 @@ export const FAQ_ITEMS = [
   },
 ]
 
+export const ACADEMIC_CALENDAR_2026 = {
+  year: 2026,
+  title: 'Academic Calendar 2026',
+  intro:
+    'Official schedule for instructional periods, assessments, bootcamps, internships, and graduation milestones.',
+  weekendPolicy:
+    'All Saturdays and Sundays are official class days for lectures, practicals, workshops, assessments, and supervised academic activities.',
+  eventsByMonth: [
+    {
+      month: 'January',
+      events: [
+        '9 January - Meet the Instructor',
+        '10 January - Resumption of Classes for Regular Students',
+        '31 January - Chess Tournament',
+      ],
+    },
+    {
+      month: 'February',
+      events: ['20 February - General Knowledge and Arts Activity'],
+    },
+    {
+      month: 'March',
+      events: ['7 March - Assessments and Project Presentations'],
+    },
+    {
+      month: 'April',
+      events: ['6-30 April - Bootcamp', '18-25 April - Day Tourism / Internship'],
+    },
+    {
+      month: 'May',
+      events: ['30 May - Board Games with School Partner Competition'],
+    },
+    {
+      month: 'July',
+      events: ['4 July - Joy Jam Day / Assessments and Project Presentations'],
+    },
+    {
+      month: 'September',
+      events: [
+        '5-19 September - Project Presentations and Assessments',
+        '26 September - Graduation Ceremony (Cohort 2)',
+      ],
+    },
+    {
+      month: 'October',
+      events: ['3 October - Commencement of Cohort 3'],
+    },
+    {
+      month: 'December',
+      events: ['7-19 December - Bootcamp', '19 December - Closure of Regular Students'],
+    },
+  ],
+  keyPolicies: [
+    'Weekend attendance is mandatory unless officially exempted.',
+    'Bootcamp attendance is compulsory unless otherwise stated.',
+    'Assessments include continuous evaluation, project work, and practical/oral presentations.',
+    'Calendar updates may be communicated through official school channels.',
+  ],
+}
+

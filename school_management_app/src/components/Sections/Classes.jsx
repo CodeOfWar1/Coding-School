@@ -1,5 +1,6 @@
 import { forwardRef } from 'react'
-import { FaLaptopCode, FaRobot} from 'react-icons/fa'
+import { FaCalendarAlt, FaClipboardCheck, FaLaptopCode, FaRobot } from 'react-icons/fa'
+import { ACADEMIC_CALENDAR_2026 } from '../../content/siteProfile'
 
 import { FaArrowRight } from "react-icons/fa";
 
@@ -55,6 +56,96 @@ const Classes = forwardRef(({ onRegisterClick }, ref) => {
               </div>
             )
           })}
+        </div>
+
+        <div className="mt-14 md:mt-16 text-center">
+          <p className="text-sm font-bold uppercase tracking-[0.2em] text-[#faa853] mb-2">
+            School Calendar
+          </p>
+          <h3 className="text-2xl md:text-4xl font-black text-[#2d3f5d]">
+            2026 Academic Year Roadmap
+          </h3>
+        </div>
+
+        <div className="calendar-section-enter calendar-ambient mt-6 md:mt-8 relative overflow-hidden rounded-3xl bg-gradient-to-br from-[#eef4ff] via-[#fff9f1] to-[#f4f7ff] p-6 md:p-8 lg:p-10 shadow-xl">
+          <div className="calendar-orb pointer-events-none absolute -top-20 -right-20 h-56 w-56 rounded-full bg-[#2d3f5d]/10 blur-3xl" />
+          <div className="calendar-orb calendar-orb--slow pointer-events-none absolute -bottom-20 -left-20 h-56 w-56 rounded-full bg-[#faa853]/20 blur-3xl" />
+
+          <div className="relative">
+            <div className="mb-8 md:mb-10 rounded-2xl bg-gradient-to-r from-[#2d3f5d] to-[#3f5780] p-5 md:p-6 text-white shadow-lg">
+              <div className="flex flex-wrap items-center gap-3 mb-4">
+                <span className="inline-flex items-center gap-2 rounded-full bg-white px-3 py-1.5 text-sm font-bold text-[#2d3f5d] shadow-sm">
+                  <FaCalendarAlt className="text-[#faa853]" />
+                  Academic Handbook
+                </span>
+                <span className="inline-flex items-center rounded-full bg-[#faa853] px-3 py-1.5 text-sm font-bold text-[#2d3f5d]">
+                  {ACADEMIC_CALENDAR_2026.year}
+                </span>
+              </div>
+              <h3 className="text-2xl md:text-3xl lg:text-4xl font-black mb-3">
+                {ACADEMIC_CALENDAR_2026.title}
+              </h3>
+              <p className="text-base md:text-lg text-white/90 mb-4 max-w-4xl">
+                {ACADEMIC_CALENDAR_2026.intro}
+              </p>
+              <div className="rounded-xl bg-white/95 px-4 py-3">
+                <p className="text-base md:text-lg text-[#2d3f5d] font-semibold">
+                  Weekend Class Policy: {ACADEMIC_CALENDAR_2026.weekendPolicy}
+                </p>
+              </div>
+            </div>
+
+            <div className="grid md:grid-cols-2 gap-5 md:gap-6">
+            {ACADEMIC_CALENDAR_2026.eventsByMonth.map((block, index) => (
+              <div
+                key={block.month}
+                className="calendar-month-card group relative overflow-hidden rounded-2xl bg-white p-5 md:p-6 shadow-md hover:shadow-2xl hover:-translate-y-1.5 transition-all duration-500"
+                style={{ animationDelay: `${120 + index * 90}ms` }}
+              >
+                <span className="calendar-card-sheen" aria-hidden />
+                <div className="pointer-events-none absolute -top-10 -right-10 h-28 w-28 rounded-full bg-[#faa853]/20 blur-2xl transition-all duration-500 group-hover:scale-125" />
+                <div className="pointer-events-none absolute inset-x-0 top-0 h-1.5 bg-gradient-to-r from-[#faa853] via-[#ffd19d] to-[#2d3f5d]" />
+
+                <div className="relative mb-4 flex items-center justify-between gap-3">
+                  <h4 className="text-lg md:text-xl font-black text-[#2d3f5d] flex items-center gap-2">
+                    <span className="h-2.5 w-2.5 rounded-full bg-[#faa853] group-hover:scale-125 transition-transform" />
+                    {block.month} 2026
+                  </h4>
+                  <span className="rounded-full bg-[#2d3f5d]/8 px-3 py-1 text-xs md:text-sm font-bold text-[#2d3f5d]">
+                    {block.events.length} event{block.events.length > 1 ? 's' : ''}
+                  </span>
+                </div>
+
+                <ul className="space-y-3 relative">
+                  {block.events.map((event) => (
+                    <li
+                      key={event}
+                      className="rounded-xl bg-[#f8faff] px-3.5 py-3 text-base md:text-lg text-gray-700 leading-relaxed flex items-start gap-2.5 group-hover:bg-[#f4f8ff] transition-colors"
+                    >
+                      <span className="mt-2 h-1.5 w-1.5 rounded-full bg-[#2d3f5d]/50 shrink-0" />
+                      <span className="font-medium">{event}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+            </div>
+
+            <div className="mt-8 rounded-2xl bg-gradient-to-r from-[#fff3e7] to-[#fffaf5] p-5 md:p-6 shadow-md">
+              <h4 className="text-lg md:text-xl font-bold text-[#2d3f5d] mb-3 flex items-center gap-2">
+                <FaClipboardCheck className="text-[#faa853]" />
+                Key Academic Policies
+              </h4>
+              <ul className="space-y-2.5">
+              {ACADEMIC_CALENDAR_2026.keyPolicies.map((item) => (
+                <li key={item} className="text-base md:text-lg text-gray-700 flex items-start gap-2.5">
+                  <span className="mt-2 h-1.5 w-1.5 rounded-full bg-[#faa853] shrink-0" />
+                  <span>{item}</span>
+                </li>
+              ))}
+              </ul>
+            </div>
+          </div>
         </div>
       </div>
     </section>
