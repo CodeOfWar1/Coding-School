@@ -45,7 +45,7 @@ export default function Testimonials() {
           <h2 className="text-3xl md:text-5xl font-black text-[#2d3f5d] mb-4 animate-slide-in-up">
             What Our Community Says
           </h2>
-          <p className="text-base md:text-lg text-gray-600 max-w-2xl mx-auto animate-fade-in animation-delay-200">
+          <p className="site-body max-w-2xl mx-auto animate-fade-in animation-delay-200">
             Real stories from parents, students, and guardians
           </p>
         </div>
@@ -58,11 +58,11 @@ export default function Testimonials() {
               style={{ animationDelay: `${idx * 100}ms` }}
             >
               <FaQuoteLeft className="text-3xl text-[#faa853]/30 mb-4" />
-              <p className="text-gray-600 leading-relaxed mb-4 italic">"{testimonial.text}"</p>
+              <p className="site-body mb-4 italic">"{testimonial.text}"</p>
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="font-bold text-[#2d3f5d]">{testimonial.name}</p>
-                  <p className="text-sm text-[#faa853]">{testimonial.role}</p>
+                  <p className="text-base font-bold text-[#2d3f5d]">{testimonial.name}</p>
+                  <p className="text-base text-[#faa853]">{testimonial.role}</p>
                 </div>
                 <div className="flex gap-1">
                   {[...Array(testimonial.rating)].map((_, i) => (
@@ -76,7 +76,7 @@ export default function Testimonials() {
 
         <div className="max-w-2xl mx-auto bg-gray-50 rounded-2xl p-6 md:p-8">
           <h3 className="text-xl font-bold text-[#2d3f5d] mb-4 text-center">Share Your Experience</h3>
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={handleSubmit} className="space-y-4 text-base">
             <input
               type="text"
               placeholder="Your name"

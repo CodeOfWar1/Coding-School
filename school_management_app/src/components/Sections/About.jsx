@@ -22,7 +22,7 @@ const About = forwardRef(({ scrollToSection }, ref) => {
           <h2 className="text-3xl md:text-5xl font-black text-[#2d3f5d] mb-4 animate-slide-in-up">
             Shaping Future Tech Leaders
           </h2>
-          <p className="text-base md:text-lg text-gray-600 max-w-3xl mx-auto animate-fade-in animation-delay-200">
+          <p className="site-body max-w-3xl mx-auto animate-fade-in animation-delay-200">
             {SCHOOL_PROFILE.aboutLead}
           </p>
         </div>
@@ -36,10 +36,10 @@ const About = forwardRef(({ scrollToSection }, ref) => {
             />
             <div className="absolute -bottom-4 -right-4 md:-bottom-6 md:-right-6 bg-[#faa853] rounded-2xl p-4 md:p-6 shadow-xl animate-scale-in">
               <p className="text-white font-black text-2xl md:text-3xl">5+</p>
-              <p className="text-white/90 text-xs md:text-sm">Years of Excellence</p>
+              <p className="text-base text-white/90">Years of Excellence</p>
             </div>
           </div>
-          
+
           <div className="space-y-6 animate-fade-in-right">
             <div className="grid grid-cols-2 gap-4">
               {stats.map((stat, idx) => {
@@ -50,22 +50,22 @@ const About = forwardRef(({ scrollToSection }, ref) => {
                       <Icon className="text-[#faa853] text-lg md:text-xl" />
                     </div>
                     <h3 className="text-lg md:text-xl font-bold text-[#2d3f5d] mb-1">{stat.value}</h3>
-                    <p className="text-xs md:text-sm text-gray-600">{stat.label}</p>
+                    <p className="text-base text-gray-600">{stat.label}</p>
                   </div>
                 )
               })}
             </div>
-            
-            <p className="text-gray-600 leading-relaxed">
+
+            <p className="site-body">
               Programs for learners aged <span className="text-[#faa853] font-bold">5–19</span> — project-based tech education with heart.
             </p>
-            
+
             <div className="flex flex-wrap items-center gap-4">
               <button
                 onClick={() => scrollToSection('classes')}
                 className="inline-flex items-center gap-2 text-[#faa853] font-semibold hover:gap-3 transition-all group"
               >
-                Explore our programs 
+                Explore our programs
                 <FaArrowRight className="text-sm group-hover:translate-x-1 transition-transform" />
               </button>
               <Link

@@ -25,7 +25,7 @@ const Gallery = forwardRef((_, ref) => {
           <h2 className="text-3xl md:text-5xl font-black text-[#2d3f5d] mb-4 animate-slide-in-up">
             Our Learning Journey
           </h2>
-          <p className="text-base md:text-lg text-gray-600 max-w-2xl mx-auto animate-fade-in animation-delay-200">
+          <p className="site-body max-w-2xl mx-auto animate-fade-in animation-delay-200">
             Capturing the excitement, creativity, and growth at Anvil Tech Academy
           </p>
         </div>
@@ -62,7 +62,7 @@ const Gallery = forwardRef((_, ref) => {
             <span>See Our Full Gallery</span>
             <FaArrowRight className="text-sm group-hover:translate-x-1 transition-transform" />
           </Link>
-          <p className="text-sm text-gray-500 mt-3">
+          <p className="text-base text-gray-500 mt-3">
             Explore more memorable moments from our academy
           </p>
         </div>

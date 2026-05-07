@@ -45,7 +45,7 @@ function heroImagePublicUrl(fileName) {
 
 const Hero = forwardRef(({ scrollToSection, onRegisterClick }, ref) => {
   const [slide, setSlide] = useState(0)
-  
+
   /**
    * `objectY` = vertical % when not top-anchored.
    * `titleMobile` / `textMobile` = shorter copy for small screens only (`md:` and up use full strings).
@@ -104,9 +104,8 @@ const Hero = forwardRef(({ scrollToSection, onRegisterClick }, ref) => {
       {slides.map((s, idx) => (
         <div
           key={idx}
-          className={`absolute inset-0 transition-all duration-1000 ease-out ${
-            idx === slide ? 'opacity-100 scale-100' : 'opacity-0 scale-110 pointer-events-none'
-          }`}
+          className={`absolute inset-0 transition-all duration-1000 ease-out ${idx === slide ? 'opacity-100 scale-100' : 'opacity-0 scale-110 pointer-events-none'
+            }`}
         >
           <img
             src={heroImagePublicUrl(s.file)}
@@ -138,7 +137,7 @@ const Hero = forwardRef(({ scrollToSection, onRegisterClick }, ref) => {
                   <span className="md:hidden">{s.titleMobile ?? s.title}</span>
                   <span className="hidden md:inline">{s.title}</span>
                 </h1>
-                <p className="mb-8 text-base leading-relaxed text-white/95 md:text-xl [text-shadow:_0_1px_3px_rgb(0_0_0_/_0.9),_0_4px_20px_rgb(0_0_0_/_0.45)]">
+                <p className="mb-8 text-base leading-relaxed text-white/95 [text-shadow:_0_1px_3px_rgb(0_0_0_/_0.9),_0_4px_20px_rgb(0_0_0_/_0.45)]">
                   <span className="md:hidden">{s.textMobile ?? s.text}</span>
                   <span className="hidden md:inline">{s.text}</span>
                 </p>
@@ -182,9 +181,8 @@ const Hero = forwardRef(({ scrollToSection, onRegisterClick }, ref) => {
             type="button"
             key={idx}
             onClick={() => setSlide(idx)}
-            className={`h-2 rounded-full transition-all duration-300 ${
-              idx === slide ? 'w-8 bg-primary' : 'w-2 bg-white/50 hover:bg-white/80'
-            }`}
+            className={`h-2 rounded-full transition-all duration-300 ${idx === slide ? 'w-8 bg-primary' : 'w-2 bg-white/50 hover:bg-white/80'
+              }`}
           />
         ))}
       </div>

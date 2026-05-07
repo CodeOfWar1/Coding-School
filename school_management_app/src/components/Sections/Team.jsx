@@ -3,9 +3,9 @@ import { FaLinkedin, FaTwitter, FaInstagram, FaEnvelope, FaStar, FaQuoteLeft, Fa
 import { SCHOOL_MEDIA_IMAGES } from '../../content/schoolMedia'
 
 const TEAM = [
-  { 
-    name: 'Ms. Nawa', 
-    role: 'Lead Instructor', 
+  {
+    name: 'Ms. Nawa',
+    role: 'Lead Instructor',
     specialty: 'Full Stack Development',
     experience: '8+ years',
     bio: 'Passionate about teaching coding with real-world projects and mentorship. Expert in JavaScript, React, and Node.js.',
@@ -14,9 +14,9 @@ const TEAM = [
     email: 'nawa@anviltech.com',
     social: { linkedin: '#', twitter: '#', instagram: '#' }
   },
-  { 
-    name: 'Mr. Zulu', 
-    role: 'Robotics Mentor', 
+  {
+    name: 'Mr. Zulu',
+    role: 'Robotics Mentor',
     specialty: 'Robotics & AI',
     experience: '6+ years',
     bio: 'Expert in robotics engineering and competitive programming. Leads robotics workshops and competitions.',
@@ -25,9 +25,9 @@ const TEAM = [
     email: 'zulu@anviltech.com',
     social: { linkedin: '#', twitter: '#', instagram: '#' }
   },
-  { 
-    name: 'Mrs. Chanda', 
-    role: 'Web Development Coach', 
+  {
+    name: 'Mrs. Chanda',
+    role: 'Web Development Coach',
     specialty: 'Frontend & UI/UX',
     experience: '7+ years',
     bio: 'Specializes in creating engaging web experiences and teaching best practices in modern web development.',
@@ -36,9 +36,9 @@ const TEAM = [
     email: 'chanda@anviltech.com',
     social: { linkedin: '#', twitter: '#', instagram: '#' }
   },
-  { 
-    name: 'Tapiwa', 
-    role: 'Web Development Expert', 
+  {
+    name: 'Tapiwa',
+    role: 'Web Development Expert',
     specialty: 'Backend & APIs',
     experience: '5+ years',
     bio: 'Expert in building scalable backend systems and RESTful APIs using Python and Django.',
@@ -47,9 +47,9 @@ const TEAM = [
     email: 'tapiwa@anviltech.com',
     social: { linkedin: '#', twitter: '#', instagram: '#' }
   },
-  { 
-    name: 'Sivogwani', 
-    role: 'Robotics Specialist', 
+  {
+    name: 'Sivogwani',
+    role: 'Robotics Specialist',
     specialty: 'Embedded Systems',
     experience: '5+ years',
     bio: 'Passionate about IoT and robotics, guiding students in hands-on projects with Arduino and Raspberry Pi.',
@@ -58,9 +58,9 @@ const TEAM = [
     email: 'sivogwani@anviltech.com',
     social: { linkedin: '#', twitter: '#', instagram: '#' }
   },
-  { 
-    name: 'Mwango', 
-    role: 'Digital Literacy Coordinator', 
+  {
+    name: 'Mwango',
+    role: 'Digital Literacy Coordinator',
     specialty: 'Digital Skills & Safety',
     experience: '4+ years',
     bio: 'Dedicated to empowering young learners with essential digital skills and online safety practices.',
@@ -85,7 +85,7 @@ const Team = forwardRef((_, ref) => {
           <h2 className="text-3xl md:text-5xl font-black text-[#2d3f5d] mb-4 animate-slide-in-up">
             Expert Educators & Mentors
           </h2>
-          <p className="text-base md:text-lg text-gray-600 max-w-2xl mx-auto animate-fade-in animation-delay-200">
+          <p className="site-body max-w-2xl mx-auto animate-fade-in animation-delay-200">
             Our diverse team brings together industry expertise, teaching excellence, and genuine passion for student success
           </p>
         </div>
@@ -109,29 +109,29 @@ const Team = forwardRef((_, ref) => {
                   />
                   {/* Gradient Overlay */}
                   <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                  
+
                   {/* Social Links - Appear on Hover */}
                   <div className="absolute bottom-4 left-0 right-0 flex justify-center gap-3 translate-y-12 group-hover:translate-y-0 transition-transform duration-500">
-                    <a 
-                      href={member.social.linkedin} 
+                    <a
+                      href={member.social.linkedin}
                       className="w-10 h-10 rounded-full bg-white/90 backdrop-blur-sm flex items-center justify-center text-[#2d3f5d] hover:bg-[#faa853] hover:text-white transition-all transform hover:scale-110"
                     >
                       <FaLinkedin className="text-lg" />
                     </a>
-                    <a 
-                      href={member.social.twitter} 
+                    <a
+                      href={member.social.twitter}
                       className="w-10 h-10 rounded-full bg-white/90 backdrop-blur-sm flex items-center justify-center text-[#2d3f5d] hover:bg-[#faa853] hover:text-white transition-all transform hover:scale-110"
                     >
                       <FaTwitter className="text-lg" />
                     </a>
-                    <a 
-                      href={member.social.instagram} 
+                    <a
+                      href={member.social.instagram}
                       className="w-10 h-10 rounded-full bg-white/90 backdrop-blur-sm flex items-center justify-center text-[#2d3f5d] hover:bg-[#faa853] hover:text-white transition-all transform hover:scale-110"
                     >
                       <FaInstagram className="text-lg" />
                     </a>
-                    <a 
-                      href={`mailto:${member.email}`} 
+                    <a
+                      href={`mailto:${member.email}`}
                       className="w-10 h-10 rounded-full bg-white/90 backdrop-blur-sm flex items-center justify-center text-[#2d3f5d] hover:bg-[#faa853] hover:text-white transition-all transform hover:scale-110"
                     >
                       <FaEnvelope className="text-lg" />
@@ -144,23 +144,23 @@ const Team = forwardRef((_, ref) => {
                   <h3 className="text-xl font-bold text-[#2d3f5d] mb-1 group-hover:text-[#faa853] transition-colors">
                     {member.name}
                   </h3>
-                  <p className="text-[#faa853] font-semibold text-sm mb-2">
+                  <p className="text-base font-semibold text-[#faa853] mb-2">
                     {member.role}
                   </p>
-                  
+
                   {/* Specialty Badge */}
                   <div className="inline-block px-3 py-1 rounded-full bg-[#faa853]/10 text-[#faa853] text-xs font-semibold mb-3">
                     {member.specialty}
                   </div>
-                  
+
                   {/* Experience */}
                   <div className="flex items-center justify-center gap-2 mb-4">
                     <FaStar className="text-[#faa853] text-xs" />
-                    <span className="text-xs text-gray-600">{member.experience} of experience</span>
+                    <span className="text-base text-gray-600">{member.experience} of experience</span>
                   </div>
-                  
+
                   {/* Bio */}
-                  <p className="text-sm text-gray-600 leading-relaxed mb-4 line-clamp-3">
+                  <p className="text-base text-gray-600 leading-relaxed mb-4 line-clamp-3">
                     {member.bio}
                   </p>
                 </div>

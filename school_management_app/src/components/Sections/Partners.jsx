@@ -19,7 +19,7 @@ const Partners = forwardRef((_, ref) => {
           <h2 className="text-3xl md:text-5xl font-black text-[#2d3f5d] mb-4 animate-slide-in-up">
             Trusted By Leading Schools
           </h2>
-          <p className="text-base md:text-lg text-gray-600 max-w-3xl mx-auto animate-fade-in animation-delay-200">
+          <p className="site-body max-w-3xl mx-auto animate-fade-in animation-delay-200">
             We collaborate with mission-driven institutions to expand access to world-class digital learning.
           </p>
         </div>
@@ -40,7 +40,7 @@ const Partners = forwardRef((_, ref) => {
               </div>
               <div className="flex items-center justify-center gap-2 text-[#2d3f5d] group-hover:text-[#faa853] transition-colors">
                 <FaHandshake className="text-sm" />
-                <p className="text-sm md:text-base font-semibold text-center">{partner.name}</p>
+                <p className="text-base font-semibold text-center">{partner.name}</p>
               </div>
             </article>
           ))}

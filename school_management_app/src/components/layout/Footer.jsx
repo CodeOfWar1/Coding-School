@@ -7,12 +7,12 @@ export default function Footer() {
         <div className="grid md:grid-cols-4 gap-8">
           <div>
             <h3 className="text-2xl font-black mb-4">Anvil<span className="text-primary">Coding</span>Acardemy</h3>
-            <p className="text-gray-300 text-sm">Empowering the next generation of tech innovators through quality education.</p>
+            <p className="text-gray-300 text-base">Empowering the next generation of tech innovators through quality education.</p>
           </div>
           
           <div>
             <h4 className="font-bold mb-4">Quick Links</h4>
-            <ul className="space-y-2 text-sm text-gray-300">
+            <ul className="space-y-2 text-base text-gray-300">
               <li><a href="#home" className="hover:text-primary transition-colors">Home</a></li>
               <li><a href="#about" className="hover:text-primary transition-colors">About</a></li>
               <li><a href="#classes" className="hover:text-primary transition-colors">Classes</a></li>
@@ -22,7 +22,7 @@ export default function Footer() {
           
           <div>
             <h4 className="font-bold mb-4">Contact Info</h4>
-            <ul className="space-y-2 text-sm text-gray-300">
+            <ul className="space-y-2 text-base text-gray-300">
               <li>
                 <a
                   href="https://maps.google.com/?q=Ibex+hill+American+embassy+road%2C+plot+100%2F735%2C+Lusaka%2C+Zambia"
@@ -82,7 +82,7 @@ export default function Footer() {
           </div>
         </div>
         
-        <div className="border-t border-white/20 mt-8 pt-8 text-center text-sm text-gray-300">
+        <div className="border-t border-white/20 mt-8 pt-8 text-center text-base text-gray-300">
           <p>&copy; 2024 AnvilCoding Academy. All rights reserved.</p>
         </div>
       </div>

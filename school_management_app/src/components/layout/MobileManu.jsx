@@ -42,7 +42,7 @@ export default function MobileMenu({ isOpen, onClose, scrollToSection, onRegiste
                 <button
                   key={item.id}
                   onClick={() => handleNavClick(item.id)}
-                  className={`w-full flex items-center gap-3 px-6 py-3 text-left transition-all duration-300 ${
+                  className={`w-full flex items-center gap-3 px-6 py-3 text-left text-base transition-all duration-300 ${
                     activeSection === item.id
                       ? 'bg-primary/10 text-primary border-l-4 border-primary'
                       : 'text-secondary hover:bg-gray-50'
@@ -59,13 +59,13 @@ export default function MobileMenu({ isOpen, onClose, scrollToSection, onRegiste
           <div className="p-6 border-t border-gray-100 space-y-3">
             <button
               onClick={onLoginClick}
-              className="w-full py-3 rounded-full border-2 border-primary text-primary font-semibold hover:bg-primary hover:text-white transition-all"
+              className="w-full py-3 rounded-full border-2 border-primary text-primary font-semibold text-base hover:bg-primary hover:text-white transition-all"
             >
               Login
             </button>
             <button
               onClick={onRegisterClick}
-              className="w-full py-3 rounded-full bg-primary text-white font-semibold hover:bg-primary/90 transition-all"
+              className="w-full py-3 rounded-full bg-primary text-white font-semibold text-base hover:bg-primary/90 transition-all"
             >
               Register Now
             </button>

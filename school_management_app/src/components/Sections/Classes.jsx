@@ -16,6 +16,12 @@ const CORE_CLASS_OFFERINGS = [
   { id: 'graphic-design', title: 'Graphic Design', age: '9-14 years', summary: 'Learn design tools to craft visuals that communicate clearly.', icon: FaLaptopCode },
 ]
 
+const PRICING_STRIP = {
+  tuition: 'K1300 per month',
+  plans: ['25%', '50%', '75%', '100%'],
+  duration: '8 months',
+}
+
 const Classes = forwardRef(({ onRegisterClick }, ref) => {
   return (
     <section id="classes" ref={ref} className="py-16 md:py-24 bg-gray-50">
@@ -27,9 +33,30 @@ const Classes = forwardRef(({ onRegisterClick }, ref) => {
           <h2 className="text-3xl md:text-5xl font-black text-[#2d3f5d] mb-4 animate-slide-in-up">
             Choose Your Learning Path
           </h2>
-          <p className="text-lg md:text-xl text-gray-600 max-w-2xl mx-auto animate-fade-in animation-delay-200">
+          <p className="site-body max-w-2xl mx-auto animate-fade-in animation-delay-200">
             Comprehensive programs designed for ages 5-18 to build future-ready skills
           </p>
+        </div>
+
+        <div className="mb-8 md:mb-10 rounded-2xl bg-gradient-to-r from-[#2d3f5d] to-[#3f5780] text-white p-4 md:p-5 shadow-lg">
+          <div className="flex flex-col md:flex-row md:items-center md:justify-center gap-3 md:gap-6 text-center">
+            <p className="text-base font-bold">
+              Tuition Fee: <span className="text-[#faa853]">{PRICING_STRIP.tuition}</span>
+            </p>
+            <div className="flex flex-col items-center gap-1">
+              <p className="text-base font-semibold text-white/90">Flexible Payment Options</p>
+              <div className="flex flex-wrap justify-center gap-2">
+                {PRICING_STRIP.plans.map((plan) => (
+                  <span
+                    key={plan}
+                    className="inline-flex items-center rounded-full bg-white/15 px-3 py-1 text-base font-bold text-[#faa853] ring-1 ring-white/20"
+                  >
+                    {plan}
+                  </span>
+                ))}
+              </div>
+            </div>
+          </div>
         </div>
 
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
@@ -45,11 +72,11 @@ const Classes = forwardRef(({ onRegisterClick }, ref) => {
                   <Icon className="text-2xl text-[#faa853] group-hover:text-white transition-colors duration-300" />
                 </div>
                 <h3 className="text-lg md:text-xl font-bold text-[#2d3f5d] mb-2">{course.title}</h3>
-                <p className="text-base md:text-lg text-[#faa853] font-semibold mb-3">Ages {course.age}</p>
-                <p className="text-gray-600 leading-relaxed mb-4 text-base md:text-lg">{course.summary}</p>
+                <p className="text-base font-semibold text-[#faa853] mb-3">Ages {course.age}</p>
+                <p className="site-body mb-4">{course.summary}</p>
                 <button
                   onClick={onRegisterClick}
-                  className="text-base md:text-lg text-[#faa853] font-semibold flex items-center gap-2 group-hover:gap-3 transition-all"
+                  className="text-base font-semibold text-[#faa853] flex items-center gap-2 group-hover:gap-3 transition-all"
                 >
                   Enroll Now <FaArrowRight className="text-sm" />
                 </button>
@@ -81,15 +108,18 @@ const Classes = forwardRef(({ onRegisterClick }, ref) => {
                 <span className="inline-flex items-center rounded-full bg-[#faa853] px-3 py-1.5 text-sm font-bold text-[#2d3f5d]">
                   {ACADEMIC_CALENDAR_2026.year}
                 </span>
+                <span className="inline-flex items-center rounded-full bg-white/15 px-3 py-1.5 text-sm font-bold text-[#faa853] ring-1 ring-white/20">
+                  Duration: {PRICING_STRIP.duration}
+                </span>
               </div>
               <h3 className="text-2xl md:text-3xl lg:text-4xl font-black mb-3">
                 {ACADEMIC_CALENDAR_2026.title}
               </h3>
-              <p className="text-base md:text-lg text-white/90 mb-4 max-w-4xl">
+              <p className="text-base leading-relaxed text-white/90 mb-4 max-w-4xl">
                 {ACADEMIC_CALENDAR_2026.intro}
               </p>
               <div className="rounded-xl bg-white/95 px-4 py-3">
-                <p className="text-base md:text-lg text-[#2d3f5d] font-semibold">
+                <p className="text-base font-semibold text-[#2d3f5d]">
                   Weekend Class Policy: {ACADEMIC_CALENDAR_2026.weekendPolicy}
                 </p>
               </div>
@@ -120,7 +150,7 @@ const Classes = forwardRef(({ onRegisterClick }, ref) => {
                   {block.events.map((event) => (
                     <li
                       key={event}
-                      className="rounded-xl bg-[#f8faff] px-3.5 py-3 text-base md:text-lg text-gray-700 leading-relaxed flex items-start gap-2.5 group-hover:bg-[#f4f8ff] transition-colors"
+                      className="rounded-xl bg-[#f8faff] px-3.5 py-3 text-base leading-relaxed text-gray-700 flex items-start gap-2.5 group-hover:bg-[#f4f8ff] transition-colors"
                     >
                       <span className="mt-2 h-1.5 w-1.5 rounded-full bg-[#2d3f5d]/50 shrink-0" />
                       <span className="font-medium">{event}</span>
@@ -138,7 +168,7 @@ const Classes = forwardRef(({ onRegisterClick }, ref) => {
               </h4>
               <ul className="space-y-2.5">
               {ACADEMIC_CALENDAR_2026.keyPolicies.map((item) => (
-                <li key={item} className="text-base md:text-lg text-gray-700 flex items-start gap-2.5">
+                <li key={item} className="text-base text-gray-700 leading-relaxed flex items-start gap-2.5">
                   <span className="mt-2 h-1.5 w-1.5 rounded-full bg-[#faa853] shrink-0" />
                   <span>{item}</span>
                 </li>

@@ -22,21 +22,21 @@ const Contact = forwardRef((_, ref) => {
     <section id="contact" ref={ref} className="py-16 md:py-24 bg-[#faa853]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
         <div className="grid md:grid-cols-2 gap-8 md:gap-12 items-center">
-          <div className="text-white animate-fade-in-left">
+          <div className="text-white text-base animate-fade-in-left">
             <h2 className="text-3xl md:text-5xl font-black mb-4">Ready to Start?</h2>
-            <p className="text-base md:text-lg text-white/90 mb-8">
+            <p className="text-base leading-relaxed text-white/90 mb-8 max-w-xl">
               Join us in shaping the next generation of tech innovators. Limited spots available!
             </p>
             <div className="space-y-4">
               <div className="flex items-center gap-3 group hover:translate-x-2 transition-transform">
                 <MdOutlineEmail className="text-2xl" />
-                <a href="mailto:admission@anvilcodingacademy.com" className="underline-offset-4 hover:underline">
+                <a href="mailto:admission@anvilcodingacademy.com" className="text-base underline-offset-4 hover:underline">
                   admission@anvilcodingacademy.com
                 </a>
               </div>
               <div className="flex items-center gap-3 group hover:translate-x-2 transition-transform">
                 <MdPhone className="text-2xl" />
-                <a href="tel:773823113" className="underline-offset-4 hover:underline">
+                <a href="tel:773823113" className="text-base underline-offset-4 hover:underline">
                   773823113
                 </a>
               </div>
@@ -46,14 +46,14 @@ const Contact = forwardRef((_, ref) => {
                   href="https://maps.google.com/?q=Ibex+hill+American+embassy+road%2C+plot+100%2F735%2C+Lusaka%2C+Zambia"
                   target="_blank"
                   rel="noreferrer"
-                  className="underline-offset-4 hover:underline"
+                  className="text-base underline-offset-4 hover:underline"
                 >
                   Ibex hill American embassy road, plot 100/735, Lusaka, Zambia
                 </a>
               </div>
               <div className="flex items-center gap-3 group hover:translate-x-2 transition-transform">
                 <MdPhone className="text-2xl" />
-                <a href="tel:+260773823113" className="underline-offset-4 hover:underline">
+                <a href="tel:+260773823113" className="text-base underline-offset-4 hover:underline">
                   +260 773823113
                 </a>
               </div>
@@ -63,17 +63,17 @@ const Contact = forwardRef((_, ref) => {
                   href="https://instagram.com/anvilcodingschool"
                   target="_blank"
                   rel="noreferrer"
-                  className="underline-offset-4 hover:underline"
+                  className="text-base underline-offset-4 hover:underline"
                 >
                   anvilcodingschool
                 </a>
               </div>
             </div>
           </div>
-          
+
           <div className="bg-white rounded-2xl p-6 md:p-8 shadow-xl animate-fade-in-right">
             <h3 className="text-xl md:text-2xl font-bold text-[#2d3f5d] mb-4">Book an Appointment</h3>
-            <form onSubmit={handleSubmit} className="space-y-4">
+            <form onSubmit={handleSubmit} className="space-y-4 text-base">
               <input
                 type="text"
                 placeholder="Full Name"
@@ -108,25 +108,24 @@ const Contact = forwardRef((_, ref) => {
 
                 {interestMenuOpen && (
                   <div className="absolute z-20 mt-2 w-full rounded-2xl border border-gray-200 bg-[#f7f7f9] shadow-xl p-3">
-                    <p className="text-sm font-semibold text-gray-500 mb-2 px-1">Choose what to view</p>
+                    <p className="text-base font-semibold text-gray-500 mb-2 px-1">Choose what to view</p>
                     <div className="grid grid-cols-2 gap-2">
-                    {interestOptions.map((option) => (
-                      <button
-                        key={option}
-                        type="button"
-                        onClick={() => {
-                          setSelectedInterest(option)
-                          setInterestMenuOpen(false)
-                        }}
-                        className={`w-full text-center px-3 py-2.5 rounded-xl text-sm font-semibold transition-colors ${
-                          selectedInterest === option
-                            ? 'bg-[#f2a24b] text-white'
-                            : 'bg-[#e8e9ed] text-[#2d3f5d] hover:bg-[#dfe1e7]'
-                        }`}
-                      >
-                        {option}
-                      </button>
-                    ))}
+                      {interestOptions.map((option) => (
+                        <button
+                          key={option}
+                          type="button"
+                          onClick={() => {
+                            setSelectedInterest(option)
+                            setInterestMenuOpen(false)
+                          }}
+                          className={`w-full text-center px-3 py-2.5 rounded-xl text-base font-semibold transition-colors ${selectedInterest === option
+                              ? 'bg-[#f2a24b] text-white'
+                              : 'bg-[#e8e9ed] text-[#2d3f5d] hover:bg-[#dfe1e7]'
+                            }`}
+                        >
+                          {option}
+                        </button>
+                      ))}
                     </div>
                   </div>
                 )}

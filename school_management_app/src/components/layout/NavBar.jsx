@@ -53,13 +53,16 @@ export default function Navbar({ activeSection, scrollToSection, onRegisterClick
             {/* Logo Image */}
             <button 
               onClick={() => scrollToSection('home')}
-              className="flex items-center transition-transform duration-300 hover:scale-105"
+              className="flex items-center gap-2 transition-transform duration-300 hover:scale-105"
             >
               <img 
                 src={logoImage} 
                 alt="AnvilCoding Academy Logo" 
                 className="h-14 w-auto md:h-16 object-contain"
               />
+              <span className="md:hidden text-base font-black text-secondary leading-tight">
+                Anvil Coding Academy
+              </span>
             </button>
 
             {/* Desktop Navigation */}
@@ -68,7 +71,7 @@ export default function Navbar({ activeSection, scrollToSection, onRegisterClick
                 <button
                   key={item.id}
                   onClick={() => handleNavClick(item.id)}
-                  className={`px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-300 relative group ${
+                  className={`px-4 py-2 rounded-lg text-base font-semibold transition-all duration-300 relative group ${
                     activeSection === item.id
                       ? 'text-primary'
                       : 'text-secondary hover:text-primary'
@@ -86,13 +89,13 @@ export default function Navbar({ activeSection, scrollToSection, onRegisterClick
             <div className="hidden md:flex items-center gap-3">
               <button
                 onClick={handleLogin}
-                className="px-6 py-2 rounded-full border-2 border-primary text-primary font-semibold text-sm hover:bg-primary hover:text-white transition-all hover:scale-105"
+                className="px-6 py-2 rounded-full border-2 border-primary text-primary font-semibold text-base hover:bg-primary hover:text-white transition-all hover:scale-105"
               >
                 Login
               </button>
               <button
                 onClick={onRegisterClick}
-                className="px-6 py-2 rounded-full bg-primary text-white font-semibold text-sm hover:bg-primary/90 transition-all hover:scale-105 shadow-md hover:shadow-lg"
+                className="px-6 py-2 rounded-full bg-primary text-white font-semibold text-base hover:bg-primary/90 transition-all hover:scale-105 shadow-md hover:shadow-lg"
               >
                 Register Now
               </button>

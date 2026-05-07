@@ -5,6 +5,11 @@ import { FaEye, FaEyeSlash, FaCheckCircle, FaExclamationCircle } from 'react-ico
 const SYSTEM_STUDENT_EMAIL_DOMAIN = 'student.anvilcodingacademy.local'
 
 export default function StudentSignupForm({ onSuccess }) {
+  const pricing = {
+    tuition: 'K1300 per month',
+    plans: '25% | 50% | 75% | 100%',
+  }
+
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
@@ -195,6 +200,15 @@ export default function StudentSignupForm({ onSuccess }) {
             </button>
           </div>
         </div>
+      </div>
+
+      <div className="mt-6 rounded-xl bg-[#2d3f5d]/5 border border-[#2d3f5d]/10 p-3">
+        <p className="text-base font-semibold text-[#2d3f5d]">
+          Tuition Fee: <span className="text-[#faa853]">{pricing.tuition}</span>
+        </p>
+        <p className="text-base text-[#2d3f5d]/90">
+          Flexible Payment Options: <span className="font-semibold text-[#faa853]">{pricing.plans}</span>
+        </p>
       </div>
 
       <button
