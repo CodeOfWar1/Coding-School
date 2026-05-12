@@ -78,28 +78,39 @@ export const MISSION_VISION_VALUES = {
   mission:
     'To ignite creativity and technical mastery through hands-on, project-based learning, equipping students with future-ready skills to thrive in a technology-driven world.',
   vision:
-    'To cultivate Africa’s next generation of tech leaders who innovate responsibly, solve local and international challenges, and compete globally.',
+    'To cultivate Africa’s next generation of tech leaders who innovate responsibly, solve local and international challenges, and are able to compete globally.',
   values: [
-    { title: 'Excellence', text: 'Rigorous standards aligned with global tech benchmarks.' },
-    { title: 'Innovation', text: 'Curriculum that integrates emerging technologies.' },
-    { title: 'Inclusivity', text: 'Welcoming learners of all backgrounds and skill levels.' },
+    { title: 'Excellence', text: 'Rigorous academic standards aligned with global tech benchmarks.' },
+    { title: 'Innovation', text: 'Cutting-edge curriculum integrating emerging technologies.' },
+    { title: 'Inclusivity', text: 'Welcoming students of all backgrounds and skill levels.' },
     { title: 'Collaboration', text: 'Teamwork among students, educators, and industry partners.' },
-    { title: 'Empowerment', text: 'Confidence through personalized learning journeys.' },
+    { title: 'Empowerment', text: 'Fostering confidence through personalized learning journeys.' },
   ],
 }
 
+/** Intro copy for the About “Who we are” hero — ordered sections with short titles for scanability. */
 export const PROFILE_INTRO = {
   title: 'Introduction',
-  lead:
-    'Anvil Coding Academy is a premier extracurricular institution dedicated to equipping students with technological skills—from coding and programming to robotics and data literacy.',
-  about:
-    'We empower the next generation of tech leaders through high-quality, hands-on, project-based learning for students of all ages.',
-  specialties: [
-    'Programming languages: Python, Java, and JavaScript for apps and websites.',
-    'Web development with HTML, CSS, and JavaScript.',
-    'Game development with engines such as Unity and Unreal.',
-    'Robotics: build and program robots for teamwork and problem-solving.',
-    'Data science: introductory analysis and visualization.',
+  welcomeLine: 'Welcome to Anvil Coding Academy, where innovation meets education!',
+  sections: [
+    {
+      id: 'school',
+      title: 'Our school',
+      body:
+        'Anvil Coding Academy is a premier extracurricular institution dedicated to equipping students with essential technological skills and knowledge, particularly in the realm of coding and programming.',
+    },
+    {
+      id: 'belief',
+      title: 'What we believe',
+      body:
+        'At Anvil Coding Academy, we believe in the power of technology to transform lives and open doors to new opportunities. We provide high-quality education tailored to the unique needs and interests of young learners.',
+    },
+    {
+      id: 'programs',
+      title: 'How we teach',
+      body:
+        'Our programs are designed for students of all ages, from beginners to advanced learners, with a strong focus on hands-on, project-based learning.',
+    },
   ],
 }
 
@@ -120,8 +131,11 @@ export const OVERVIEW_FACTS = {
 
 export const MILESTONES = [
   { year: '2024', text: 'Official registration & establishment.' },
-  { year: 'Jan 2025', text: 'Launched inaugural courses in Python, Java, JavaScript, and web development.' },
-  { year: 'Ongoing', text: 'Partnerships with Lusaka International School, Trinade Technologies, and Family Development Initiatives.' },
+  { year: 'January 2025', text: 'Launched inaugural courses in Python, Java, JavaScript, and web development.' },
+  {
+    year: 'Strategic partnerships',
+    text: 'Collaborations with Lusaka International School, Trinade Technologies, and Family Development Initiatives to enhance curriculum delivery and community impact.',
+  },
 ]
 
 export const ACADEMIC_OFFERINGS_TABLE = [
@@ -158,17 +172,19 @@ export const SIGNATURE_PROGRAMS = [
 ]
 
 export const VALUE_DIFFERENTIATORS = {
+  headline: 'Why choose Anvil Academy?',
   why: [
-    'Modern pedagogy aligned with technologies in use today.',
-    'Age-appropriate paths—from gamified coding to professional-grade tools for teens.',
-    'STEAM integration blending coding with science, arts, and math.',
-    'Portfolio building: websites, apps, games, AI chatbots, and animations.',
-    'Industry mentorship via Trinade Technologies Limited.',
-    'Safety first: robust child protection and safeguarding policies.',
+    'Modern pedagogical approach to our curriculum, covering the technologies in use on the market today.',
+    'Age-appropriate learning: curriculum designed for developmental stages, from gamified coding for kids to professional-grade tools for teens.',
+    'STEAM integration: blends coding with science, arts, and math for holistic skill development.',
+    'Portfolio building: students graduate with tangible projects (websites, apps, games, functional AI chatbots, animations) to showcase to fellow students, parents, and institutions.',
+    'Industry partnerships: mentorship from Trinade Technologies Limited.',
+    'Safety first: robust child protection and safeguarding policies to ensure child safety.',
   ],
+  trendsTitle: 'Adapting to tech trends',
   trends: [
-    'Quarterly curriculum updates for AI, IoT, and robotics (Aviskaar).',
-    'Themed workshops on tools like Flutter and AWS.',
+    'Quarterly curriculum updates to include AI, IoT, and robotics by Aviskaar.',
+    'Themed workshops on cutting-edge tools like Flutter (mobile development) and AWS (cloud computing).',
   ],
 }
 
@@ -179,48 +195,58 @@ export const FACULTY_AND_ENVIRONMENT = {
   ],
   facilities: [
     { label: 'Dynamic classrooms', text: 'Reconfigurable spaces for individual and group work.' },
-    { label: 'Maker labs', text: '3D printers, VR headsets, and robotics kits.' },
-    { label: 'Digital resources', text: 'Learning resources with coding platforms, video tutorials, and progress updates.' },
+    { label: 'Maker labs', text: 'Access to 3D printers, VR headsets, and robotics kits.' },
+    {
+      label: 'Digital resources',
+      text: 'LMS with coding platforms, video tutorials, and progress dashboards for parents.',
+    },
   ],
 }
 
 export const STUDENT_SUCCESS = {
+  achievementsTitle: 'Achievements (2024–2025)',
   achievements: [
-    '92% student satisfaction (2024–2025).',
-    '45+ real-world projects deployed—including a nationally recognized mental health app and an AI homework assistant chatbot tested by 100+ students.',
+    '92% student satisfaction rate.',
+    '45+ real-world projects deployed, including:',
+    'A mental health app recognized at a national tech competition.',
+    'An AI chatbot for homework assistance, tested by 100+ students.',
   ],
+  progressTitle: 'Progress tracking',
   progress: [
-    'Personalized learning plans by skill level.',
-    'Digital portfolios showcasing growth.',
-    'Quarterly reports for parents with achievements and next steps.',
+    'Personalized learning plans: tailored to individual skill levels.',
+    'Digital portfolios: showcase student work and growth over time.',
+    'Quarterly reports: shared with parents, highlighting achievements and areas for improvement.',
   ],
 }
 
 export const COMMUNITY_PARTNERSHIPS = [
   {
     name: 'Family Development Initiatives',
-    text: 'Workshops on digital literacy and technology access for underserved communities.',
+    text: 'Joint workshops on digital literacy and technology access for underserved communities, empowering families to support their children’s tech education journey.',
   },
   {
     name: 'Lusaka International Community School (LICS)',
-    text: 'Co-developed STEAM programs, safeguarding training, and student exchanges in visual programming.',
+    text: 'Co-developed STEAM programs and shared resources, including teacher training on child support and safeguarding policies and student exchange initiatives focused on coding in visual programming.',
   },
   {
     name: 'Learning Ladder International School',
-    text: 'Extra-curricular alignment to embed age-appropriate coding in primary frameworks.',
+    text: 'Extra-curricular alignment partnerships to integrate age-appropriate coding fundamentals into primary education frameworks.',
   },
   {
     name: 'Best Buddies School',
-    text: 'Inclusive tech education—collaborative projects between neurodiverse and mainstream students.',
+    text: 'Inclusive tech education initiatives promoting collaborative learning between neurodiverse and mainstream students through adaptive coding projects and technology literacy.',
   },
 ]
 
 export const PARTNERSHIP_OBJECTIVES = [
-  'Cross-institutional teacher training on safeguarding.',
+  'Cross-institutional teacher training on child support and safeguarding policies.',
   'Community tech literacy drives.',
   'Student project showcases.',
   'Resource-sharing for equitable access.',
 ]
+
+export const COMMUNITY_PARTNERSHIPS_CLOSING =
+  'These strategic alliances reinforce our commitment to building a collaborative ecosystem that advances tech education across Zambia and Africa at large.';
 
 export const SCHOOL_PROFILE = {
   name: 'Anvil Coding Academy',
@@ -373,15 +399,6 @@ export const CLIENT2_COURSES = [
     title: 'Artificial Intelligence (AI)',
     text: 'An introduction to AI concepts, machine learning basics, and real-world AI applications.',
   },
-]
-
-export const WHY_CHOOSE_ANVIL = [
-  'Age-appropriate structured curriculum',
-  'Hands-on practical learning',
-  'Project-based teaching approach',
-  'Small class sizes for personalized attention',
-  'Preparation for future careers in technology',
-  'Encourages creativity, innovation, and critical thinking',
 ]
 
 export const FACILITIES = [

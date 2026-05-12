@@ -1,5 +1,5 @@
 import { FaUsers } from 'react-icons/fa'
-import { SCHOOL_PROFILE } from '../../content/siteProfile'
+import { PROFILE_INTRO, SCHOOL_PROFILE } from '../../content/siteProfile'
 import { SCHOOL_MEDIA_IMAGES } from '../../content/schoolMedia'
 
 export default function AboutWhoWeAreCard() {
@@ -36,23 +36,21 @@ export default function AboutWhoWeAreCard() {
               <h2 className="mt-3 text-2xl font-black leading-tight text-[#2d3f5d] md:text-[1.65rem]">{SCHOOL_PROFILE.name}</h2>
             </div>
           </header>
-          <div className="relative mb-6 max-w-prose space-y-4">
-            <p className="text-[15px] leading-7 text-gray-700 md:text-base">
-              Anvil Coding Academy is an extracurricular technology school dedicated to equipping young learners with essential digital skills for the modern world.
-            </p>
-            <p className="text-[15px] leading-7 text-gray-700 md:text-base">
-              We specialize in Digital Literacy, Coding, Robotics, Cyber Security, and Artificial Intelligence, preparing students aged 5 to 19 years for the future of technology.
-            </p>
-          </div>
-          <div className="relative mb-6 flex flex-wrap gap-2">
-            {['Digital Literacy', 'Coding', 'Robotics & AI'].map((label) => (
-              <span
-                key={label}
-                className="rounded-full border border-[#faa853]/40 bg-white/70 px-3.5 py-1.5 text-xs font-semibold text-[#2d3f5d] shadow-sm backdrop-blur-sm transition-colors hover:border-[#faa853]/60 hover:bg-[#faa853]/10"
-              >
-                {label}
-              </span>
-            ))}
+          <div className="relative mb-8 max-w-prose text-[15px] leading-7 text-gray-700 md:text-base">
+            <p className="font-semibold text-[#2d3f5d]">{PROFILE_INTRO.welcomeLine}</p>
+            <div className="mt-6 space-y-6 border-t border-[#2d3f5d]/10 pt-6">
+              {PROFILE_INTRO.sections.map((block) => (
+                <section key={block.id} aria-labelledby={`profile-intro-${block.id}`}>
+                  <h3
+                    id={`profile-intro-${block.id}`}
+                    className="text-[11px] font-black uppercase tracking-[0.14em] text-[#faa853]"
+                  >
+                    {block.title}
+                  </h3>
+                  <p className="mt-2.5 text-gray-700 leading-relaxed">{block.body}</p>
+                </section>
+              ))}
+            </div>
           </div>
           <div className="relative grid grid-cols-2 gap-3 md:gap-4">
             <div className="rounded-2xl border border-[#2d3f5d]/10 bg-white/75 p-4 shadow-sm backdrop-blur-sm transition-all duration-300 hover:border-[#faa853]/30 hover:shadow-md">

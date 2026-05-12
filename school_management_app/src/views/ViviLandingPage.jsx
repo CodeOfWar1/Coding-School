@@ -16,7 +16,7 @@ import RegisterModal from '../components/registration/RegisterModal'
 export default function ViviLandingPage() {
   const [signUp, setSignUp] = useState(false)
   const [activeSection, setActiveSection] = useState('home')
-  
+
   const sectionRefs = {
     home: useRef(null),
     about: useRef(null),
@@ -29,7 +29,7 @@ export default function ViviLandingPage() {
 
   const scrollToSection = (sectionId) => {
     setActiveSection(sectionId)
-    sectionRefs[sectionId]?.current?.scrollIntoView({ 
+    sectionRefs[sectionId]?.current?.scrollIntoView({
       behavior: 'smooth',
       block: 'start'
     })
@@ -58,15 +58,15 @@ export default function ViviLandingPage() {
   return (
     <div className="min-h-screen bg-white">
       <RegisterModal open={signUp} onClose={() => setSignUp(false)} />
-      
-      <Navbar 
-        activeSection={activeSection} 
+
+      <Navbar
+        activeSection={activeSection}
         scrollToSection={scrollToSection}
         onRegisterClick={() => setSignUp(true)}
       />
-      
+
       <main>
-        <Hero 
+        <Hero
           ref={sectionRefs.home}
           scrollToSection={scrollToSection}
           onRegisterClick={() => setSignUp(true)}
@@ -87,7 +87,7 @@ export default function ViviLandingPage() {
       >
         Register
       </button>
-      
+
       <Footer />
     </div>
   )

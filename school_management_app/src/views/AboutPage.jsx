@@ -1,6 +1,6 @@
 import { useState } from 'react'
+import AboutAcademyProfile from '../components/about/AboutAcademyProfile'
 import AboutClosingSections from '../components/about/AboutClosingSections'
-import AboutMidSections from '../components/about/AboutMidSections'
 import AboutPageHeader from '../components/about/AboutPageHeader'
 import AboutWhoWeAreCard from '../components/about/AboutWhoWeAreCard'
 import Footer from '../components/layout/Footer'
@@ -19,7 +19,7 @@ export default function AboutPage() {
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 py-12 md:py-16 space-y-8">
         <AboutWhoWeAreCard />
-        <AboutMidSections />
+        <AboutAcademyProfile />
         <AboutClosingSections />
       </div>
 
