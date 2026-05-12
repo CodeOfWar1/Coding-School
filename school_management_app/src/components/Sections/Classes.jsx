@@ -27,18 +27,20 @@ const Classes = forwardRef(({ onRegisterClick }, ref) => {
     <section id="classes" ref={ref} className="py-16 md:py-24 bg-gray-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
         <div className="text-center mb-12 md:mb-16">
-          <p className="text-sm font-bold uppercase tracking-[0.2em] text-[#faa853] mb-3 animate-fade-in">
-            Our Programs
-          </p>
-          <h2 className="text-3xl md:text-5xl font-black text-[#2d3f5d] mb-4 animate-slide-in-up">
-            Choose Your Learning Path
-          </h2>
-          <p className="site-body max-w-2xl mx-auto animate-fade-in animation-delay-200">
-            Comprehensive programs designed for ages 5-18 to build future-ready skills
-          </p>
+          <div data-reveal className="scroll-reveal">
+            <p className="text-sm font-bold uppercase tracking-[0.2em] text-[#faa853] mb-3">
+              Our Programs
+            </p>
+            <h2 className="text-3xl md:text-5xl font-black text-[#2d3f5d] mb-4">
+              Choose Your Learning Path
+            </h2>
+            <p className="site-body max-w-2xl mx-auto">
+              Comprehensive programs designed for ages 5-18 to build future-ready skills
+            </p>
+          </div>
         </div>
 
-        <div className="mb-8 md:mb-10 rounded-2xl bg-gradient-to-r from-[#2d3f5d] to-[#3f5780] text-white p-4 md:p-5 shadow-lg">
+        <div data-reveal className="mb-8 md:mb-10 rounded-2xl bg-gradient-to-r from-[#2d3f5d] to-[#3f5780] text-white p-4 md:p-5 shadow-lg scroll-reveal">
           <div className="flex flex-col md:flex-row md:items-center md:justify-center gap-3 md:gap-6 text-center">
             <p className="text-base font-bold">
               Tuition Fee: <span className="text-[#faa853]">{PRICING_STRIP.tuition}</span>
@@ -65,8 +67,10 @@ const Classes = forwardRef(({ onRegisterClick }, ref) => {
             return (
               <div
                 key={course.id}
-                className="group bg-white rounded-2xl p-6 hover:shadow-xl transition-all duration-500 hover:-translate-y-2 animate-fade-in-up"
-                style={{ animationDelay: `${idx * 100}ms` }}
+                data-reveal
+                className={`group bg-white rounded-2xl p-6 hover:shadow-xl transition-all duration-500 hover:-translate-y-2 scroll-reveal ${
+                  idx % 2 === 0 ? 'scroll-reveal--left' : 'scroll-reveal--right'
+                }`}
               >
                 <div className="w-14 h-14 md:w-16 md:h-16 rounded-full bg-[#faa853]/10 flex items-center justify-center mb-6 group-hover:bg-[#faa853] transition-all duration-300">
                   <Icon className="text-2xl text-[#faa853] group-hover:text-white transition-colors duration-300" />
@@ -85,7 +89,7 @@ const Classes = forwardRef(({ onRegisterClick }, ref) => {
           })}
         </div>
 
-        <div className="mt-14 md:mt-16 text-center">
+        <div data-reveal className="mt-14 md:mt-16 text-center scroll-reveal">
           <p className="text-sm font-bold uppercase tracking-[0.2em] text-[#faa853] mb-2">
             School Calendar
           </p>
@@ -94,7 +98,7 @@ const Classes = forwardRef(({ onRegisterClick }, ref) => {
           </h3>
         </div>
 
-        <div className="calendar-section-enter calendar-ambient mt-6 md:mt-8 relative overflow-hidden rounded-3xl bg-gradient-to-br from-[#eef4ff] via-[#fff9f1] to-[#f4f7ff] p-6 md:p-8 lg:p-10 shadow-xl">
+        <div data-reveal className="calendar-section-enter calendar-ambient mt-6 md:mt-8 relative overflow-hidden rounded-3xl bg-gradient-to-br from-[#eef4ff] via-[#fff9f1] to-[#f4f7ff] p-6 md:p-8 lg:p-10 shadow-xl scroll-reveal">
           <div className="calendar-orb pointer-events-none absolute -top-20 -right-20 h-56 w-56 rounded-full bg-[#2d3f5d]/10 blur-3xl" />
           <div className="calendar-orb calendar-orb--slow pointer-events-none absolute -bottom-20 -left-20 h-56 w-56 rounded-full bg-[#faa853]/20 blur-3xl" />
 

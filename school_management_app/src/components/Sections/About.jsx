@@ -15,20 +15,23 @@ const About = forwardRef(({ scrollToSection }, ref) => {
   return (
     <section id="about" ref={ref} className="py-16 md:py-24 bg-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
-        <div className="text-center mb-12 md:mb-16">
-          <p className="text-sm font-bold uppercase tracking-[0.2em] text-[#faa853] mb-3 animate-fade-in">
+        <div
+          data-reveal
+          className="text-center mb-12 md:mb-16 scroll-reveal"
+        >
+          <p className="text-sm font-bold uppercase tracking-[0.2em] text-[#faa853] mb-3">
             About Us
           </p>
-          <h2 className="text-3xl md:text-5xl font-black text-[#2d3f5d] mb-4 animate-slide-in-up">
+          <h2 className="text-3xl md:text-5xl font-black text-[#2d3f5d] mb-4">
             Shaping Future Tech Leaders
           </h2>
-          <p className="site-body max-w-3xl mx-auto animate-fade-in animation-delay-200">
+          <p className="site-body max-w-3xl mx-auto">
             {SCHOOL_PROFILE.aboutLead}
           </p>
         </div>
 
         <div className="grid md:grid-cols-2 gap-8 md:gap-12 items-center">
-          <div className="relative animate-fade-in-left">
+          <div data-reveal className="relative scroll-reveal scroll-reveal--left">
             <img
               src={SCHOOL_MEDIA_IMAGES.hero}
               alt="Students learning"
@@ -40,7 +43,7 @@ const About = forwardRef(({ scrollToSection }, ref) => {
             </div>
           </div>
 
-          <div className="space-y-6 animate-fade-in-right">
+          <div data-reveal className="space-y-6 scroll-reveal scroll-reveal--right">
             <div className="grid grid-cols-2 gap-4">
               {stats.map((stat, idx) => {
                 const Icon = stat.icon

@@ -77,17 +77,19 @@ const Team = forwardRef((_, ref) => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
         {/* Section Header */}
         <div className="text-center mb-12 md:mb-16">
-          <div className="inline-block px-4 py-2 rounded-full bg-[#faa853]/10 mb-4 animate-fade-in">
-            <p className="text-sm font-bold uppercase tracking-[0.2em] text-[#faa853]">
-              Meet the Team
+          <div data-reveal className="scroll-reveal">
+            <div className="inline-block px-4 py-2 rounded-full bg-[#faa853]/10 mb-4">
+              <p className="text-sm font-bold uppercase tracking-[0.2em] text-[#faa853]">
+                Meet the Team
+              </p>
+            </div>
+            <h2 className="text-3xl md:text-5xl font-black text-[#2d3f5d] mb-4">
+              Expert Educators & Mentors
+            </h2>
+            <p className="site-body max-w-2xl mx-auto">
+              Our diverse team brings together industry expertise, teaching excellence, and genuine passion for student success
             </p>
           </div>
-          <h2 className="text-3xl md:text-5xl font-black text-[#2d3f5d] mb-4 animate-slide-in-up">
-            Expert Educators & Mentors
-          </h2>
-          <p className="site-body max-w-2xl mx-auto animate-fade-in animation-delay-200">
-            Our diverse team brings together industry expertise, teaching excellence, and genuine passion for student success
-          </p>
         </div>
 
         {/* Team Grid */}
@@ -95,8 +97,8 @@ const Team = forwardRef((_, ref) => {
           {TEAM.map((member, idx) => (
             <div
               key={member.name}
-              className="group relative animate-fade-in-up"
-              style={{ animationDelay: `${idx * 100}ms` }}
+              data-reveal
+              className={`group relative scroll-reveal ${idx % 2 === 0 ? 'scroll-reveal--left' : 'scroll-reveal--right'}`}
             >
               {/* Card Container */}
               <div className="relative bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-500 hover:-translate-y-2">

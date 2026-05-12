@@ -113,6 +113,7 @@ export default function SiteNavbar({
                 <div className="p-2">
                   {[
                     { to: '/about', label: 'About Us' },
+                    { to: '/partners', label: 'Partners' },
                     { to: '/programs', label: 'Classes' },
                     { to: '/faq', label: 'FAQ' },
                     { to: '/newsletter', label: 'Newsletter' },

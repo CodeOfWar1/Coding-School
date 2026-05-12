@@ -39,23 +39,27 @@ export default function Testimonials() {
     <section className="py-16 md:py-24 bg-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
         <div className="text-center mb-12 md:mb-16">
-          <p className="text-sm font-bold uppercase tracking-[0.2em] text-[#faa853] mb-3 animate-fade-in">
-            Testimonials
-          </p>
-          <h2 className="text-3xl md:text-5xl font-black text-[#2d3f5d] mb-4 animate-slide-in-up">
-            What Our Community Says
-          </h2>
-          <p className="site-body max-w-2xl mx-auto animate-fade-in animation-delay-200">
-            Real stories from parents, students, and guardians
-          </p>
+          <div data-reveal className="scroll-reveal">
+            <p className="text-sm font-bold uppercase tracking-[0.2em] text-[#faa853] mb-3">
+              Testimonials
+            </p>
+            <h2 className="text-3xl md:text-5xl font-black text-[#2d3f5d] mb-4">
+              What Our Community Says
+            </h2>
+            <p className="site-body max-w-2xl mx-auto">
+              Real stories from parents, students, and guardians
+            </p>
+          </div>
         </div>
 
         <div className="grid md:grid-cols-3 gap-6 md:gap-8 mb-12">
           {feedbackList.map((testimonial, idx) => (
             <div
               key={idx}
-              className="bg-gray-50 rounded-2xl p-6 md:p-8 transition-all duration-500 hover:-translate-y-2 animate-fade-in-up"
-              style={{ animationDelay: `${idx * 100}ms` }}
+              data-reveal
+              className={`bg-gray-50 rounded-2xl p-6 md:p-8 transition-all duration-500 hover:-translate-y-2 scroll-reveal ${
+                idx % 2 === 0 ? 'scroll-reveal--left' : 'scroll-reveal--right'
+              }`}
             >
               <FaQuoteLeft className="text-3xl text-[#faa853]/30 mb-4" />
               <p className="site-body mb-4 italic">"{testimonial.text}"</p>
@@ -74,7 +78,7 @@ export default function Testimonials() {
           ))}
         </div>
 
-        <div className="max-w-2xl mx-auto bg-gray-50 rounded-2xl p-6 md:p-8">
+        <div data-reveal className="max-w-2xl mx-auto bg-gray-50 rounded-2xl p-6 md:p-8 scroll-reveal">
           <h3 className="text-xl font-bold text-[#2d3f5d] mb-4 text-center">Share Your Experience</h3>
           <form onSubmit={handleSubmit} className="space-y-4 text-base">
             <input

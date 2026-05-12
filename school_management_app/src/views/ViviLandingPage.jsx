@@ -12,10 +12,13 @@ import Contact from '../components/Sections/Contact'
 import { SCHOOL_PROFILE } from '../content/siteProfile'
 import { SCHOOL_MEDIA_IMAGES } from '../content/schoolMedia'
 import RegisterModal from '../components/registration/RegisterModal'
+import { useLandingScrollReveal } from '../hooks/useLandingScrollReveal'
 
 export default function ViviLandingPage() {
   const [signUp, setSignUp] = useState(false)
   const [activeSection, setActiveSection] = useState('home')
+
+  useLandingScrollReveal()
 
   const sectionRefs = {
     home: useRef(null),

@@ -22,7 +22,7 @@ const Contact = forwardRef((_, ref) => {
     <section id="contact" ref={ref} className="py-16 md:py-24 bg-[#faa853]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
         <div className="grid md:grid-cols-2 gap-8 md:gap-12 items-center">
-          <div className="text-white text-base animate-fade-in-left">
+          <div data-reveal className="text-white text-base scroll-reveal scroll-reveal--left">
             <h2 className="text-3xl md:text-5xl font-black mb-4">Ready to Start?</h2>
             <p className="text-base leading-relaxed text-white/90 mb-8 max-w-xl">
               Join us in shaping the next generation of tech innovators. Limited spots available!
@@ -71,7 +71,7 @@ const Contact = forwardRef((_, ref) => {
             </div>
           </div>
 
-          <div className="bg-white rounded-2xl p-6 md:p-8 shadow-xl animate-fade-in-right">
+          <div data-reveal className="bg-white rounded-2xl p-6 md:p-8 shadow-xl scroll-reveal scroll-reveal--right">
             <h3 className="text-xl md:text-2xl font-bold text-[#2d3f5d] mb-4">Book an Appointment</h3>
             <form onSubmit={handleSubmit} className="space-y-4 text-base">
               <input

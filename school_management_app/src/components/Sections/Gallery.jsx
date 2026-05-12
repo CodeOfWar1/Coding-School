@@ -19,23 +19,27 @@ const Gallery = forwardRef((_, ref) => {
     <section id="gallery" ref={ref} className="py-5 md:py-10 bg-gray-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
         <div className="text-center mb-12 md:mb-16">
-          <p className="text-sm font-bold uppercase tracking-[0.2em] text-[#faa853] mb-3 animate-fade-in">
-            Moments
-          </p>
-          <h2 className="text-3xl md:text-5xl font-black text-[#2d3f5d] mb-4 animate-slide-in-up">
-            Our Learning Journey
-          </h2>
-          <p className="site-body max-w-2xl mx-auto animate-fade-in animation-delay-200">
-            Capturing the excitement, creativity, and growth at Anvil Tech Academy
-          </p>
+          <div data-reveal className="scroll-reveal">
+            <p className="text-sm font-bold uppercase tracking-[0.2em] text-[#faa853] mb-3">
+              Moments
+            </p>
+            <h2 className="text-3xl md:text-5xl font-black text-[#2d3f5d] mb-4">
+              Our Learning Journey
+            </h2>
+            <p className="site-body max-w-2xl mx-auto">
+              Capturing the excitement, creativity, and growth at Anvil Tech Academy
+            </p>
+          </div>
         </div>
 
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {GALLERY_IMAGES.map((item, idx) => (
             <div
               key={idx}
-              className="group relative overflow-hidden rounded-2xl cursor-pointer animate-fade-in-up"
-              style={{ animationDelay: `${idx * 100}ms` }}
+              data-reveal
+              className={`group relative overflow-hidden rounded-2xl cursor-pointer scroll-reveal ${
+                idx % 2 === 0 ? 'scroll-reveal--left' : 'scroll-reveal--right'
+              }`}
               onClick={() => setSelectedImage(item)}
             >
               <div className="relative h-64 overflow-hidden">
@@ -54,7 +58,7 @@ const Gallery = forwardRef((_, ref) => {
         </div>
 
         {/* See Our Gallery Button */}
-        <div className="text-center mt-12 md:mt-16 animate-fade-in-up animation-delay-400">
+        <div data-reveal className="text-center mt-12 md:mt-16 scroll-reveal">
           <Link
             to="/gallery"
             className="group inline-flex items-center gap-3 px-8 py-4 rounded-full bg-white border-2 border-[#faa853] text-[#faa853] font-semibold hover:bg-[#faa853] hover:text-white transition-all duration-300 hover:shadow-lg hover:-translate-y-1"

@@ -9,6 +9,7 @@ import ParentDashboard from './views/ParentDashboard'
 import AdminDashboard from './views/AdminDashboard'
 import Gallery from './views/Gallery'
 import AboutPage from './views/AboutPage'
+import PartnersPage from './views/PartnersPage'
 import DashboardRedirect from './views/DashboardRedirect'
 
 function ScrollToTopOnRouteChange() {
@@ -73,6 +74,7 @@ export default function App() {
         <Route path="/" element={<ViviLandingPage />} />
         <Route path="/gallery" element={<Gallery />} />
         <Route path="/about" element={<AboutPage />} />
+        <Route path="/partners" element={<PartnersPage />} />
         <Route path="/login" element={<LoginPage />} />
 
         {/* Protected */}

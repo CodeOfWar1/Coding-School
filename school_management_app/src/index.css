@@ -207,6 +207,18 @@
   transform: translateY(0) scale(1);
 }
 
+@media (prefers-reduced-motion: reduce) {
+
+  [data-reveal].scroll-reveal,
+  [data-reveal].scroll-reveal--left,
+  [data-reveal].scroll-reveal--right,
+  [data-reveal].scroll-reveal.scroll-reveal--about-hero {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+  }
+}
+
 /* Hover Effects */
 .hover-lift {
   transition: transform 0.3s ease, box-shadow 0.3s ease;
