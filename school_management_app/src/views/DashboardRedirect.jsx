@@ -14,6 +14,8 @@ export default function DashboardRedirect() {
       navigate('/dashboard/student', { replace: true })
     } else if (profile.role === 'parent') {
       navigate('/dashboard/parent', { replace: true })
+    } else if (profile.role === 'finance') {
+      navigate('/dashboard/finance', { replace: true })
     } else if (profile.role === 'admin') {
       navigate('/dashboard/admin', { replace: true })
     } else {

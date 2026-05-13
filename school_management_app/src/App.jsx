@@ -7,6 +7,7 @@ import ViviLandingPage from './views/ViviLandingPage'
 import StudentDashboard from './views/StudentDashboard'
 import ParentDashboard from './views/ParentDashboard'
 import AdminDashboard from './views/AdminDashboard'
+import FinanceDashboard from './views/FinanceDashboard'
 import Gallery from './views/Gallery'
 import AboutPage from './views/AboutPage'
 import PartnersPage from './views/PartnersPage'
@@ -101,6 +102,15 @@ export default function App() {
           element={
             <RouteGuard allowedRoles={['admin']}>
               <AdminDashboard />
+            </RouteGuard>
+          }
+        />
+
+        <Route
+          path="/dashboard/finance"
+          element={
+            <RouteGuard allowedRoles={['finance']}>
+              <FinanceDashboard />
             </RouteGuard>
           }
         />

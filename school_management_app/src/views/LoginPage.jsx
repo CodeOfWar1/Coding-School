@@ -15,19 +15,21 @@ export default function LoginPage() {
   const navigate = useNavigate()
   const { user, profile } = useAuth()
 
-useEffect(() => {
-  if (!user || !profile) return
+  useEffect(() => {
+    if (!user || !profile) return
 
-  if (!user.email_confirmed_at) return
+    if (!user.email_confirmed_at) return
 
-  if (profile.role === 'student') {
-    navigate('/dashboard/student', { replace: true })
-  } else if (profile.role === 'parent') {
-    navigate('/dashboard/parent', { replace: true })
-  } else if (profile.role === 'admin') {
-    navigate('/dashboard/admin', { replace: true })
-  }
-}, [user, profile])
+    if (profile.role === 'student') {
+      navigate('/dashboard/student', { replace: true })
+    } else if (profile.role === 'parent') {
+      navigate('/dashboard/parent', { replace: true })
+    } else if (profile.role === 'finance') {
+      navigate('/dashboard/finance', { replace: true })
+    } else if (profile.role === 'admin') {
+      navigate('/dashboard/admin', { replace: true })
+    }
+  }, [user, profile])
 
   const handleLogin = async (e) => {
     e.preventDefault()

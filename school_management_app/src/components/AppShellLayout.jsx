@@ -1,16 +1,10 @@
 import { useState } from 'react'
+import { Link } from 'react-router-dom'
 import { useAuth } from '../state/AuthContext'
+import logoImage from '../assets/logo.png'
 
 /**
- * Shared “myschool” layout: blue top bar, dark sidebar, light main area.
- * @param {object} props
- * @param {import('react').ReactNode} props.children
- * @param {{ id: string, label: string, badge?: number, active?: boolean, icon?: string }[]} props.navItems
- * @param {string} [props.activeNavId] — when set with onNavSelect, highlights this id (overrides item.active)
- * @param {(id: string) => void} [props.onNavSelect] — sidebar item click handler (also closes mobile drawer)
- * @param {string} [props.roleLabel]
- * @param {string} [props.pageTitle]
- * @param {string} [props.breadcrumbLast]
+ * Portal shell — visual language aligned with the public landing (navy, amber, cream/sky surfaces).
  */
 export default function AppShellLayout({
   children,
@@ -19,7 +13,7 @@ export default function AppShellLayout({
   onNavSelect,
   roleLabel = 'User',
   pageTitle = 'Dashboard',
-  breadcrumbLast,
+  breadcrumbLast: _breadcrumbLast,
 }) {
   const { user, profile, logout } = useAuth()
   const [sidebarOpen, setSidebarOpen] = useState(false)
@@ -32,18 +26,13 @@ export default function AppShellLayout({
     .slice(0, 2)
     .toUpperCase()
 
-  const crumb = breadcrumbLast ?? pageTitle
-
   return (
-    <div className="flex min-h-screen flex-col bg-[var(--vivi-light)]">
-      <header
-        className="sticky top-0 z-30 flex h-14 shrink-0 items-center justify-between px-3 text-white shadow md:px-4"
-        style={{ backgroundColor: 'var(--anvil-royal)' }}
-      >
+    <div className="portal-page flex min-h-screen flex-col font-sans">
+      <header className="sticky top-0 z-30 flex h-14 shrink-0 items-center justify-between border-b border-primary/25 bg-gradient-to-r from-secondary to-[#1a2542] px-3 text-white shadow-md md:px-5">
         <div className="flex items-center gap-3">
           <button
             type="button"
-            className="rounded p-2 hover:bg-white/10 md:hidden"
+            className="rounded-lg p-2 hover:bg-white/10 md:hidden"
             aria-label="Open menu"
             onClick={() => setSidebarOpen((o) => !o)}
           >
@@ -51,36 +40,37 @@ export default function AppShellLayout({
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
             </svg>
           </button>
-          <img src="/Screenshot%202026-04-03%20164428.png" alt="" className="hidden h-8 w-8 rounded sm:block" />
-          <span className="font-semibold tracking-tight">Anvil</span>
+          <Link to="/" className="flex items-center gap-2 transition hover:opacity-90">
+            <img src={logoImage} alt="" className="h-9 w-auto object-contain" />
+            <span className="hidden font-heading text-lg font-black tracking-tight sm:inline">Anvil Coding Academy</span>
+          </Link>
         </div>
-        <div className="flex items-center gap-3 text-sm">
-          <div className="flex max-w-[160px] items-center gap-1 truncate rounded bg-white/10 px-2 py-1">
-            <span className="truncate">{displayName}</span>
-            <span className="shrink-0 text-white/80">▾</span>
-          </div>
+        <div className="flex items-center gap-2 text-sm md:gap-3">
+          <span className="hidden max-w-[200px] truncate rounded-full border border-white/20 bg-white/10 px-3 py-1 text-xs font-semibold text-white/95 md:inline">
+            {displayName}
+          </span>
+          <span className="rounded-full bg-primary/90 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-secondary shadow-sm">
+            {roleLabel}
+          </span>
         </div>
       </header>
 
       <div className="flex flex-1">
         <aside
-          className={`fixed bottom-0 left-0 z-40 w-56 transform border-r border-[var(--anvil-royal-deep)] bg-[var(--anvil-navy)] text-white transition md:static md:z-0 md:flex md:translate-x-0 md:flex-col ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'
-            }`}
+          className={`fixed bottom-0 left-0 z-40 w-60 transform border-r border-secondary/15 bg-gradient-to-b from-secondary via-[#263553] to-[#1a2542] text-white shadow-xl transition md:static md:z-0 md:flex md:w-56 md:translate-x-0 md:flex-col md:shadow-none ${
+            sidebarOpen ? 'translate-x-0' : '-translate-x-full'
+          }`}
           style={{ top: '3.5rem' }}
         >
-          <div className="border-b border-[var(--anvil-royal-deep)] p-4">
-            <p className="text-lg font-bold tracking-tight">Anvil</p>
-            <p className="text-[10px] font-medium uppercase tracking-wider text-slate-500">Portal</p>
+          <div className="border-b border-white/10 p-4">
+            <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-primary">Portal</p>
             <div className="mt-4 flex items-center gap-3">
-              <div
-                className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full text-sm font-bold text-white"
-                style={{ backgroundColor: 'var(--anvil-royal)' }}
-              >
+              <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-primary to-[#f28c38] text-sm font-black text-secondary shadow-lg ring-2 ring-white/25">
                 {initials}
               </div>
               <div className="min-w-0">
-                <p className="truncate font-medium">{displayName}</p>
-                <p className="text-xs text-slate-400">{roleLabel}</p>
+                <p className="truncate font-semibold text-white">{displayName}</p>
+                <p className="text-xs text-white/60">{roleLabel}</p>
               </div>
             </div>
           </div>
@@ -93,20 +83,23 @@ export default function AppShellLayout({
                   <li key={item.id}>
                     <button
                       type="button"
-                      style={selected ? { backgroundColor: 'var(--anvil-royal)' } : undefined}
-                      className={`flex w-full items-center gap-2 rounded px-3 py-2.5 text-left transition ${selected
-                          ? 'font-semibold text-white shadow-md shadow-slate-900/30'
-                          : 'text-slate-200 hover:bg-[var(--anvil-royal-deep)]/65 hover:text-white'
-                        }`}
+                      className={`flex w-full items-center gap-2 rounded-xl px-3 py-2.5 text-left transition ${
+                        selected
+                          ? 'bg-white/15 font-semibold text-white shadow-inner ring-1 ring-primary/40'
+                          : 'text-white/85 hover:bg-white/10 hover:text-white'
+                      }`}
                       onClick={() => {
                         onNavSelect?.(item.id)
                         setSidebarOpen(false)
                       }}
                     >
-                      {item.icon && <span className="text-base opacity-90">{item.icon}</span>}
+                      {item.icon && <span className="text-base opacity-95">{item.icon}</span>}
                       <span className="flex-1">{item.label}</span>
+                      {selected && (
+                        <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-primary shadow-[0_0_8px_rgba(250,168,83,0.9)]" />
+                      )}
                       {item.badge != null && item.badge > 0 && (
-                        <span className="rounded-full bg-sky-300 px-2 py-0.5 text-[11px] font-bold text-sky-950">
+                        <span className="rounded-full bg-primary px-2 py-0.5 text-[11px] font-bold text-secondary">
                           {item.badge}
                         </span>
                       )}
@@ -116,8 +109,12 @@ export default function AppShellLayout({
               })}
             </ul>
           </nav>
-          <div className="border-t border-[var(--anvil-royal-deep)] p-3">
-            <button type="button" className="btn-theme-primary w-full px-2 py-2 text-left text-sm" onClick={() => logout()}>
+          <div className="border-t border-white/10 p-3">
+            <button
+              type="button"
+              className="btn-portal-outline w-full bg-transparent px-3 py-2.5 text-center text-sm font-bold shadow-none"
+              onClick={() => logout()}
+            >
               Sign out
             </button>
           </div>
@@ -126,20 +123,27 @@ export default function AppShellLayout({
         {sidebarOpen && (
           <button
             type="button"
-            className="fixed inset-0 z-30 bg-black/40 md:hidden"
+            className="fixed inset-0 z-30 bg-secondary/40 backdrop-blur-[2px] md:hidden"
             aria-label="Close menu"
             onClick={() => setSidebarOpen(false)}
           />
         )}
 
-        <main className="min-w-0 flex-1 bg-white p-4 md:p-5">
-          <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
-            <h1 className="text-2xl font-semibold text-slate-900">{pageTitle}</h1>
-            <nav className="text-sm text-slate-500" aria-label="Page context">
-              <span className="text-slate-700">{crumb}</span>
-            </nav>
+        <main className="min-w-0 flex-1 p-4 md:p-6 lg:p-8">
+          <div className="mx-auto max-w-[1600px]">
+            <div className="mb-6 flex flex-wrap items-end justify-between gap-3 border-b border-secondary/10 pb-4">
+              <div>
+                <p className="text-xs font-bold uppercase tracking-[0.2em] text-primary">Dashboard</p>
+                <h1 className="font-heading text-2xl font-black tracking-tight text-secondary md:text-3xl">{pageTitle}</h1>
+              </div>
+              <div className="flex flex-wrap items-center gap-2" aria-label="Page context">
+                <span className="rounded-full border border-secondary/20 bg-gradient-to-r from-[#f8fbff] to-[#fff8ef] px-3 py-1.5 text-[11px] font-bold uppercase tracking-wider text-secondary shadow-sm ring-1 ring-secondary/10">
+                  {roleLabel}
+                </span>
+              </div>
+            </div>
+            <div className="space-y-6">{children}</div>
           </div>
-          {children}
         </main>
       </div>
     </div>

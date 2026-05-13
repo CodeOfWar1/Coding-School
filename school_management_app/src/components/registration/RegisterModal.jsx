@@ -43,11 +43,11 @@ export default function RegisterModal({ open, onClose }) {
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-4" role="dialog" aria-modal="true">
       {/* Backdrop */}
-      <button 
-        type="button" 
-        className="absolute inset-0 bg-black/50 backdrop-blur-sm" 
-        aria-label="Close" 
-        onClick={handleClose} 
+      <button
+        type="button"
+        className="absolute inset-0 bg-black/50 backdrop-blur-sm"
+        aria-label="Close"
+        onClick={handleClose}
       />
 
       {/* Modal Container */}
@@ -62,8 +62,8 @@ export default function RegisterModal({ open, onClose }) {
                   <h2 className="mt-2 text-3xl font-black">Join Our Community</h2>
                   <p className="mt-2 text-white/80">Choose how you'd like to sign up</p>
                 </div>
-                <button 
-                  onClick={handleClose} 
+                <button
+                  onClick={handleClose}
                   className="text-white/70 hover:text-white transition-colors"
                 >
                   <FaTimes size={24} />
@@ -116,7 +116,7 @@ export default function RegisterModal({ open, onClose }) {
                     {userType === 'student' ? 'Create Student Account' : 'Create Parent Account'}
                   </h2>
                 </div>
-                <button 
+                <button
                   onClick={handleBack}
                   className="px-4 py-2 rounded-lg bg-white/10 hover:bg-white/20 transition-colors text-sm font-semibold"
                 >

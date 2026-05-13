@@ -1,10 +1,12 @@
 import { forwardRef } from 'react'
 import { FaUsers, FaChalkboardTeacher, FaBriefcase, FaHandshake, FaArrowRight } from 'react-icons/fa'
 import { Link } from 'react-router-dom'
-import { SCHOOL_PROFILE } from '../../content/siteProfile'
 import { SCHOOL_MEDIA_IMAGES } from '../../content/schoolMedia'
+import { useLandingSiteContent } from '../../hooks/useLandingSiteContent'
 
 const About = forwardRef(({ scrollToSection }, ref) => {
+  const { data: site } = useLandingSiteContent()
+
   const stats = [
     { icon: FaUsers, value: '500+', label: 'Students', color: 'text-[#faa853]' },
     { icon: FaChalkboardTeacher, value: '10+', label: 'Experts', color: 'text-[#faa853]' },
@@ -19,21 +21,15 @@ const About = forwardRef(({ scrollToSection }, ref) => {
           data-reveal
           className="text-center mb-12 md:mb-16 scroll-reveal"
         >
-          <p className="text-sm font-bold uppercase tracking-[0.2em] text-[#faa853] mb-3">
-            About Us
-          </p>
-          <h2 className="text-3xl md:text-5xl font-black text-[#2d3f5d] mb-4">
-            Shaping Future Tech Leaders
-          </h2>
-          <p className="site-body max-w-3xl mx-auto">
-            {SCHOOL_PROFILE.aboutLead}
-          </p>
+          <p className="text-sm font-bold uppercase tracking-[0.2em] text-[#faa853] mb-3">{site.about_eyebrow}</p>
+          <h2 className="text-3xl md:text-5xl font-black text-[#2d3f5d] mb-4">{site.about_heading}</h2>
+          <p className="site-body max-w-3xl mx-auto">{site.about_lead}</p>
         </div>
 
         <div className="grid md:grid-cols-2 gap-8 md:gap-12 items-center">
           <div data-reveal className="relative scroll-reveal scroll-reveal--left">
             <img
-              src={SCHOOL_MEDIA_IMAGES.hero}
+              src={site.about_image_url || SCHOOL_MEDIA_IMAGES.hero}
               alt="Students learning"
               className="rounded-2xl w-full object-cover shadow-lg"
             />

@@ -11,6 +11,32 @@ import { useMessageInbox } from '../hooks/useMessageInbox'
 import { createPortalMessage, listPortalMessages } from '../state/portalMessages'
 import { createPortalEvent, listPortalEvents } from '../state/portalEvents'
 import { Line, Pie, Bar } from 'react-chartjs-2'
+import {
+  FaBullhorn,
+  FaCalendarAlt,
+  FaChartBar,
+  FaCheckDouble,
+  FaClipboardCheck,
+  FaCode,
+  FaEnvelope,
+  FaGraduationCap,
+  FaHandshake,
+  FaHeading,
+  FaImage,
+  FaImages,
+  FaInbox,
+  FaLink,
+  FaPaperPlane,
+  FaPhone,
+  FaPlus,
+  FaSearch,
+  FaTrashAlt,
+  FaUpload,
+  FaUserGraduate,
+} from 'react-icons/fa'
+import { emptyLandingContent } from '../content/landingSiteDefaults'
+import { mergeLandingSiteRow, buildLandingUpsertPayload } from '../utils/landingContentMerge'
+import { uploadSiteMediaFile } from '../lib/siteMediaUpload'
 
 const NAV_BASE = [
   { id: 'dash', label: 'Overview', icon: '🏠' },
@@ -19,6 +45,8 @@ const NAV_BASE = [
   { id: 'grade', label: 'Grading', icon: '✅' },
   { id: 'skills', label: 'Skill insights', icon: '🎯' },
   { id: 'landing', label: 'Landing page', icon: '🖼️' },
+  { id: 'cmsGallery', label: 'Site gallery', icon: '📷' },
+  { id: 'cmsPartners', label: 'Partners', icon: '🤝' },
   { id: 'activity', label: 'Activity', icon: '📡' },
   { id: 'msg', label: 'Messages', icon: '✉️', badge: 0 },
 ]
@@ -30,11 +58,22 @@ const SECTION_TITLE = {
   grade: 'Grading',
   skills: 'Skill insights',
   landing: 'Landing page',
+  cmsGallery: 'Site gallery',
+  cmsPartners: 'Partners & outreach',
   activity: 'Activity',
   msg: 'Messages',
 }
 
 const ROLES = ['student', 'parent', 'finance', 'admin']
+
+function broadcastAccent(target) {
+  const t = String(target || 'all').toLowerCase()
+  if (t === 'student') return 'border-l-4 border-l-primary bg-gradient-to-r from-[#fff8ef]/90 to-white'
+  if (t === 'parent') return 'border-l-4 border-l-sky-500 bg-gradient-to-r from-sky-50/80 to-white'
+  if (t === 'finance') return 'border-l-4 border-l-emerald-500 bg-gradient-to-r from-emerald-50/70 to-white'
+  if (t === 'admin') return 'border-l-4 border-l-violet-500 bg-gradient-to-r from-violet-50/70 to-white'
+  return 'border-l-4 border-l-secondary bg-gradient-to-r from-[#f8fbff] to-white'
+}
 
 export default function AdminDashboard() {
   const { isDemoMode, user } = useAuth()
@@ -46,12 +85,7 @@ export default function AdminDashboard() {
   const [submissionCount, setSubmissionCount] = useState(0)
   const [paymentCount, setPaymentCount] = useState(0)
   const [taskForm, setTaskForm] = useState({ title: '', description: '', deadline: '' })
-  const [content, setContent] = useState({
-    hero_title: '',
-    hero_text: '',
-    hero_image_url: '',
-    hero_image_url_secondary: '',
-  })
+  const [content, setContent] = useState(() => emptyLandingContent())
   const [tasksList, setTasksList] = useState([])
   const [submissionsFeed, setSubmissionsFeed] = useState([])
   const [gradeEdits, setGradeEdits] = useState({})
@@ -75,12 +109,14 @@ export default function AdminDashboard() {
       setTaskCount(4)
       setSubmissionCount(6)
       setPaymentCount(2)
-      setContent({
-        hero_title: 'Learn to code with confidence',
-        hero_text: 'Build real projects with mentors.',
-        hero_image_url: '/media/hero.jpg',
-        hero_image_url_secondary: '/media/Logo.png',
-      })
+      setContent(
+        mergeLandingSiteRow({
+          hero_title: 'Learn to code with confidence',
+          hero_text: 'Build real projects with mentors.',
+          hero_image_url: '/media/hero.jpg',
+          hero_image_url_secondary: '/media/Logo.png',
+        }),
+      )
       setTasksList([
         { id: 1, title: 'FizzBuzz', deadline: new Date().toISOString(), description: 'Warmup' },
         { id: 2, title: 'Palindrome lab', deadline: new Date().toISOString(), description: 'Strings' },
@@ -137,13 +173,7 @@ export default function AdminDashboard() {
       supabase.from('payments').select('id', { count: 'exact', head: true }),
     ])
     setUsers(usersRes.data ?? [])
-    setContent({
-      ...(contentRes.data ?? {}),
-      hero_title: contentRes.data?.hero_title ?? '',
-      hero_text: contentRes.data?.hero_text ?? '',
-      hero_image_url: contentRes.data?.hero_image_url ?? '',
-      hero_image_url_secondary: contentRes.data?.hero_image_url_secondary ?? '',
-    })
+    setContent(mergeLandingSiteRow(contentRes.data))
     setTasksList(tasksRes.data ?? [])
     setTaskCount((tasksRes.data ?? []).length)
     setSubmissionCount(subRes.count ?? 0)
@@ -247,20 +277,87 @@ export default function AdminDashboard() {
     }
   }
 
-  const saveContent = async (e) => {
-    e.preventDefault()
+  const persistLandingContent = async (e) => {
+    e?.preventDefault?.()
     if (isDemoMode) {
-      setContent((c) => ({ ...c }))
-    } else {
-      await supabase.from('landing_content').upsert({
-        id: 1,
-        hero_title: content.hero_title,
-        hero_text: content.hero_text,
-        hero_image_url: content.hero_image_url || null,
-        hero_image_url_secondary: content.hero_image_url_secondary || null,
-      })
-      await loadAll()
+      setToast('Demo mode — website content is not saved to the database.')
+      return
     }
+    const { error } = await supabase.from('landing_content').upsert(buildLandingUpsertPayload(content))
+    if (error) {
+      setToast(error.message || 'Save failed. Add missing columns in Supabase (see supabase/landing_content_extend.sql).')
+      return
+    }
+    await loadAll()
+    setToast('Website content saved.')
+  }
+
+  const addGalleryItem = () => {
+    setContent((p) => ({
+      ...p,
+      gallery_items: [...(p.gallery_items || []), { title: 'Photo title', image_url: '' }],
+    }))
+  }
+
+  const removeGalleryItem = (idx) => {
+    setContent((p) => ({
+      ...p,
+      gallery_items: (p.gallery_items || []).filter((_, i) => i !== idx),
+    }))
+  }
+
+  const patchGalleryItem = (idx, field, value) => {
+    setContent((p) => {
+      const items = [...(p.gallery_items || [])]
+      items[idx] = { ...items[idx], [field]: value }
+      return { ...p, gallery_items: items }
+    })
+  }
+
+  const addPartnerItem = () => {
+    setContent((p) => ({
+      ...p,
+      partners_items: [...(p.partners_items || []), { name: 'Partner name', logo_url: '', activity_summary: '' }],
+    }))
+  }
+
+  const removePartnerItem = (idx) => {
+    setContent((p) => ({
+      ...p,
+      partners_items: (p.partners_items || []).filter((_, i) => i !== idx),
+    }))
+  }
+
+  const patchPartnerItem = (idx, field, value) => {
+    setContent((p) => {
+      const items = [...(p.partners_items || [])]
+      items[idx] = { ...items[idx], [field]: value }
+      return { ...p, partners_items: items }
+    })
+  }
+
+  const uploadGalleryFile = async (idx, fileList) => {
+    const file = fileList?.[0]
+    if (!file) return
+    const r = await uploadSiteMediaFile(file, 'gallery')
+    if (r.error) {
+      setToast(r.error)
+      return
+    }
+    patchGalleryItem(idx, 'image_url', r.publicUrl)
+    setToast('Image uploaded — save to publish on the public site.')
+  }
+
+  const uploadPartnerLogo = async (idx, fileList) => {
+    const file = fileList?.[0]
+    if (!file) return
+    const r = await uploadSiteMediaFile(file, 'partners')
+    if (r.error) {
+      setToast(r.error)
+      return
+    }
+    patchPartnerItem(idx, 'logo_url', r.publicUrl)
+    setToast('Logo uploaded — save to publish.')
   }
 
   const updateUserRole = async (userId, role) => {
@@ -371,11 +468,11 @@ export default function AdminDashboard() {
             0,
             0,
           ],
-          borderColor: '#22c55e',
-          backgroundColor: 'rgba(34, 197, 94, 0.12)',
+          borderColor: '#2d3f5d',
+          backgroundColor: 'rgba(45, 63, 93, 0.08)',
           fill: true,
           tension: 0.35,
-          pointBackgroundColor: '#22c55e',
+          pointBackgroundColor: '#faa853',
           pointBorderColor: '#fff',
           pointRadius: 5,
         },
@@ -393,15 +490,25 @@ export default function AdminDashboard() {
   const studentSkillBar = useMemo(() => {
     if (!studentSkillRadar) return null
     const ds = studentSkillRadar.datasets?.[0]
+    const data = ds?.data ?? []
+    const len = data.length
+    const fills =
+      len === 0
+        ? []
+        : Array.from({ length: len }, (_, i) =>
+            i % 2 === 0 ? 'rgba(250, 168, 83, 0.9)' : 'rgba(45, 63, 93, 0.85)',
+          )
     return {
       labels: studentSkillRadar.labels ?? [],
       datasets: [
         {
           label: ds?.label ?? 'Skill profile',
-          data: ds?.data ?? [],
-          backgroundColor: 'rgba(37, 99, 235, 0.22)',
-          borderColor: '#2563eb',
-          borderWidth: 1,
+          data,
+          backgroundColor: fills,
+          borderColor: '#2d3f5d',
+          borderWidth: 1.5,
+          borderRadius: 8,
+          borderSkipped: false,
         },
       ],
     }
@@ -448,13 +555,13 @@ export default function AdminDashboard() {
 
       {activeSection === 'dash' && (
         <>
-          <p className="mb-4 text-sm text-slate-600">
+          <p className="mb-4 text-sm text-gray-600">
             Overview metrics link to each admin area. Use <strong>Skill insights</strong> to review each
             student&apos;s estimated skill profile from their grades.
           </p>
           <div className="mb-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             <MetricCard
-              color="bg-blue-600"
+              color="bg-primary"
               value={roleCounts.student || 0}
               title="Students"
               icon="🎓"
@@ -504,7 +611,7 @@ export default function AdminDashboard() {
               onMoreInfo={() => overviewNav('activity', 'Recent submissions feed.')}
             />
             <MetricCard
-              color="bg-violet-600"
+              color="bg-secondary"
               value={paymentCount}
               title="Payments"
               icon="💳"
@@ -514,7 +621,7 @@ export default function AdminDashboard() {
               onMoreInfo={() => overviewNav('activity', 'Pair with finance for verification.')}
             />
             <MetricCard
-              color="bg-slate-700"
+              color="bg-[#243652]"
               value={users.length}
               title="Accounts"
               icon="👤"
@@ -536,14 +643,14 @@ export default function AdminDashboard() {
           </div>
 
           <div className="mb-6 grid gap-4 lg:grid-cols-2">
-            <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
-              <h3 className="mb-2 font-semibold text-slate-800">Event schedule</h3>
-              <p className="mb-3 text-xs text-slate-500">
+            <div className="rounded-xl border border-secondary/10 bg-white p-4 shadow-sm">
+              <h3 className="mb-2 font-semibold text-secondary">Event schedule</h3>
+              <p className="mb-3 text-xs text-gray-500">
                 Publish school events here; students and parents will see highlighted dates in their schedules.
               </p>
               <CalendarWidget title="School events" highlightDates={eventHighlightsAll} />
               <form
-                className="mt-4 grid gap-3 rounded-lg border border-slate-100 bg-slate-50 p-3 md:grid-cols-3"
+                className="mt-4 grid gap-3 rounded-lg border border-secondary/[0.06] bg-[#f8fbff] p-3 md:grid-cols-3"
                 onSubmit={(e) => {
                   e.preventDefault()
                   const created = createPortalEvent({
@@ -562,21 +669,21 @@ export default function AdminDashboard() {
                 }}
               >
                 <input
-                  className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm outline-none ring-sky-500/20 focus:ring-2 md:col-span-1"
+                  className="rounded-lg border border-secondary/10 bg-white px-3 py-2 text-sm outline-none ring-sky-500/20 focus:ring-2 md:col-span-1"
                   placeholder="Event title"
                   value={eventDraft.title}
                   onChange={(e) => setEventDraft((p) => ({ ...p, title: e.target.value }))}
                   required
                 />
                 <input
-                  className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm outline-none ring-sky-500/20 focus:ring-2 md:col-span-1"
+                  className="rounded-lg border border-secondary/10 bg-white px-3 py-2 text-sm outline-none ring-sky-500/20 focus:ring-2 md:col-span-1"
                   type="date"
                   value={eventDraft.date ? String(eventDraft.date).slice(0, 10) : ''}
                   onChange={(e) => setEventDraft((p) => ({ ...p, date: e.target.value }))}
                   required
                 />
                 <select
-                  className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm outline-none ring-sky-500/20 focus:ring-2 md:col-span-1"
+                  className="rounded-lg border border-secondary/10 bg-white px-3 py-2 text-sm outline-none ring-sky-500/20 focus:ring-2 md:col-span-1"
                   value={eventDraft.target}
                   onChange={(e) => setEventDraft((p) => ({ ...p, target: e.target.value }))}
                 >
@@ -586,15 +693,15 @@ export default function AdminDashboard() {
                 </select>
                 <button
                   type="submit"
-                  className="mt-1 rounded-lg bg-slate-900 px-4 py-2 text-sm font-semibold text-white hover:bg-black md:col-span-3"
+                  className="mt-1 rounded-lg bg-secondary px-4 py-2 text-sm font-semibold text-white hover:bg-black md:col-span-3"
                 >
                   Publish event
                 </button>
               </form>
               <div className="mt-4">
-                <h4 className="mb-2 text-sm font-semibold text-slate-800">Recent events</h4>
+                <h4 className="mb-2 text-sm font-semibold text-secondary">Recent events</h4>
                 {portalEvents.length === 0 ? (
-                  <p className="text-sm text-slate-500">No events yet.</p>
+                  <p className="text-sm text-gray-500">No events yet.</p>
                 ) : (
                   <ul className="space-y-2">
                     {portalEvents
@@ -602,9 +709,9 @@ export default function AdminDashboard() {
                       .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
                       .slice(0, 4)
                       .map((ev) => (
-                        <li key={ev.id} className="rounded border border-slate-100 bg-white p-2 text-sm">
-                          <p className="font-semibold text-slate-900">{ev.title}</p>
-                          <p className="text-xs text-slate-600">
+                        <li key={ev.id} className="rounded border border-secondary/[0.06] bg-white p-2 text-sm">
+                          <p className="font-semibold text-secondary">{ev.title}</p>
+                          <p className="text-xs text-gray-600">
                             {ev.target} · {new Date(ev.date).toLocaleDateString()}
                           </p>
                         </li>
@@ -613,9 +720,9 @@ export default function AdminDashboard() {
                 )}
               </div>
             </div>
-            <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
-              <h3 className="mb-3 font-semibold text-slate-800">System activity snapshot</h3>
-              <p className="mb-2 text-xs text-slate-500">
+            <div className="rounded-xl border border-secondary/10 bg-white p-4 shadow-sm">
+              <h3 className="mb-3 font-semibold text-secondary">System activity snapshot</h3>
+              <p className="mb-2 text-xs text-gray-500">
                 Tracks key platform counts (payments, tasks, submissions, and accounts) as a quick health overview.
               </p>
               <div className="h-64">
@@ -633,15 +740,15 @@ export default function AdminDashboard() {
           </div>
 
           <div className="mb-6 grid gap-4 lg:grid-cols-2">
-            <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
-              <h3 className="mb-2 font-semibold text-slate-800">Users by role</h3>
-              <p className="mb-3 text-xs text-slate-500">Distribution of user accounts across role groups.</p>
+            <div className="rounded-xl border border-secondary/10 bg-white p-4 shadow-sm">
+              <h3 className="mb-2 font-semibold text-secondary">Users by role</h3>
+              <p className="mb-3 text-xs text-gray-500">Distribution of user accounts across role groups.</p>
               <div className="mx-auto h-64 max-w-sm">
                 <Pie data={pie} options={commonOptions} />
               </div>
             </div>
-            <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
-              <h3 className="mb-3 font-semibold text-slate-800">Landing preview</h3>
+            <div className="rounded-xl border border-secondary/10 bg-white p-4 shadow-sm">
+              <h3 className="mb-3 font-semibold text-secondary">Landing preview</h3>
               {content.hero_image_url && (
                 <img
                   src={content.hero_image_url}
@@ -649,94 +756,181 @@ export default function AdminDashboard() {
                   className="mb-3 h-28 w-full rounded object-cover"
                 />
               )}
-              <p className="text-lg font-bold text-slate-900">{content.hero_title}</p>
-              <p className="mt-2 text-sm text-slate-600">{content.hero_text}</p>
-              <button
-                type="button"
-                onClick={() => overviewNav('landing', 'Edit landing in the next section.')}
-                className="mt-3 text-sm font-semibold text-blue-700 hover:underline"
-              >
-                Edit landing content →
-              </button>
+              <p className="text-lg font-bold text-secondary">{content.hero_title}</p>
+              <p className="mt-2 text-sm text-gray-600">{content.hero_text}</p>
+              <div className="mt-3 flex flex-wrap gap-x-4 gap-y-2">
+                <button
+                  type="button"
+                  onClick={() => overviewNav('landing', 'Hero, About strip, announcement, contact.')}
+                  className="text-sm font-semibold text-secondary hover:text-primary hover:underline"
+                >
+                  Landing content →
+                </button>
+                <button
+                  type="button"
+                  onClick={() => overviewNav('cmsGallery', 'Gallery photos on the home page.')}
+                  className="text-sm font-semibold text-secondary hover:text-primary hover:underline"
+                >
+                  Site gallery →
+                </button>
+                <button
+                  type="button"
+                  onClick={() => overviewNav('cmsPartners', 'Partner logos and activities.')}
+                  className="text-sm font-semibold text-secondary hover:text-primary hover:underline"
+                >
+                  Partners CMS →
+                </button>
+              </div>
             </div>
           </div>
         </>
       )}
 
       {activeSection === 'skills' && (
-        <section className="mb-6 rounded-xl border border-indigo-100 bg-indigo-50/60 p-6 shadow-sm">
-          <h2 className="text-lg font-semibold text-indigo-950">Skill insights by student</h2>
-          <p className="mt-1 text-sm text-indigo-900/80">
-            Choose a student to see an estimated skill profile derived from <strong>their</strong> graded submissions
-            only. Switch students to compare. Scores use submissions loaded for admin (most recent records, up to
-            500).
-          </p>
-
-          {studentUsers.length === 0 ? (
-            <p className="mt-6 text-sm text-indigo-900/70">No student accounts yet — add students under Users & roles.</p>
-          ) : (
-            <>
-              <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-end">
-                <label className="flex min-w-[16rem] flex-col gap-1 text-sm font-medium text-indigo-950">
-                  Student
-                  <input
-                    className="rounded-lg border border-indigo-200 bg-white px-3 py-2 text-sm text-slate-900 shadow-sm outline-none ring-indigo-500/30 focus:ring-2"
-                    placeholder="Search student…"
-                    value={skillStudentQuery}
-                    onChange={(e) => setSkillStudentQuery(e.target.value)}
-                  />
-                  <select
-                    value={skillStudentId}
-                    onChange={(e) => setSelectedSkillStudentId(e.target.value)}
-                    className="rounded-lg border border-indigo-200 bg-white px-3 py-2 text-sm text-slate-900 shadow-sm outline-none ring-indigo-500/30 focus:ring-2"
-                  >
-                    {skillSelectOptions.map((u) => (
-                      <option key={u.id} value={u.id}>
-                        {u.full_name ?? u.id}
-                      </option>
-                    ))}
-                  </select>
-                </label>
-                <div className="rounded-lg border border-indigo-200/80 bg-white/80 px-4 py-2 text-sm text-indigo-950">
-                  <span className="font-semibold">{skillStudentLabel}</span>
-                  {skillAvgText != null && (
-                    <span className="ml-2 text-indigo-800/90">
-                      · avg grade {skillAvgText} ({skillScores.length} graded submission
-                      {skillScores.length === 1 ? '' : 's'})
-                    </span>
-                  )}
-                  {skillAvgText == null && <span className="ml-2 text-amber-800">· no graded work yet</span>}
-                </div>
+        <div className="space-y-8">
+          <header className="relative overflow-hidden rounded-3xl border border-secondary/12 bg-gradient-to-br from-secondary/[0.08] via-white to-primary/[0.07] p-6 shadow-xl md:p-8">
+            <div className="pointer-events-none absolute -right-8 -top-10 h-40 w-40 rounded-full bg-primary/20 blur-3xl" aria-hidden />
+            <div className="relative flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+              <div className="max-w-3xl">
+                <p className="inline-flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.22em] text-secondary">
+                  <FaGraduationCap className="text-primary" aria-hidden />
+                  Skill analytics
+                </p>
+                <h2 className="font-heading mt-3 text-3xl font-black tracking-tight text-secondary md:text-4xl">
+                  Skill insights by student
+                </h2>
+                <p className="mt-2 text-sm leading-relaxed text-gray-600 md:text-base">
+                  Choose a student to see an estimated skill profile from{' '}
+                  <strong className="text-secondary">their graded submissions only</strong>. Switch students to compare.
+                  Data uses the most recent admin-loaded submissions (up to 500).
+                </p>
               </div>
+            </div>
+          </header>
 
-              <div className="mx-auto mt-6 max-w-lg">
-                {studentSkillBar ? (
-                  <div className="h-64 rounded-xl border border-indigo-200 bg-white/60 p-2">
-                    <Bar
-                      data={studentSkillBar}
-                      options={{
-                        ...commonOptions,
-                        plugins: { legend: { display: false } },
-                        scales: { y: { min: 0, max: 100, ticks: { stepSize: 25 } } },
-                      }}
-                    />
+          <section className="portal-section-card border-0 shadow-none ring-0" id="skills">
+            {studentUsers.length === 0 ? (
+              <p className="rounded-3xl border border-dashed border-secondary/25 bg-[#f8fbff]/80 py-14 text-center text-sm text-secondary/75">
+                No student accounts yet — add students under Users & roles.
+              </p>
+            ) : (
+              <>
+                <div className="grid gap-6 lg:grid-cols-12 lg:items-stretch">
+                  <div className="flex flex-col gap-4 lg:col-span-5">
+                    <div className="rounded-3xl border-2 border-secondary/15 bg-gradient-to-br from-white to-[#f8fbff] p-5 shadow-lg md:p-6">
+                      <div className="mb-4 flex items-center gap-3 border-b border-secondary/10 pb-4">
+                        <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-secondary/10 text-secondary">
+                          <FaSearch className="h-5 w-5" aria-hidden />
+                        </span>
+                        <div>
+                          <p className="font-heading text-sm font-bold text-secondary">Pick a learner</p>
+                          <p className="text-xs text-gray-500">Search then select from the list</p>
+                        </div>
+                      </div>
+                      <label className="sr-only" htmlFor="skill-student-search">
+                        Search students
+                      </label>
+                      <input
+                        id="skill-student-search"
+                        className="portal-input mb-3 shadow-inner"
+                        placeholder="Search student…"
+                        value={skillStudentQuery}
+                        onChange={(e) => setSkillStudentQuery(e.target.value)}
+                      />
+                      <label className="sr-only" htmlFor="skill-student-select">
+                        Student
+                      </label>
+                      <select
+                        id="skill-student-select"
+                        value={skillStudentId}
+                        onChange={(e) => setSelectedSkillStudentId(e.target.value)}
+                        className="portal-input font-heading font-semibold text-secondary"
+                      >
+                        {skillSelectOptions.map((u) => (
+                          <option key={u.id} value={u.id}>
+                            {u.full_name ?? u.id}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                    <div className="rounded-3xl border-2 border-primary/30 bg-gradient-to-br from-[#fff8ef] via-white to-[#f8fbff] p-5 shadow-lg md:p-6">
+                      <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-gray-500">Snapshot</p>
+                      <p className="font-heading mt-2 text-lg font-bold text-secondary">{skillStudentLabel}</p>
+                      {skillAvgText != null ? (
+                        <p className="mt-2 text-sm text-secondary/85">
+                          Avg grade{' '}
+                          <span className="rounded-lg bg-primary/20 px-2 py-0.5 font-heading text-xl font-black tabular-nums text-secondary">
+                            {skillAvgText}
+                          </span>
+                          <span className="text-gray-600">
+                            {' '}
+                            · {skillScores.length} graded submission{skillScores.length === 1 ? '' : 's'}
+                          </span>
+                        </p>
+                      ) : (
+                        <p className="mt-2 font-medium text-amber-800">No graded work yet for this student.</p>
+                      )}
+                    </div>
                   </div>
-                ) : (
-                  <p className="rounded-lg border border-dashed border-indigo-200 bg-white/60 py-12 text-center text-sm text-indigo-900/75">
-                    No numeric grades for this student yet. Post scores in <strong>Grading</strong> to build a profile.
-                  </p>
-                )}
-              </div>
-            </>
-          )}
-        </section>
+
+                  <div className="lg:col-span-7">
+                    {studentSkillBar ? (
+                      <div className="relative h-full min-h-[20rem] overflow-hidden rounded-3xl border-2 border-secondary/20 bg-gradient-to-br from-[#0f172a] via-secondary to-[#1a2542] p-5 shadow-2xl md:p-6">
+                        <div className="pointer-events-none absolute right-0 top-0 h-32 w-32 rounded-full bg-primary/25 blur-3xl" aria-hidden />
+                        <div className="relative mb-4 flex items-center gap-3">
+                          <span className="rounded-full bg-primary/20 px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-primary ring-1 ring-primary/40">
+                            Profile bars
+                          </span>
+                          <span className="text-xs font-medium text-white/70">Alternating navy · amber fills</span>
+                        </div>
+                        <div className="relative rounded-2xl bg-white p-4 shadow-xl ring-2 ring-white/10">
+                          <div className="h-72 md:h-80">
+                            <Bar
+                              data={studentSkillBar}
+                              options={{
+                                ...commonOptions,
+                                plugins: { legend: { display: false } },
+                                scales: {
+                                  y: {
+                                    min: 0,
+                                    max: 100,
+                                    ticks: { stepSize: 25, color: '#64748b' },
+                                    grid: { color: 'rgba(45,63,93,0.08)' },
+                                  },
+                                  x: {
+                                    ticks: { color: '#475569', font: { size: 11, weight: '600' } },
+                                    grid: { display: false },
+                                  },
+                                },
+                              }}
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="flex h-full min-h-[20rem] items-center justify-center rounded-3xl border-2 border-dashed border-secondary/25 bg-gradient-to-br from-[#f8fbff] to-white p-8 text-center shadow-inner">
+                        <div>
+                          <FaChartBar className="mx-auto mb-3 h-12 w-12 text-secondary/20" aria-hidden />
+                          <p className="max-w-sm text-sm text-secondary/80">
+                            No numeric grades for this student yet. Post scores in <strong>Grading</strong> to build a
+                            profile.
+                          </p>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </>
+            )}
+          </section>
+        </div>
       )}
 
       {activeSection === 'users' && (
         <section className="mb-6 space-y-6" id="users">
           <div>
-            <h2 className="text-xl font-bold tracking-tight text-slate-900">Users & roles</h2>
-            <p className="mt-1 max-w-3xl text-sm text-slate-600">
+            <h2 className="text-xl font-bold tracking-tight text-secondary">Users & roles</h2>
+            <p className="mt-1 max-w-3xl text-sm text-gray-600">
               Accounts are grouped by role so you can scan each cohort quickly. Changing a role updates the local row;
               click <strong>Apply</strong> to persist (demo updates immediately; production follows Supabase RLS).
             </p>
@@ -744,14 +938,14 @@ export default function AdminDashboard() {
 
           <div className="flex flex-wrap gap-3 items-center">
             <input
-              className="w-full max-w-md rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm shadow-sm outline-none ring-sky-500/25 transition focus:ring-2"
+              className="w-full max-w-md rounded-xl border border-secondary/10 bg-white px-4 py-2.5 text-sm shadow-sm outline-none ring-sky-500/25 transition focus:ring-2"
               placeholder="Search users by name or id…"
               value={usersSearch}
               onChange={(e) => setUsersSearch(e.target.value)}
             />
             <button
               type="button"
-              className="rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 shadow-sm hover:bg-slate-50"
+              className="rounded-xl border border-secondary/10 bg-white px-4 py-2.5 text-sm font-semibold text-secondary shadow-sm hover:bg-[#f8fbff]"
               onClick={() => setUsersSearch('')}
             >
               Clear
@@ -763,26 +957,23 @@ export default function AdminDashboard() {
               const meta = ROLE_META[role]
               const group = filteredUsers.filter((u) => u.role === role)
               return (
-                <div
-                  key={role}
-                  className="overflow-hidden rounded-2xl border border-slate-200/90 bg-white shadow-md ring-1 ring-slate-200/60"
-                >
+                <div key={role} className={`overflow-hidden rounded-2xl ${meta.card}`}>
                   <div className={`bg-gradient-to-r px-5 py-4 text-white shadow-inner ${meta.header}`}>
                     <div className="flex flex-wrap items-center justify-between gap-3">
                       <div>
-                        <h3 className="text-lg font-bold">{meta.label}</h3>
-                        <p className="text-sm text-white/90">{meta.description}</p>
+                        <h3 className="text-lg font-bold tracking-tight drop-shadow-sm">{meta.label}</h3>
+                        <p className="text-sm text-white/92">{meta.description}</p>
                       </div>
-                      <span className="rounded-full bg-white/20 px-3 py-1 text-sm font-bold tabular-nums">
+                      <span className="rounded-full border border-white/25 bg-white/15 px-3.5 py-1 text-sm font-bold tabular-nums backdrop-blur-[2px]">
                         {group.length}
                       </span>
                     </div>
                   </div>
 
                   {group.length === 0 ? (
-                    <p className="px-5 py-8 text-center text-sm text-slate-500">No accounts in this group yet.</p>
+                    <p className="px-5 py-8 text-center text-sm text-gray-500">No accounts in this group yet.</p>
                   ) : (
-                    <ul className="divide-y divide-slate-100">
+                    <ul className={`divide-y ${meta.divide}`}>
                       {group.map((u) => (
                         <li
                           key={u.id}
@@ -794,11 +985,11 @@ export default function AdminDashboard() {
                               aria-hidden
                             />
                             <div className="min-w-0">
-                              <p className="truncate font-semibold text-slate-900">{u.full_name}</p>
-                              <p className="truncate text-xs text-slate-500">{u.id}</p>
+                              <p className="truncate font-semibold text-secondary">{u.full_name}</p>
+                              <p className="truncate text-xs text-gray-500">{u.id}</p>
                             </div>
                             <span
-                              className={`hidden shrink-0 rounded-full border px-2 py-0.5 text-[11px] font-bold uppercase tracking-wide sm:inline ${meta.chip}`}
+                              className={`inline-flex shrink-0 rounded-full px-2.5 py-0.5 text-[11px] font-bold uppercase tracking-wide shadow-sm ${meta.chip}`}
                             >
                               {meta.singular}
                             </span>
@@ -809,7 +1000,7 @@ export default function AdminDashboard() {
                             </label>
                             <select
                               id={`role-${u.id}`}
-                              className="min-w-[9rem] rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm font-medium text-slate-800 shadow-sm outline-none ring-sky-500/25 focus:ring-2"
+                              className={`min-w-[9rem] rounded-xl border bg-white px-3 py-2 text-sm font-medium text-secondary shadow-sm outline-none transition ${meta.selectRing}`}
                               value={u.role}
                               onChange={(e) => {
                                 const nextRole = e.target.value
@@ -824,8 +1015,7 @@ export default function AdminDashboard() {
                             </select>
                             <button
                               type="button"
-                              className="rounded-xl px-4 py-2 text-sm font-bold text-white shadow-sm transition hover:brightness-110"
-                              style={{ backgroundColor: 'var(--app-brand)' }}
+                              className={`rounded-xl px-4 py-2 text-sm font-bold shadow-sm transition ${meta.applyBtn}`}
                               onClick={() => updateUserRole(u.id, u.role)}
                             >
                               Apply
@@ -853,233 +1043,778 @@ export default function AdminDashboard() {
       )}
 
       {activeSection === 'tasks' && (
-      <section className="mb-6 rounded border border-slate-200 bg-white p-4 shadow-sm" id="tasks">
-        <h2 className="mb-2 text-lg font-semibold">Create & manage coding tasks</h2>
-        <form className="mb-6 grid gap-2 md:grid-cols-3" onSubmit={createTask}>
-          <input
-            className="rounded border border-slate-300 p-2"
-            placeholder="Title"
-            value={taskForm.title}
-            onChange={(e) => setTaskForm((p) => ({ ...p, title: e.target.value }))}
-            required
-          />
-          <input
-            className="rounded border border-slate-300 p-2"
-            placeholder="Description"
-            value={taskForm.description}
-            onChange={(e) => setTaskForm((p) => ({ ...p, description: e.target.value }))}
-            required
-          />
-          <input
-            className="rounded border border-slate-300 p-2"
-            type="datetime-local"
-            value={taskForm.deadline}
-            onChange={(e) => setTaskForm((p) => ({ ...p, deadline: e.target.value }))}
-            required
-          />
-          <button type="submit" className="rounded bg-indigo-600 px-3 py-2 text-white md:col-span-3">
-            Create task
-          </button>
+      <div className="space-y-6" id="tasks">
+        <header className="rounded-3xl border border-secondary/12 bg-gradient-to-r from-white via-[#f8fbff] to-[#fff8ef]/60 p-6 shadow-lg md:p-7">
+          <div className="flex flex-wrap items-start gap-4">
+            <span className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-secondary to-[#1a2542] text-2xl text-primary shadow-lg ring-2 ring-white">
+              <FaCode className="h-7 w-7" aria-hidden />
+            </span>
+            <div>
+              <h2 className="font-heading text-2xl font-black tracking-tight text-secondary md:text-3xl">Coding tasks</h2>
+              <p className="mt-2 max-w-2xl text-sm leading-relaxed text-gray-600">
+                Create assignments with a due date. Students see published tasks on their dashboard and can submit work there.
+              </p>
+            </div>
+          </div>
+        </header>
+
+        <form
+          className="group relative overflow-hidden rounded-3xl border-2 border-secondary/15 bg-white shadow-xl"
+          onSubmit={createTask}
+        >
+          <div className="h-1.5 bg-gradient-to-r from-secondary via-[#3d5a8a] to-primary" aria-hidden />
+          <div className="border-b border-secondary/10 bg-gradient-to-r from-[#f8fbff] to-white px-5 py-4 md:px-6">
+            <h3 className="font-heading text-lg font-bold text-secondary md:text-xl">Create &amp; publish</h3>
+            <p className="mt-1 text-sm text-gray-600">Fill in the basics below — all fields are required.</p>
+          </div>
+          <div className="space-y-5 p-5 md:p-6">
+            <div className="grid gap-4 md:grid-cols-3">
+              <label className="block text-xs font-semibold uppercase tracking-wide text-secondary/80">
+                <span className="mb-1.5 flex items-center gap-2">
+                  <FaCode className="h-3.5 w-3.5 text-primary" aria-hidden />
+                  Title
+                </span>
+                <input
+                  className="portal-input"
+                  placeholder="e.g. FizzBuzz warmup"
+                  value={taskForm.title}
+                  onChange={(e) => setTaskForm((p) => ({ ...p, title: e.target.value }))}
+                  required
+                />
+              </label>
+              <label className="block text-xs font-semibold uppercase tracking-wide text-secondary/80 md:col-span-1">
+                <span className="mb-1.5 flex items-center gap-2">
+                  <FaClipboardCheck className="h-3.5 w-3.5 text-primary" aria-hidden />
+                  Description
+                </span>
+                <input
+                  className="portal-input"
+                  placeholder="Short summary for students"
+                  value={taskForm.description}
+                  onChange={(e) => setTaskForm((p) => ({ ...p, description: e.target.value }))}
+                  required
+                />
+              </label>
+              <label className="block text-xs font-semibold uppercase tracking-wide text-secondary/80">
+                <span className="mb-1.5 flex items-center gap-2">
+                  <FaCalendarAlt className="h-3.5 w-3.5 text-primary" aria-hidden />
+                  Due
+                </span>
+                <input
+                  className="portal-input"
+                  type="datetime-local"
+                  value={taskForm.deadline}
+                  onChange={(e) => setTaskForm((p) => ({ ...p, deadline: e.target.value }))}
+                  required
+                />
+              </label>
+            </div>
+            <button type="submit" className="btn-portal-primary inline-flex w-full items-center justify-center gap-2 md:w-auto md:min-w-[13rem]">
+              <FaPlus className="h-4 w-4" aria-hidden />
+              Create task
+            </button>
+          </div>
         </form>
-        <h3 className="mb-2 font-medium text-slate-800">Published tasks</h3>
-        <ul className="space-y-2 text-sm">
-          {tasksList.map((t) => (
-            <li key={t.id} className="flex flex-wrap items-center justify-between gap-2 rounded border border-slate-100 p-2">
-              <span>
-                <strong>{t.title}</strong>
-                <span className="text-slate-600"> — due {new Date(t.deadline).toLocaleString()}</span>
-              </span>
-              <button
-                type="button"
-                className="rounded bg-red-600 px-2 py-1 text-xs text-white"
-                onClick={() => deleteTask(t.id)}
-              >
-                Delete
-              </button>
-            </li>
-          ))}
-        </ul>
-      </section>
+
+        <section className="portal-section-card">
+          <div className="mb-5 flex flex-wrap items-end justify-between gap-3 border-b border-secondary/10 pb-4">
+            <div>
+              <h3 className="font-heading text-lg font-bold text-secondary md:text-xl">Published tasks</h3>
+              <p className="mt-1 text-sm text-gray-600">
+                {tasksList.length === 0
+                  ? 'No tasks yet — create one above.'
+                  : `${tasksList.length} assignment${tasksList.length === 1 ? '' : 's'} live for students.`}
+              </p>
+            </div>
+          </div>
+          <ul className="space-y-3">
+            {tasksList.map((t, idx) => {
+              const accent =
+                idx % 3 === 0
+                  ? 'from-secondary via-[#2d4a73] to-primary'
+                  : idx % 3 === 1
+                    ? 'from-primary via-amber-400 to-secondary'
+                    : 'from-emerald-600 via-teal-600 to-secondary'
+              return (
+                <li
+                  key={t.id}
+                  className="group relative overflow-hidden rounded-2xl border border-secondary/12 bg-white shadow-md transition hover:-translate-y-0.5 hover:shadow-lg"
+                >
+                  <div className={`absolute left-0 top-0 h-full w-1.5 bg-gradient-to-b ${accent}`} aria-hidden />
+                  <div className="flex flex-wrap items-center justify-between gap-4 pl-5 pr-4 py-4 sm:pl-6">
+                    <div className="min-w-0 flex-1">
+                      <p className="font-heading font-bold text-secondary">{t.title}</p>
+                      <p className="mt-1 line-clamp-2 text-sm text-gray-600">{t.description}</p>
+                      <span className="mt-3 inline-flex items-center gap-1.5 rounded-full border border-secondary/15 bg-[#f8fbff] px-3 py-1 text-xs font-semibold text-secondary">
+                        <FaCalendarAlt className="h-3 w-3 text-primary" aria-hidden />
+                        Due {new Date(t.deadline).toLocaleString()}
+                      </span>
+                    </div>
+                    <button
+                      type="button"
+                      className="inline-flex shrink-0 items-center gap-2 rounded-xl border-2 border-red-200 bg-white px-4 py-2 text-xs font-bold text-red-700 shadow-sm transition hover:border-red-300 hover:bg-red-50"
+                      onClick={() => deleteTask(t.id)}
+                    >
+                      <FaTrashAlt className="h-3.5 w-3.5" aria-hidden />
+                      Delete
+                    </button>
+                  </div>
+                </li>
+              )
+            })}
+          </ul>
+        </section>
+      </div>
       )}
 
       {activeSection === 'grade' && (
-      <section className="mb-6 rounded border border-slate-200 bg-white p-4 shadow-sm" id="grading">
-        <h2 className="mb-2 text-lg font-semibold">Grades & feedback</h2>
-        <p className="mb-4 text-sm text-slate-600">Students and parents see scores and feedback on the dashboards.</p>
-        <div className="space-y-4">
-          {submissionsFeed.map((row) => {
+      <div className="space-y-6">
+        <header className="rounded-3xl border border-secondary/12 bg-gradient-to-r from-white via-[#f8fbff] to-[#fff8ef]/60 p-6 shadow-lg md:p-7">
+          <div className="flex flex-wrap items-start gap-4">
+            <span className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-secondary to-[#1a2542] text-2xl text-primary shadow-lg ring-2 ring-white">
+              <FaClipboardCheck className="h-7 w-7" aria-hidden />
+            </span>
+            <div>
+              <h2 className="font-heading text-2xl font-black tracking-tight text-secondary md:text-3xl">Grades & feedback</h2>
+              <p className="mt-2 max-w-2xl text-sm leading-relaxed text-gray-600">
+                Students and parents see scores and feedback on their dashboards. Save after editing each submission.
+              </p>
+            </div>
+          </div>
+        </header>
+
+        <section className="space-y-6" id="grading">
+        <div className="space-y-6">
+          {submissionsFeed.map((row, idx) => {
             const edit = gradeEdits[row.id] ?? {}
             const scoreVal = edit.score !== undefined ? edit.score : row.score ?? ''
             const feedbackVal = edit.feedback !== undefined ? edit.feedback : row.feedback ?? ''
+            const hasScore = row.score != null && row.score !== ''
+            const initial = (String(row.student_name || '?').trim().slice(0, 1) || '?').toUpperCase()
+            const accent =
+              idx % 3 === 0
+                ? 'from-secondary via-[#2d4a73] to-primary'
+                : idx % 3 === 1
+                  ? 'from-primary via-amber-400 to-secondary'
+                  : 'from-emerald-600 via-teal-600 to-secondary'
             return (
-              <div key={row.id} className="rounded border border-slate-100 p-3">
-                <div className="flex flex-wrap justify-between gap-2 text-sm">
-                  <span className="font-medium">{row.student_name}</span>
-                  <span className="text-slate-600">{row.task_title}</span>
-                  <span className="text-slate-400">{new Date(row.submitted_at).toLocaleString()}</span>
-                </div>
-                {row.code_preview && (
-                  <pre className="mt-2 max-h-24 overflow-auto rounded bg-slate-50 p-2 text-xs">{row.code_preview}…</pre>
-                )}
-                <div className="mt-3 grid gap-2 md:grid-cols-3">
-                  <input
-                    type="number"
-                    min={0}
-                    max={100}
-                    className="rounded border border-slate-200 p-2 text-sm"
-                    placeholder="Score /100"
-                    value={scoreVal}
-                    onChange={(e) => setGradeField(row.id, 'score', e.target.value)}
-                  />
-                  <input
-                    className="rounded border border-slate-200 p-2 text-sm md:col-span-2"
-                    placeholder="Feedback for student"
-                    value={feedbackVal}
-                    onChange={(e) => setGradeField(row.id, 'feedback', e.target.value)}
-                  />
-                </div>
-                <button
-                  type="button"
-                  className="mt-2 rounded bg-emerald-600 px-3 py-1.5 text-sm text-white"
-                  onClick={() => saveGrade(row)}
+              <div
+                key={row.id}
+                className={`group relative overflow-hidden rounded-3xl border-2 bg-white shadow-xl transition hover:-translate-y-0.5 hover:shadow-2xl ${
+                  hasScore ? 'border-secondary/20' : 'border-primary/35 ring-2 ring-primary/15'
+                }`}
+              >
+                <div className={`absolute left-0 top-0 h-full w-1.5 bg-gradient-to-b ${accent}`} aria-hidden />
+                <div
+                  className={`flex flex-wrap items-start justify-between gap-4 border-b px-5 py-4 sm:items-center md:px-6 ${
+                    hasScore
+                      ? 'border-secondary/10 bg-gradient-to-r from-[#f8fbff] to-white'
+                      : 'border-primary/15 bg-gradient-to-r from-[#fff8ef] to-white'
+                  }`}
                 >
-                  Save grade
-                </button>
+                  <div className="flex min-w-0 items-start gap-4 pl-1">
+                    <div
+                      className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl text-lg font-black text-white shadow-md ring-2 ring-white ${
+                        hasScore ? 'bg-gradient-to-br from-secondary to-[#1a2542]' : 'bg-gradient-to-br from-primary to-[#e89235] text-secondary'
+                      }`}
+                    >
+                      {initial}
+                    </div>
+                    <div className="min-w-0">
+                      <p className="flex flex-wrap items-center gap-2 font-heading text-lg font-bold text-secondary">
+                        <FaUserGraduate className="hidden h-4 w-4 text-primary sm:inline" aria-hidden />
+                        {row.student_name}
+                      </p>
+                      <p className="mt-0.5 text-sm font-medium text-gray-600">{row.task_title}</p>
+                    </div>
+                  </div>
+                  <span className="shrink-0 rounded-full border border-secondary/10 bg-white px-3 py-1 text-xs tabular-nums text-gray-500 shadow-sm">
+                    {new Date(row.submitted_at).toLocaleString()}
+                  </span>
+                </div>
+                <div className="px-5 py-5 md:px-6 md:py-6">
+                  {row.code_preview && (
+                    <pre className="mb-5 max-h-32 overflow-auto rounded-2xl border border-secondary/10 bg-[#0f172a] p-4 font-mono text-xs leading-relaxed text-slate-100">
+                      {row.code_preview}…
+                    </pre>
+                  )}
+                  <div className="grid gap-4 md:grid-cols-3">
+                    <label className="block text-[11px] font-bold uppercase tracking-[0.12em] text-secondary/70">
+                      Score /100
+                      <input
+                        type="number"
+                        min={0}
+                        max={100}
+                        className="portal-input mt-2 tabular-nums shadow-inner"
+                        placeholder="0–100"
+                        value={scoreVal}
+                        onChange={(e) => setGradeField(row.id, 'score', e.target.value)}
+                      />
+                    </label>
+                    <label className="block text-[11px] font-bold uppercase tracking-[0.12em] text-secondary/70 md:col-span-2">
+                      Feedback for student
+                      <textarea
+                        className="portal-input mt-2 min-h-[5rem] resize-y shadow-inner"
+                        placeholder="Encouragement and next steps…"
+                        rows={3}
+                        value={feedbackVal}
+                        onChange={(e) => setGradeField(row.id, 'feedback', e.target.value)}
+                      />
+                    </label>
+                  </div>
+                  <button
+                    type="button"
+                    className="btn-portal-secondary mt-5 inline-flex items-center gap-2 px-8 py-3 text-sm font-bold shadow-lg"
+                    onClick={() => saveGrade(row)}
+                  >
+                    <FaClipboardCheck className="h-4 w-4" aria-hidden />
+                    Save grade
+                  </button>
+                </div>
               </div>
             )
           })}
           {submissionsFeed.length === 0 && (
-            <p className="text-sm text-slate-500">No submissions yet.</p>
+            <p className="rounded-3xl border border-dashed border-secondary/25 bg-[#f8fbff]/60 py-14 text-center text-sm text-gray-500">
+              No submissions yet.
+            </p>
           )}
         </div>
-      </section>
+        </section>
+      </div>
       )}
 
       {activeSection === 'landing' && (
-      <section className="mb-6 rounded border border-slate-200 bg-white p-4 shadow-sm" id="landing">
-        <h2 className="mb-2 text-lg font-semibold">Landing page content</h2>
-        <p className="mb-4 text-sm text-slate-600">Text and hero images (use public paths like /media/hero.jpg or full URLs).</p>
-        <form onSubmit={saveContent} className="space-y-3">
-          <input
-            className="w-full rounded border border-slate-300 p-2"
-            placeholder="Hero title"
-            value={content.hero_title ?? ''}
-            onChange={(e) => setContent((p) => ({ ...p, hero_title: e.target.value }))}
-          />
-          <textarea
-            className="w-full rounded border border-slate-300 p-2"
-            placeholder="Hero text"
-            value={content.hero_text ?? ''}
-            onChange={(e) => setContent((p) => ({ ...p, hero_text: e.target.value }))}
-          />
-          <input
-            className="w-full rounded border border-slate-300 p-2"
-            placeholder="Hero image URL (primary)"
-            value={content.hero_image_url ?? ''}
-            onChange={(e) => setContent((p) => ({ ...p, hero_image_url: e.target.value }))}
-          />
-          <input
-            className="w-full rounded border border-slate-300 p-2"
-            placeholder="Secondary image URL (optional)"
-            value={content.hero_image_url_secondary ?? ''}
-            onChange={(e) => setContent((p) => ({ ...p, hero_image_url_secondary: e.target.value }))}
-          />
-          <button type="submit" className="rounded bg-slate-900 px-4 py-2 text-white">
-            Save landing content
-          </button>
-        </form>
-      </section>
+      <div className="space-y-6">
+        <header className="overflow-hidden rounded-3xl border border-primary/20 bg-gradient-to-br from-[#fff8ef]/80 via-white to-[#f8fbff] p-6 shadow-lg md:p-7">
+          <div className="flex flex-wrap items-center gap-4">
+            <span className="flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-primary to-[#e89235] text-secondary shadow-lg ring-2 ring-white">
+              <FaHeading className="h-7 w-7" aria-hidden />
+            </span>
+            <div>
+              <h2 className="font-heading text-2xl font-black text-secondary md:text-3xl">Landing page content</h2>
+              <p className="mt-2 max-w-2xl text-sm leading-relaxed text-gray-600">
+                Hero, announcement bar, About strip, and contact lines shown on the marketing site. Gallery and partner logos
+                have their own admin sections. Use{' '}
+                <code className="rounded-md bg-secondary/10 px-2 py-0.5 font-mono text-xs text-secondary">/media/...</code>{' '}
+                paths or full URLs; optional uploads use Supabase Storage bucket{' '}
+                <code className="rounded-md bg-secondary/10 px-2 py-0.5 font-mono text-xs text-secondary">site-media</code>.
+              </p>
+            </div>
+          </div>
+        </header>
+
+        <div className="grid gap-8 lg:grid-cols-2 lg:items-start">
+          <section className="relative overflow-hidden rounded-3xl border-2 border-secondary/15 bg-white p-6 shadow-xl md:p-8" id="landing">
+            <div className="absolute inset-x-0 top-0 h-1.5 bg-gradient-to-r from-secondary via-primary to-secondary" aria-hidden />
+            <form onSubmit={persistLandingContent} className="relative space-y-5 pt-2">
+              <label className="block text-[11px] font-bold uppercase tracking-[0.14em] text-secondary/65">
+                <span className="mb-2 flex items-center gap-2">
+                  <FaHeading className="h-3.5 w-3.5 text-primary" aria-hidden />
+                  Hero title
+                </span>
+                <input
+                  className="portal-input shadow-inner"
+                  placeholder="Learn to code with confidence"
+                  value={content.hero_title ?? ''}
+                  onChange={(e) => setContent((p) => ({ ...p, hero_title: e.target.value }))}
+                />
+              </label>
+              <label className="block text-[11px] font-bold uppercase tracking-[0.14em] text-secondary/65">
+                <span className="mb-2 flex items-center gap-2">
+                  <FaImage className="h-3.5 w-3.5 text-primary" aria-hidden />
+                  Hero text
+                </span>
+                <textarea
+                  className="portal-input min-h-[6rem] resize-y shadow-inner"
+                  placeholder="Supporting line shown under the headline"
+                  value={content.hero_text ?? ''}
+                  onChange={(e) => setContent((p) => ({ ...p, hero_text: e.target.value }))}
+                />
+              </label>
+              <label className="block text-[11px] font-bold uppercase tracking-[0.14em] text-secondary/65">
+                <span className="mb-2 flex items-center gap-2">
+                  <FaLink className="h-3.5 w-3.5 text-primary" aria-hidden />
+                  Hero image URL (primary)
+                </span>
+                <input
+                  className="portal-input font-mono text-sm shadow-inner"
+                  placeholder="/media/hero.jpg"
+                  value={content.hero_image_url ?? ''}
+                  onChange={(e) => setContent((p) => ({ ...p, hero_image_url: e.target.value }))}
+                />
+              </label>
+              <label className="block text-[11px] font-bold uppercase tracking-[0.14em] text-secondary/65">
+                <span className="mb-2 flex items-center gap-2">
+                  <FaImage className="h-3.5 w-3.5 text-secondary/50" aria-hidden />
+                  Secondary image URL (optional)
+                </span>
+                <input
+                  className="portal-input font-mono text-sm shadow-inner"
+                  placeholder="/media/Logo.png"
+                  value={content.hero_image_url_secondary ?? ''}
+                  onChange={(e) => setContent((p) => ({ ...p, hero_image_url_secondary: e.target.value }))}
+                />
+              </label>
+
+              <div className="border-t border-secondary/10 pt-6">
+                <p className="mb-4 text-[11px] font-bold uppercase tracking-[0.14em] text-secondary/65">Announcement</p>
+                <label className="block text-[11px] font-bold uppercase tracking-[0.14em] text-secondary/65">
+                  <span className="mb-2 flex items-center gap-2">
+                    <FaBullhorn className="h-3.5 w-3.5 text-primary" aria-hidden />
+                    Top banner (optional)
+                  </span>
+                  <input
+                    className="portal-input shadow-inner"
+                    placeholder="e.g. Open house — Saturday 10am"
+                    value={content.announcement_banner ?? ''}
+                    onChange={(e) => setContent((p) => ({ ...p, announcement_banner: e.target.value }))}
+                  />
+                </label>
+              </div>
+
+              <div className="border-t border-secondary/10 pt-6">
+                <p className="mb-4 font-heading text-sm font-bold text-secondary">About section (home)</p>
+                <div className="grid gap-4 md:grid-cols-2">
+                  <label className="block text-[11px] font-bold uppercase tracking-[0.14em] text-secondary/65 md:col-span-2">
+                    <span className="mb-2 block">Eyebrow label</span>
+                    <input
+                      className="portal-input shadow-inner"
+                      value={content.about_eyebrow ?? ''}
+                      onChange={(e) => setContent((p) => ({ ...p, about_eyebrow: e.target.value }))}
+                    />
+                  </label>
+                  <label className="block text-[11px] font-bold uppercase tracking-[0.14em] text-secondary/65 md:col-span-2">
+                    <span className="mb-2 block">Heading</span>
+                    <input
+                      className="portal-input shadow-inner"
+                      value={content.about_heading ?? ''}
+                      onChange={(e) => setContent((p) => ({ ...p, about_heading: e.target.value }))}
+                    />
+                  </label>
+                  <label className="block text-[11px] font-bold uppercase tracking-[0.14em] text-secondary/65 md:col-span-2">
+                    <span className="mb-2 block">Lead paragraph</span>
+                    <textarea
+                      className="portal-input min-h-[5rem] resize-y shadow-inner"
+                      value={content.about_lead ?? ''}
+                      onChange={(e) => setContent((p) => ({ ...p, about_lead: e.target.value }))}
+                    />
+                  </label>
+                  <label className="block text-[11px] font-bold uppercase tracking-[0.14em] text-secondary/65 md:col-span-2">
+                    <span className="mb-2 flex items-center gap-2">
+                      <FaImage className="h-3.5 w-3.5 text-primary" aria-hidden />
+                      Side image URL
+                    </span>
+                    <input
+                      className="portal-input font-mono text-sm shadow-inner"
+                      placeholder="/media/gallery/..."
+                      value={content.about_image_url ?? ''}
+                      onChange={(e) => setContent((p) => ({ ...p, about_image_url: e.target.value }))}
+                    />
+                  </label>
+                </div>
+              </div>
+
+              <div className="border-t border-secondary/10 pt-6">
+                <p className="mb-4 font-heading text-sm font-bold text-secondary">Contact block (display text)</p>
+                <div className="grid gap-4 md:grid-cols-2">
+                  <label className="block text-[11px] font-bold uppercase tracking-[0.14em] text-secondary/65">
+                    <span className="mb-2 flex items-center gap-2">
+                      <FaEnvelope className="h-3.5 w-3.5 text-primary" aria-hidden />
+                      Email shown
+                    </span>
+                    <input
+                      className="portal-input font-mono text-sm shadow-inner"
+                      value={content.contact_email_display ?? ''}
+                      onChange={(e) => setContent((p) => ({ ...p, contact_email_display: e.target.value }))}
+                    />
+                  </label>
+                  <label className="block text-[11px] font-bold uppercase tracking-[0.14em] text-secondary/65">
+                    <span className="mb-2 flex items-center gap-2">
+                      <FaPhone className="h-3.5 w-3.5 text-primary" aria-hidden />
+                      Phone shown
+                    </span>
+                    <input
+                      className="portal-input font-mono text-sm shadow-inner"
+                      placeholder="+260 ..."
+                      value={content.contact_phone_display ?? ''}
+                      onChange={(e) => setContent((p) => ({ ...p, contact_phone_display: e.target.value }))}
+                    />
+                  </label>
+                </div>
+              </div>
+
+              <button type="submit" className="btn-portal-primary mt-2 inline-flex items-center gap-2 px-8 py-3.5 text-base font-bold shadow-lg">
+                Save landing content
+              </button>
+            </form>
+          </section>
+
+          <aside className="sticky top-6 rounded-3xl border-2 border-dashed border-secondary/20 bg-gradient-to-b from-[#f8fbff] to-white p-6 shadow-inner md:p-8">
+            <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-secondary/50">Live preview</p>
+            <h3 className="font-heading mt-2 text-lg font-bold text-secondary">Marketing hero</h3>
+            {content.hero_image_url ? (
+              <img src={content.hero_image_url} alt="" className="mt-4 h-36 w-full rounded-2xl border border-secondary/10 object-cover shadow-md" />
+            ) : (
+              <div className="mt-4 flex h-36 items-center justify-center rounded-2xl border border-dashed border-secondary/20 bg-white text-sm text-gray-400">
+                Add a primary image URL
+              </div>
+            )}
+            <p className="font-heading mt-5 text-2xl font-black leading-tight text-secondary">{content.hero_title || 'Your headline'}</p>
+            <p className="mt-3 text-sm leading-relaxed text-gray-600">{content.hero_text || 'Supporting copy appears here.'}</p>
+            {content.hero_image_url_secondary ? (
+              <img
+                src={content.hero_image_url_secondary}
+                alt=""
+                className="mt-6 mx-auto max-h-24 object-contain opacity-90"
+              />
+            ) : null}
+          </aside>
+        </div>
+      </div>
+      )}
+
+      {activeSection === 'cmsGallery' && (
+      <div className="space-y-6">
+        <header className="rounded-3xl border border-secondary/12 bg-gradient-to-r from-white via-[#f8fbff] to-[#fff8ef]/60 p-6 shadow-lg md:p-7">
+          <div className="flex flex-wrap items-start gap-4">
+            <span className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-secondary to-[#1a2542] text-2xl text-primary shadow-lg ring-2 ring-white">
+              <FaImages className="h-7 w-7" aria-hidden />
+            </span>
+            <div>
+              <h2 className="font-heading text-2xl font-black tracking-tight text-secondary md:text-3xl">Site gallery</h2>
+              <p className="mt-2 max-w-2xl text-sm leading-relaxed text-gray-600">
+                Controls the &quot;Moments&quot; grid on the home page (same content family as the full Gallery page). Add image URLs or
+                upload to Supabase Storage bucket <code className="rounded bg-secondary/10 px-1.5 py-0.5 font-mono text-xs">site-media</code>.
+              </p>
+            </div>
+          </div>
+        </header>
+
+        <section className="relative overflow-hidden rounded-3xl border-2 border-secondary/15 bg-white p-6 shadow-xl md:p-8">
+          <div className="absolute inset-x-0 top-0 h-1.5 bg-gradient-to-r from-secondary via-[#3d5a8a] to-primary" aria-hidden />
+          <div className="grid gap-4 pt-2 md:grid-cols-3">
+            <label className="block text-[11px] font-bold uppercase tracking-[0.14em] text-secondary/65">
+              Eyebrow
+              <input
+                className="portal-input mt-1.5"
+                value={content.gallery_eyebrow ?? ''}
+                onChange={(e) => setContent((p) => ({ ...p, gallery_eyebrow: e.target.value }))}
+              />
+            </label>
+            <label className="block text-[11px] font-bold uppercase tracking-[0.14em] text-secondary/65 md:col-span-2">
+              Heading
+              <input
+                className="portal-input mt-1.5"
+                value={content.gallery_heading ?? ''}
+                onChange={(e) => setContent((p) => ({ ...p, gallery_heading: e.target.value }))}
+              />
+            </label>
+            <label className="block text-[11px] font-bold uppercase tracking-[0.14em] text-secondary/65 md:col-span-3">
+              Subtitle
+              <textarea
+                className="portal-input mt-1.5 min-h-[4rem] resize-y"
+                value={content.gallery_subtitle ?? ''}
+                onChange={(e) => setContent((p) => ({ ...p, gallery_subtitle: e.target.value }))}
+              />
+            </label>
+          </div>
+
+          <div className="mt-8 space-y-4">
+            <p className="font-heading text-sm font-bold text-secondary">Photos</p>
+            {(content.gallery_items || []).map((item, idx) => (
+              <div
+                key={`gal-${idx}`}
+                className="flex flex-col gap-3 rounded-2xl border border-secondary/12 bg-[#f8fbff]/40 p-4 md:flex-row md:items-end"
+              >
+                <label className="min-w-0 flex-1 text-[11px] font-bold uppercase tracking-[0.14em] text-secondary/65">
+                  Title
+                  <input
+                    className="portal-input mt-1.5"
+                    value={item.title}
+                    onChange={(e) => patchGalleryItem(idx, 'title', e.target.value)}
+                  />
+                </label>
+                <label className="min-w-0 flex-[2] text-[11px] font-bold uppercase tracking-[0.14em] text-secondary/65">
+                  Image URL
+                  <input
+                    className="portal-input mt-1.5 font-mono text-sm"
+                    placeholder="/media/gallery/photo.jpeg"
+                    value={item.image_url}
+                    onChange={(e) => patchGalleryItem(idx, 'image_url', e.target.value)}
+                  />
+                </label>
+                <div className="flex flex-wrap gap-2 md:pb-1">
+                  <label className="inline-flex cursor-pointer items-center gap-2 rounded-xl border-2 border-secondary/15 bg-white px-4 py-2 text-xs font-bold text-secondary shadow-sm hover:bg-[#f8fbff]">
+                    <FaUpload className="h-3.5 w-3.5 text-primary" aria-hidden />
+                    Upload
+                    <input
+                      type="file"
+                      accept="image/*"
+                      className="sr-only"
+                      onChange={(e) => {
+                        uploadGalleryFile(idx, e.target.files)
+                        e.target.value = ''
+                      }}
+                    />
+                  </label>
+                  <button
+                    type="button"
+                    className="inline-flex items-center gap-2 rounded-xl border-2 border-red-200 bg-white px-4 py-2 text-xs font-bold text-red-700 hover:bg-red-50"
+                    onClick={() => removeGalleryItem(idx)}
+                  >
+                    <FaTrashAlt className="h-3.5 w-3.5" aria-hidden />
+                    Remove
+                  </button>
+                </div>
+                {item.image_url ? (
+                  <div className="md:w-28 shrink-0">
+                    <img src={item.image_url} alt="" className="h-20 w-full rounded-lg border border-secondary/10 object-cover md:h-24" />
+                  </div>
+                ) : null}
+              </div>
+            ))}
+          </div>
+
+          <div className="mt-6 flex flex-wrap gap-3">
+            <button type="button" className="btn-portal-outline inline-flex items-center gap-2 px-5 py-2.5 text-sm font-bold" onClick={addGalleryItem}>
+              <FaPlus className="h-4 w-4" aria-hidden />
+              Add photo
+            </button>
+            <button type="button" className="btn-portal-primary inline-flex items-center gap-2 px-8 py-3 text-sm font-bold shadow-lg" onClick={persistLandingContent}>
+              Save gallery
+            </button>
+          </div>
+        </section>
+      </div>
+      )}
+
+      {activeSection === 'cmsPartners' && (
+      <div className="space-y-6">
+        <header className="rounded-3xl border border-secondary/12 bg-gradient-to-r from-white via-[#f8fbff] to-[#fff8ef]/60 p-6 shadow-lg md:p-7">
+          <div className="flex flex-wrap items-start gap-4">
+            <span className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-secondary to-[#1a2542] text-2xl text-primary shadow-lg ring-2 ring-white">
+              <FaHandshake className="h-7 w-7" aria-hidden />
+            </span>
+            <div>
+              <h2 className="font-heading text-2xl font-black tracking-tight text-secondary md:text-3xl">Partners &amp; outreach</h2>
+              <p className="mt-2 max-w-2xl text-sm leading-relaxed text-gray-600">
+                Logos on the home partners strip and on <strong className="text-secondary">/partners</strong>. Activity text appears only on the full partners page (cards below logos).
+              </p>
+            </div>
+          </div>
+        </header>
+
+        <section className="relative overflow-hidden rounded-3xl border-2 border-secondary/15 bg-white p-6 shadow-xl md:p-8">
+          <div className="absolute inset-x-0 top-0 h-1.5 bg-gradient-to-r from-primary via-amber-400 to-secondary" aria-hidden />
+          <div className="space-y-4 pt-2">
+            <label className="block text-[11px] font-bold uppercase tracking-[0.14em] text-secondary/65">
+              Intro (both placements)
+              <textarea
+                className="portal-input mt-1.5 min-h-[4rem] resize-y"
+                value={content.partners_intro ?? ''}
+                onChange={(e) => setContent((p) => ({ ...p, partners_intro: e.target.value }))}
+              />
+            </label>
+            <div className="grid gap-4 md:grid-cols-2">
+              <label className="block text-[11px] font-bold uppercase tracking-[0.14em] text-secondary/65">
+                Partners page title (hero)
+                <input
+                  className="portal-input mt-1.5"
+                  value={content.partners_page_title ?? ''}
+                  onChange={(e) => setContent((p) => ({ ...p, partners_page_title: e.target.value }))}
+                />
+              </label>
+              <label className="block text-[11px] font-bold uppercase tracking-[0.14em] text-secondary/65 md:col-span-2">
+                Partners page subtitle
+                <textarea
+                  className="portal-input mt-1.5 min-h-[3.5rem] resize-y"
+                  value={content.partners_page_subtitle ?? ''}
+                  onChange={(e) => setContent((p) => ({ ...p, partners_page_subtitle: e.target.value }))}
+                />
+              </label>
+            </div>
+          </div>
+
+          <div className="mt-8 space-y-4">
+            <p className="font-heading text-sm font-bold text-secondary">Partner entries</p>
+            {(content.partners_items || []).map((item, idx) => (
+              <div key={`par-${idx}`} className="rounded-2xl border border-secondary/12 bg-[#f8fbff]/40 p-4 space-y-3">
+                <div className="grid gap-3 md:grid-cols-2">
+                  <label className="block text-[11px] font-bold uppercase tracking-[0.14em] text-secondary/65">
+                    Name
+                    <input
+                      className="portal-input mt-1.5"
+                      value={item.name}
+                      onChange={(e) => patchPartnerItem(idx, 'name', e.target.value)}
+                    />
+                  </label>
+                  <label className="block text-[11px] font-bold uppercase tracking-[0.14em] text-secondary/65">
+                    Logo URL
+                    <input
+                      className="portal-input mt-1.5 font-mono text-sm"
+                      placeholder="/media/partner logos/logo.png"
+                      value={item.logo_url ?? ''}
+                      onChange={(e) => patchPartnerItem(idx, 'logo_url', e.target.value)}
+                    />
+                  </label>
+                </div>
+                <label className="block text-[11px] font-bold uppercase tracking-[0.14em] text-secondary/65">
+                  Activity / collaboration (shown on /partners)
+                  <textarea
+                    className="portal-input mt-1.5 min-h-[4rem] resize-y"
+                    placeholder="Short paragraph about joint programs or workshops."
+                    value={item.activity_summary ?? ''}
+                    onChange={(e) => patchPartnerItem(idx, 'activity_summary', e.target.value)}
+                  />
+                </label>
+                <div className="flex flex-wrap items-center gap-3">
+                  <label className="inline-flex cursor-pointer items-center gap-2 rounded-xl border-2 border-secondary/15 bg-white px-4 py-2 text-xs font-bold text-secondary shadow-sm hover:bg-[#f8fbff]">
+                    <FaUpload className="h-3.5 w-3.5 text-primary" aria-hidden />
+                    Upload logo
+                    <input
+                      type="file"
+                      accept="image/*"
+                      className="sr-only"
+                      onChange={(e) => {
+                        uploadPartnerLogo(idx, e.target.files)
+                        e.target.value = ''
+                      }}
+                    />
+                  </label>
+                  <button
+                    type="button"
+                    className="inline-flex items-center gap-2 rounded-xl border-2 border-red-200 bg-white px-4 py-2 text-xs font-bold text-red-700 hover:bg-red-50"
+                    onClick={() => removePartnerItem(idx)}
+                  >
+                    <FaTrashAlt className="h-3.5 w-3.5" aria-hidden />
+                    Remove partner
+                  </button>
+                  {item.logo_url ? (
+                    <img src={item.logo_url} alt="" className="ml-auto h-14 max-w-[10rem] object-contain" />
+                  ) : null}
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <div className="mt-6 flex flex-wrap gap-3">
+            <button type="button" className="btn-portal-outline inline-flex items-center gap-2 px-5 py-2.5 text-sm font-bold" onClick={addPartnerItem}>
+              <FaPlus className="h-4 w-4" aria-hidden />
+              Add partner
+            </button>
+            <button type="button" className="btn-portal-primary inline-flex items-center gap-2 px-8 py-3 text-sm font-bold shadow-lg" onClick={persistLandingContent}>
+              Save partners
+            </button>
+          </div>
+        </section>
+      </div>
       )}
 
       {activeSection === 'activity' && (
-      <section className="rounded border border-slate-200 bg-white p-4 shadow-sm" id="activity">
-        <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
-          <div>
-            <h2 className="text-lg font-semibold text-slate-900">Activity & submissions</h2>
-            <p className="mt-1 text-sm text-slate-600">
-              Search recent submissions by student or task, then jump into Grading to review scores.
-            </p>
+      <div className="space-y-8">
+        <header className="relative overflow-hidden rounded-3xl border border-secondary/12 bg-white p-6 shadow-xl md:p-7">
+          <div className="pointer-events-none absolute right-0 top-0 h-32 w-32 rounded-bl-full bg-primary/10" aria-hidden />
+          <div className="relative flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
+            <div className="max-w-xl">
+              <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-primary">Pipeline</p>
+              <h2 className="font-heading mt-2 text-2xl font-black text-secondary md:text-3xl">Activity & submissions</h2>
+              <p className="mt-2 text-sm leading-relaxed text-gray-600">
+                Search recent submissions by student or task, filter by grading state, then jump into Grading.
+              </p>
+            </div>
+            <div className="flex w-full flex-col gap-3 sm:flex-row sm:flex-wrap lg:w-auto lg:max-w-md">
+              <label className="relative flex-1 min-w-[12rem]">
+                <span className="sr-only">Search</span>
+                <FaSearch className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-secondary/35" aria-hidden />
+                <input
+                  className="portal-input w-full pl-10 shadow-md shadow-secondary/[0.04]"
+                  placeholder="Search student or task…"
+                  value={activityQuery}
+                  onChange={(e) => setActivityQuery(e.target.value)}
+                />
+              </label>
+              <select
+                className="portal-input min-w-[11rem] font-heading font-semibold shadow-md shadow-secondary/[0.04]"
+                value={activityStatus}
+                onChange={(e) => setActivityStatus(e.target.value)}
+              >
+                <option value="all">All</option>
+                <option value="graded">Graded only</option>
+                <option value="pending">Pending only</option>
+              </select>
+            </div>
           </div>
-          <div className="flex flex-wrap gap-2">
-            <input
-              className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm shadow-sm outline-none ring-sky-500/25 transition focus:ring-2 lg:w-64"
-              placeholder="Search student or task…"
-              value={activityQuery}
-              onChange={(e) => setActivityQuery(e.target.value)}
-            />
-            <select
-              className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm shadow-sm outline-none ring-sky-500/25 transition focus:ring-2"
-              value={activityStatus}
-              onChange={(e) => setActivityStatus(e.target.value)}
-            >
-              <option value="all">All</option>
-              <option value="graded">Graded only</option>
-              <option value="pending">Pending only</option>
-            </select>
+        </header>
+
+        <section className="space-y-6" id="activity">
+        <div className="grid gap-4 sm:grid-cols-3">
+          <div className="relative overflow-hidden rounded-3xl border-2 border-secondary/20 bg-gradient-to-br from-white to-[#f8fbff] p-5 shadow-lg">
+            <div className="absolute left-0 top-0 h-full w-1 bg-secondary" aria-hidden />
+            <p className="font-heading text-4xl font-black tabular-nums text-secondary">{activityCounts.total}</p>
+            <p className="mt-1 text-[11px] font-bold uppercase tracking-[0.15em] text-primary">Total</p>
+            <p className="mt-4 text-xs text-gray-500">Latest submissions</p>
+          </div>
+          <div className="relative overflow-hidden rounded-3xl border-2 border-emerald-200/60 bg-gradient-to-br from-emerald-50/80 to-white p-5 shadow-lg">
+            <div className="absolute left-0 top-0 h-full w-1 bg-emerald-500" aria-hidden />
+            <p className="font-heading text-4xl font-black tabular-nums text-emerald-900">{activityCounts.graded}</p>
+            <p className="mt-1 text-[11px] font-bold uppercase tracking-[0.15em] text-emerald-800">Graded</p>
+            <p className="mt-4 text-xs text-gray-500">Has a score</p>
+          </div>
+          <div className="relative overflow-hidden rounded-3xl border-2 border-primary/35 bg-gradient-to-br from-[#fff8ef] to-white p-5 shadow-lg">
+            <div className="absolute left-0 top-0 h-full w-1 bg-primary" aria-hidden />
+            <p className="font-heading text-4xl font-black tabular-nums text-secondary">{activityCounts.pending}</p>
+            <p className="mt-1 text-[11px] font-bold uppercase tracking-[0.15em] text-amber-900">Pending</p>
+            <p className="mt-4 text-xs text-gray-500">Awaiting grading</p>
           </div>
         </div>
 
-        <div className="mt-4 grid gap-4 sm:grid-cols-3">
-          <MetricCard
-            color="bg-slate-700"
-            value={activityCounts.total}
-            title="Total"
-            icon="📤"
-            animationDelayMs={0}
-            foot="Latest submissions"
-          />
-          <MetricCard
-            color="bg-emerald-600"
-            value={activityCounts.graded}
-            title="Graded"
-            icon="✅"
-            animationDelayMs={70}
-            foot="Has a score"
-          />
-          <MetricCard
-            color="bg-amber-500"
-            value={activityCounts.pending}
-            title="Pending"
-            icon="⏳"
-            animationDelayMs={140}
-            foot="Awaiting grading"
-          />
-        </div>
-
-        <div className="mt-4 max-h-64 overflow-auto text-sm">
-          <table className="w-full text-left">
-            <thead className="sticky top-0 bg-slate-50 text-slate-600">
-              <tr>
-                <th className="py-2">When</th>
-                <th className="py-2">Student</th>
-                <th className="py-2">Task</th>
-                <th className="py-2">Score</th>
-                <th className="py-2">Action</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filteredActivity.map((row) => {
+        <div className="overflow-hidden rounded-3xl border border-secondary/12 bg-white shadow-xl shadow-secondary/[0.06]">
+          <div className="flex flex-wrap items-center gap-2 border-b border-secondary/10 bg-gradient-to-r from-secondary/[0.06] to-transparent px-4 py-3 md:px-5">
+            <span className="font-heading text-sm font-bold text-secondary">Submission log</span>
+            <span className="ml-auto rounded-full bg-secondary/10 px-3 py-1 text-[10px] font-bold uppercase tracking-wide text-secondary">
+              {filteredActivity.length} rows
+            </span>
+          </div>
+          <div className="max-h-[26rem] overflow-auto text-sm">
+            <table className="w-full min-w-[32rem] text-left">
+              <thead className="portal-table-head sticky top-0 z-10 text-xs font-bold uppercase tracking-wider text-secondary">
+                <tr>
+                  <th className="px-4 py-3.5">When</th>
+                  <th className="px-4 py-3.5">Student</th>
+                  <th className="px-4 py-3.5">Task</th>
+                  <th className="px-4 py-3.5">Score</th>
+                  <th className="px-4 py-3.5">Action</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-secondary/[0.07] bg-white">
+              {filteredActivity.map((row, ridx) => {
                 const scored = row.score != null && row.score !== ''
                 return (
-                  <tr key={row.id} className="border-t border-slate-100">
-                    <td className="py-2 whitespace-nowrap">{new Date(row.submitted_at).toLocaleString()}</td>
-                    <td className="py-2">{row.student_name}</td>
-                    <td className="py-2">{row.task_title}</td>
-                    <td className="py-2">
+                  <tr
+                    key={row.id}
+                    className={`transition ${
+                      ridx % 2 === 0 ? 'bg-white' : 'bg-[#f8fbff]/35'
+                    } hover:bg-primary/[0.05]`}
+                  >
+                    <td className="whitespace-nowrap px-4 py-3.5 text-gray-600">{new Date(row.submitted_at).toLocaleString()}</td>
+                    <td className="px-4 py-3.5 font-heading font-semibold text-secondary">{row.student_name}</td>
+                    <td className="px-4 py-3.5 text-gray-700">{row.task_title}</td>
+                    <td className="px-4 py-3.5">
                       {scored ? (
-                        <span className="rounded-full bg-emerald-100 px-2 py-0.5 text-xs font-semibold text-emerald-900">
+                        <span className="inline-flex min-w-[2.25rem] justify-center rounded-full border border-secondary/15 bg-gradient-to-b from-[#f8fbff] to-white px-2.5 py-1 text-xs font-bold tabular-nums text-secondary shadow-sm">
                           {Number(row.score).toFixed(0)}
                         </span>
                       ) : (
-                        <span className="rounded-full bg-amber-100 px-2 py-0.5 text-xs font-semibold text-amber-900">
+                        <span className="inline-flex rounded-full border border-primary/35 bg-[#fff8ef] px-2.5 py-1 text-xs font-bold text-amber-950">
                           —
                         </span>
                       )}
                     </td>
-                    <td className="py-2">
+                    <td className="px-4 py-3.5">
                       <button
                         type="button"
-                        className="rounded-lg bg-slate-900 px-3 py-1.5 text-xs font-semibold text-white hover:bg-black"
+                        className="inline-flex items-center gap-1.5 rounded-full bg-gradient-to-r from-secondary to-[#243652] px-4 py-2 text-xs font-bold text-white shadow-md transition hover:from-[#243652] hover:to-secondary active:scale-[0.98]"
                         onClick={() => overviewNav('grade', 'Opened grading from activity feed.')}
                       >
                         Open grading
@@ -1090,117 +1825,197 @@ export default function AdminDashboard() {
               })}
               {filteredActivity.length === 0 && (
                 <tr>
-                  <td className="py-6 text-center text-sm text-slate-500" colSpan={5}>
+                  <td className="py-14 text-center text-sm text-gray-500" colSpan={5}>
                     No submissions match your filters.
                   </td>
                 </tr>
               )}
-            </tbody>
-          </table>
+              </tbody>
+            </table>
+          </div>
         </div>
-      </section>
+        </section>
+      </div>
       )}
 
       {activeSection === 'msg' && (
-        <section className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
-          <h2 className="text-lg font-semibold">Messages</h2>
-          <p className="mt-2 text-sm text-slate-600">
-            Create announcements for all users or a selected role. Only admin can create messages.
-          </p>
-          <form
-            className="mt-4 grid gap-3 rounded-xl border border-violet-200 bg-violet-50/50 p-4 md:grid-cols-2"
-            onSubmit={(e) => {
-              e.preventDefault()
-              const created = createPortalMessage({
-                title: msgDraft.title,
-                body: msgDraft.body,
-                target: msgDraft.target,
-                author: 'admin',
-              })
-              if (!created) {
-                setToast('Please add both title and message body.')
-                return
-              }
-              setMsgVersion((v) => v + 1)
-              setMsgDraft({ title: '', body: '', target: msgDraft.target })
-              setToast('Message published.')
-            }}
-          >
-            <input
-              className="rounded-lg border border-violet-200 bg-white px-3 py-2 text-sm outline-none ring-violet-500/30 focus:ring-2"
-              placeholder="Message title"
-              value={msgDraft.title}
-              onChange={(e) => setMsgDraft((p) => ({ ...p, title: e.target.value }))}
-              required
-            />
-            <select
-              className="rounded-lg border border-violet-200 bg-white px-3 py-2 text-sm outline-none ring-violet-500/30 focus:ring-2"
-              value={msgDraft.target}
-              onChange={(e) => setMsgDraft((p) => ({ ...p, target: e.target.value }))}
-            >
-              <option value="all">All users</option>
-              <option value="student">Students</option>
-              <option value="parent">Parents</option>
-              <option value="finance">Finance</option>
-              <option value="admin">Admins</option>
-            </select>
-            <textarea
-              className="rounded-lg border border-violet-200 bg-white px-3 py-2 text-sm outline-none ring-violet-500/30 focus:ring-2 md:col-span-2"
-              rows={3}
-              placeholder="Write announcement..."
-              value={msgDraft.body}
-              onChange={(e) => setMsgDraft((p) => ({ ...p, body: e.target.value }))}
-              required
-            />
-            <div className="md:col-span-2">
-              <button type="submit" className="rounded-lg bg-violet-600 px-4 py-2 text-sm font-semibold text-white hover:bg-violet-700">
-                Publish message
-              </button>
-            </div>
-          </form>
-          <div
-            className={`mt-4 rounded-xl border p-4 transition ${
-              adminMsgRead
-                ? 'border-slate-200 bg-slate-50'
-                : 'border-violet-200 bg-violet-50/80 ring-2 ring-violet-200/50'
-            }`}
-          >
-            <div className="flex flex-wrap items-start justify-between gap-2">
-              <div>
-                <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">System</p>
-                <p className="font-semibold text-slate-900">Weekly review</p>
-                <p className="mt-2 text-sm text-slate-700">
-                  Check Users & roles for new accounts, then review Grading for pending scores.
+        <div className="space-y-8">
+          <header className="relative overflow-hidden rounded-3xl border border-secondary/12 bg-gradient-to-br from-secondary/[0.06] via-white to-primary/[0.08] p-6 shadow-xl md:p-8">
+            <div className="pointer-events-none absolute -left-10 bottom-0 h-40 w-40 rounded-full bg-primary/15 blur-3xl" aria-hidden />
+            <div className="relative flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+              <div className="max-w-2xl">
+                <p className="inline-flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.22em] text-secondary">
+                  <FaBullhorn className="text-primary" aria-hidden />
+                  Broadcast center
+                </p>
+                <h2 className="font-heading mt-3 text-3xl font-black text-secondary md:text-4xl">Messages</h2>
+                <p className="mt-2 text-sm leading-relaxed text-gray-600 md:text-base">
+                  Publish announcements for everyone or a single role. Only administrators can send portal messages.
                 </p>
               </div>
-              {!adminMsgRead && (
-                <span className="rounded-full bg-violet-600 px-2 py-0.5 text-xs font-bold text-white">New</span>
-              )}
+              <div className="flex flex-wrap gap-2">
+                {unreadCount > 0 && !adminMsgRead && (
+                  <span className="rounded-2xl border border-primary/40 bg-primary/15 px-4 py-2 text-xs font-bold text-secondary shadow-md">
+                    Unread digest
+                  </span>
+                )}
+                <span className="inline-flex items-center gap-2 rounded-2xl border border-secondary/15 bg-white/90 px-4 py-2 text-xs font-bold text-secondary shadow-md">
+                  <FaInbox className="text-primary" aria-hidden />
+                  {portalMsgs.length} published
+                </span>
+              </div>
             </div>
-            <button
-              type="button"
-              onClick={() => markRead()}
-              className="mt-3 text-sm font-semibold text-violet-700 hover:text-violet-900"
+          </header>
+
+          <section className="rounded-3xl border-2 border-secondary/12 bg-white p-6 shadow-xl md:p-8">
+            <div className="mb-6 flex items-center gap-3 border-b border-secondary/10 pb-5">
+              <span className="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-secondary to-[#1a2542] text-primary shadow-lg">
+                <FaPaperPlane className="h-5 w-5" aria-hidden />
+              </span>
+              <div>
+                <h3 className="font-heading text-lg font-bold text-secondary">Compose</h3>
+                <p className="text-sm text-gray-500">Title, audience, and body — then publish.</p>
+              </div>
+            </div>
+            <form
+              className="grid gap-4 rounded-2xl border border-primary/20 bg-gradient-to-br from-[#fff8ef]/50 via-white to-[#f8fbff]/40 p-5 md:grid-cols-2 md:p-6"
+              onSubmit={(e) => {
+                e.preventDefault()
+                const created = createPortalMessage({
+                  title: msgDraft.title,
+                  body: msgDraft.body,
+                  target: msgDraft.target,
+                  author: 'admin',
+                })
+                if (!created) {
+                  setToast('Please add both title and message body.')
+                  return
+                }
+                setMsgVersion((v) => v + 1)
+                setMsgDraft({ title: '', body: '', target: msgDraft.target })
+                setToast('Message published.')
+              }}
             >
-              {adminMsgRead ? 'Marked as read' : 'Mark as read'}
-            </button>
-          </div>
-          <div className="mt-6">
-            <h3 className="text-sm font-semibold text-slate-900">Recent published messages</h3>
-            <div className="mt-2 space-y-2">
-              {portalMsgs.slice(0, 8).map((m) => (
-                <article key={m.id} className="rounded-lg border border-slate-200 bg-slate-50 p-3">
-                  <p className="text-xs uppercase tracking-wide text-slate-500">
-                    {m.target} · {new Date(m.created_at).toLocaleString()}
-                  </p>
-                  <p className="font-semibold text-slate-900">{m.title}</p>
-                  <p className="text-sm text-slate-700">{m.body}</p>
-                </article>
-              ))}
-              {portalMsgs.length === 0 && <p className="text-sm text-slate-500">No messages yet.</p>}
+              <label className="block md:col-span-1">
+                <span className="text-[11px] font-bold uppercase tracking-wide text-secondary/70">Message title</span>
+                <input
+                  className="portal-input mt-2 shadow-inner"
+                  placeholder="Weekly review"
+                  value={msgDraft.title}
+                  onChange={(e) => setMsgDraft((p) => ({ ...p, title: e.target.value }))}
+                  required
+                />
+              </label>
+              <label className="block md:col-span-1">
+                <span className="text-[11px] font-bold uppercase tracking-wide text-secondary/70">Audience</span>
+                <select
+                  className="portal-input mt-2 font-heading font-semibold shadow-inner"
+                  value={msgDraft.target}
+                  onChange={(e) => setMsgDraft((p) => ({ ...p, target: e.target.value }))}
+                >
+                  <option value="all">All users</option>
+                  <option value="student">Students</option>
+                  <option value="parent">Parents</option>
+                  <option value="finance">Finance</option>
+                  <option value="admin">Admins</option>
+                </select>
+              </label>
+              <label className="block md:col-span-2">
+                <span className="text-[11px] font-bold uppercase tracking-wide text-secondary/70">Message body</span>
+                <textarea
+                  className="portal-input mt-2 min-h-[7rem] resize-y shadow-inner"
+                  rows={4}
+                  placeholder="Write announcement…"
+                  value={msgDraft.body}
+                  onChange={(e) => setMsgDraft((p) => ({ ...p, body: e.target.value }))}
+                  required
+                />
+              </label>
+              <div className="md:col-span-2">
+                <button type="submit" className="btn-portal-primary inline-flex items-center gap-2 px-8 py-3.5 text-sm font-bold shadow-lg">
+                  <FaPaperPlane className="h-4 w-4" aria-hidden />
+                  Publish message
+                </button>
+              </div>
+            </form>
+
+            <div
+              className={`relative mt-8 overflow-hidden rounded-2xl border p-6 shadow-inner ${
+                adminMsgRead
+                  ? 'border-secondary/15 bg-[#f8fbff]/90'
+                  : 'border-primary/35 bg-gradient-to-br from-[#fff8ef] to-white ring-2 ring-primary/20'
+              }`}
+            >
+              <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-secondary via-primary to-secondary" aria-hidden />
+              <div className="flex flex-wrap items-start justify-between gap-4 pt-1">
+                <div className="flex gap-4">
+                  <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-secondary/10 text-secondary">
+                    {adminMsgRead ? <FaCheckDouble className="h-5 w-5" aria-hidden /> : <FaEnvelope className="h-5 w-5" aria-hidden />}
+                  </span>
+                  <div>
+                    <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-gray-500">System</p>
+                    <p className="font-heading text-lg font-bold text-secondary">Weekly review</p>
+                    <p className="mt-2 text-sm leading-relaxed text-gray-700">
+                      Check Users & roles for new accounts, then review Grading for pending scores.
+                    </p>
+                  </div>
+                </div>
+                {!adminMsgRead && (
+                  <span className="rounded-full bg-secondary px-3 py-1 text-[10px] font-bold uppercase tracking-wide text-white shadow-md">
+                    New
+                  </span>
+                )}
+              </div>
+              <button
+                type="button"
+                onClick={() => markRead()}
+                className={
+                  adminMsgRead
+                    ? 'mt-5 rounded-full border-2 border-secondary/20 bg-white px-6 py-2.5 text-sm font-bold text-secondary shadow-sm hover:bg-white'
+                    : 'btn-portal-primary mt-5 px-8 py-3 text-sm font-bold shadow-lg'
+                }
+              >
+                <span className="inline-flex items-center gap-2">
+                  <FaCheckDouble className="h-4 w-4" aria-hidden />
+                  {adminMsgRead ? 'Marked as read' : 'Mark as read'}
+                </span>
+              </button>
             </div>
-          </div>
-        </section>
+
+            <div className="mt-10">
+              <h3 className="font-heading flex items-center gap-2 text-lg font-bold text-secondary">
+                <FaInbox className="text-primary" aria-hidden />
+                Recent published messages
+              </h3>
+              <div className="mt-4 space-y-3">
+                {portalMsgs.slice(0, 8).map((m) => (
+                  <article
+                    key={m.id}
+                    className={`overflow-hidden rounded-2xl border border-secondary/10 shadow-md transition hover:shadow-lg ${broadcastAccent(m.target)}`}
+                  >
+                    <div className="px-5 py-4">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <span className="rounded-full bg-white/90 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-secondary ring-1 ring-secondary/15">
+                          {m.target}
+                        </span>
+                        <time className="text-xs tabular-nums text-gray-500" dateTime={m.created_at}>
+                          {new Date(m.created_at).toLocaleString()}
+                        </time>
+                      </div>
+                      <p className="font-heading mt-3 text-base font-bold text-secondary">{m.title}</p>
+                      <p className="mt-2 text-sm leading-relaxed text-gray-700">{m.body}</p>
+                    </div>
+                  </article>
+                ))}
+                {portalMsgs.length === 0 && (
+                  <p className="rounded-2xl border border-dashed border-secondary/20 bg-[#f8fbff]/80 py-12 text-center text-sm text-gray-500">
+                    No messages yet — publish one above.
+                  </p>
+                )}
+              </div>
+            </div>
+          </section>
+        </div>
       )}
     </AppShellLayout>
   )

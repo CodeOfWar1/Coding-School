@@ -3,7 +3,7 @@ import { supabase } from '../lib/supabase'
 import { useAuth } from '../state/AuthContext'
 import { useMessageInbox } from '../hooks/useMessageInbox'
 import { listMessagesForRole } from '../state/portalMessages'
-import { listPortalEvents } from '../state/portalEvents'
+import { listPortalEvents, PORTAL_EVENTS_CHANGED, PORTAL_EVENTS_STORAGE_KEY } from '../state/portalEvents'
 import AppShellLayout from '../components/AppShellLayout'
 import MetricCard from '../components/MetricCard'
 import CalendarWidget from '../components/CalendarWidget'
@@ -16,6 +16,22 @@ import {
   submissionTime,
   taskStatus,
 } from '../utils/academic'
+import {
+  FaCalendarAlt,
+  FaChartBar,
+  FaChartLine,
+  FaComments,
+  FaCreditCard,
+  FaFileInvoiceDollar,
+  FaReceipt,
+  FaUsers,
+} from 'react-icons/fa'
+
+const CARD_ACCENTS = [
+  'from-secondary via-[#2d4a73] to-primary',
+  'from-primary via-amber-400 to-secondary',
+  'from-emerald-600 via-teal-600 to-secondary',
+]
 
 const NAV_BASE = [
   { id: 'dash', label: 'Overview', icon: '🏠' },
@@ -113,19 +129,50 @@ export default function ParentDashboard() {
   const [tasks, setTasks] = useState([])
   const [submissions, setSubmissions] = useState([])
   const [toast, setToast] = useState(null)
+  const [portalEventsTick, setPortalEventsTick] = useState(0)
   const { unreadCount, markRead, read: parentMsgRead } = useMessageInbox(user?.id, 'parent')
   const messages = listMessagesForRole('parent')
 
-  const portalEvents = useMemo(() => listPortalEvents(), [])
+  useEffect(() => {
+    const bump = () => setPortalEventsTick((n) => n + 1)
+    window.addEventListener(PORTAL_EVENTS_CHANGED, bump)
+    const onStorage = (e) => {
+      if (e.key === PORTAL_EVENTS_STORAGE_KEY) bump()
+    }
+    window.addEventListener('storage', onStorage)
+    return () => {
+      window.removeEventListener(PORTAL_EVENTS_CHANGED, bump)
+      window.removeEventListener('storage', onStorage)
+    }
+  }, [])
+
+  const portalEvents = useMemo(() => {
+    void portalEventsTick
+    return listPortalEvents()
+  }, [portalEventsTick])
   const parentEvents = useMemo(
     () => portalEvents.filter((e) => e.target === 'all' || e.target === 'parent'),
     [portalEvents],
   )
   const eventHighlights = useMemo(() => parentEvents.map((e) => e.date), [parentEvents])
-  const upcomingParentEvents = useMemo(() => {
-    const copy = [...parentEvents]
-    copy.sort((a, b) => new Date(a.date) - new Date(b.date))
-    return copy.slice(0, 10)
+
+  /** Same admin-published events as the calendar highlights above — next upcoming first. */
+  const { nextSchoolEvent, restUpcomingSchoolEvents } = useMemo(() => {
+    const today = new Date()
+    today.setHours(0, 0, 0, 0)
+    const upcoming = parentEvents
+      .filter((e) => {
+        const d = new Date(e.date)
+        if (Number.isNaN(d.getTime())) return false
+        const day = new Date(d)
+        day.setHours(0, 0, 0, 0)
+        return day >= today
+      })
+      .sort((a, b) => new Date(a.date) - new Date(b.date))
+    return {
+      nextSchoolEvent: upcoming[0] ?? null,
+      restUpcomingSchoolEvents: upcoming.slice(1, 8),
+    }
   }, [parentEvents])
 
   const loadLinkedChildren = useCallback(async () => {
@@ -231,7 +278,15 @@ export default function ParentDashboard() {
 
   const donut = {
     labels: ['Paid (family)', 'Outstanding (family)'],
-    datasets: [{ data: [totalPaid, remaining], backgroundColor: ['#16b8e6', '#d4d8e2'] }],
+    datasets: [
+      {
+        data: [totalPaid, remaining],
+        backgroundColor: ['#faa853', '#cbd5e1'],
+        borderWidth: 3,
+        borderColor: '#ffffff',
+        hoverOffset: 10,
+      },
+    ],
   }
 
   const pct = useMemo(() => completionPercent(tasks, submissions), [tasks, submissions])
@@ -254,10 +309,14 @@ export default function ParentDashboard() {
         {
           label: 'Scores',
           data: sortedSubs.map((s) => Number(s.score ?? 0)),
-          borderColor: '#2563eb',
-          backgroundColor: 'rgba(37, 99, 235, 0.12)',
+          borderColor: '#2d3f5d',
+          backgroundColor: 'rgba(250, 168, 83, 0.18)',
           fill: true,
-          tension: 0.3,
+          tension: 0.35,
+          pointBackgroundColor: '#faa853',
+          pointBorderColor: '#2d3f5d',
+          pointBorderWidth: 2,
+          pointRadius: 5,
         },
       ],
     }),
@@ -272,7 +331,15 @@ export default function ParentDashboard() {
     })
     return {
       labels,
-      datasets: [{ label: 'Latest grade', data, backgroundColor: '#0ea5e9' }],
+      datasets: [
+        {
+          label: 'Latest grade',
+          data,
+          backgroundColor: labels.map((_, i) => (i % 2 === 0 ? '#faa853' : '#2d3f5d')),
+          borderRadius: 8,
+          borderSkipped: false,
+        },
+      ],
     }
   }, [tasks, submissions])
 
@@ -282,17 +349,22 @@ export default function ParentDashboard() {
   const skillRadar = useMemo(() => buildSkillRadarFromAvg(avg), [avg])
 
   const skillBar = useMemo(() => {
-    // Reuse the same skill values, but present them as bars (clearer than radar for many users).
     const ds = skillRadar.datasets?.[0]
+    const labels = skillRadar.labels ?? []
+    const data = ds?.data ?? []
     return {
-      labels: skillRadar.labels ?? [],
+      labels,
       datasets: [
         {
           label: ds?.label ?? 'Skill profile',
-          data: ds?.data ?? [],
-          backgroundColor: 'rgba(37, 99, 235, 0.22)',
-          borderColor: '#2563eb',
-          borderWidth: 1,
+          data,
+          backgroundColor: labels.map((_, i) =>
+            i % 2 === 0 ? 'rgba(250, 168, 83, 0.9)' : 'rgba(45, 63, 93, 0.88)',
+          ),
+          borderColor: labels.map((_, i) => (i % 2 === 0 ? '#e89235' : '#1a2542')),
+          borderWidth: 1.5,
+          borderRadius: 8,
+          borderSkipped: false,
         },
       ],
     }
@@ -305,29 +377,40 @@ export default function ParentDashboard() {
   }, [unreadCount])
 
   const childSelector = (
-    <section className="mb-6 rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
-      <h2 className="text-lg font-semibold text-slate-900">Select child</h2>
-      <p className="mt-1 text-sm text-slate-600">
-        Switch students to see academic progress and payments in context.
-      </p>
-      <div className="mt-3 flex flex-wrap gap-2">
-        {children.map((c) => (
-          <button
-            key={c.id}
-            type="button"
-            onClick={() => setSelectedId(c.id)}
-            className={`rounded-full px-4 py-2 text-sm font-medium transition ${
-              String(resolvedChildId) === String(c.id)
-                ? 'bg-blue-600 text-white shadow-md'
-                : 'border border-slate-200 bg-white text-slate-700 hover:bg-slate-50'
-            }`}
-          >
-            {c.full_name}
-          </button>
-        ))}
-        {children.length === 0 && (
-          <p className="text-sm text-slate-500">No linked students. Ask an admin to link your account.</p>
-        )}
+    <section className="relative mb-6 overflow-hidden rounded-3xl border-2 border-secondary/12 bg-white shadow-xl">
+      <div className="h-1.5 bg-gradient-to-r from-secondary via-[#3d5a8a] to-primary" aria-hidden />
+      <div className="flex flex-wrap items-start gap-4 p-5 md:p-6">
+        <span className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-secondary to-[#1a2542] text-2xl text-primary shadow-lg ring-2 ring-white">
+          <FaUsers className="h-7 w-7" aria-hidden />
+        </span>
+        <div className="min-w-0 flex-1">
+          <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-primary">Family</p>
+          <h2 className="font-heading text-xl font-black tracking-tight text-secondary md:text-2xl">Select child</h2>
+          <p className="mt-1 text-sm leading-relaxed text-gray-600">
+            Switch students to see academic progress and payments in context.
+          </p>
+          <div className="mt-4 flex flex-wrap gap-2">
+            {children.map((c) => (
+              <button
+                key={c.id}
+                type="button"
+                onClick={() => setSelectedId(c.id)}
+                className={`rounded-full px-5 py-2.5 text-sm font-heading font-semibold shadow-sm transition-all ${
+                  String(resolvedChildId) === String(c.id)
+                    ? 'bg-gradient-to-r from-secondary to-[#1a2542] text-white shadow-lg ring-2 ring-primary/35'
+                    : 'border-2 border-secondary/12 bg-white text-secondary hover:border-primary/40 hover:bg-[#f8fbff]'
+                }`}
+              >
+                {c.full_name}
+              </button>
+            ))}
+            {children.length === 0 && (
+              <p className="rounded-xl border border-dashed border-secondary/20 bg-[#f8fbff]/80 px-4 py-3 text-sm text-gray-600">
+                No linked students yet — ask an administrator to link your account.
+              </p>
+            )}
+          </div>
+        </div>
       </div>
     </section>
   )
@@ -351,15 +434,27 @@ export default function ParentDashboard() {
 
       {activeSection === 'dash' && (
         <>
-          <p className="mb-4 text-sm text-slate-600">
-            Use the sidebar to open <strong>child progress</strong> (including skill balance), payments, receipts, and
-            messages.
-          </p>
+          <header className="mb-6 overflow-hidden rounded-3xl border border-secondary/12 bg-gradient-to-r from-white via-[#f8fbff] to-[#fff8ef]/60 p-6 shadow-lg md:p-7">
+            <div className="flex flex-wrap items-start gap-4">
+              <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-primary to-[#e89235] text-secondary shadow-md ring-2 ring-white">
+                <FaChartLine className="h-6 w-6" aria-hidden />
+              </span>
+              <div>
+                <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-primary">At a glance</p>
+                <h2 className="font-heading mt-1 text-xl font-black text-secondary md:text-2xl">Your family dashboard</h2>
+                <p className="mt-2 max-w-2xl text-sm leading-relaxed text-gray-600">
+                  Jump into <strong className="text-secondary">child progress</strong> for skills and grades, or manage{' '}
+                  <strong className="text-secondary">payments</strong> and <strong className="text-secondary">receipts</strong>{' '}
+                  from the shortcuts below.
+                </p>
+              </div>
+            </div>
+          </header>
           {childSelector}
           {resolvedChildId && (
             <div className="mb-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
               <MetricCard
-                color="bg-blue-600"
+                color="bg-primary"
                 value={`${pct}%`}
                 title="Task completion"
                 icon="📈"
@@ -416,15 +511,16 @@ export default function ParentDashboard() {
               />
             </div>
           )}
-          <div className="flex flex-wrap gap-2">
+          <div className="flex flex-wrap gap-3">
             <button
               type="button"
               onClick={() => {
                 jump('pay')
                 setToast('Family payment overview.')
               }}
-              className="rounded-lg bg-slate-900 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700"
+              className="btn-portal-primary inline-flex items-center gap-2 px-6 py-3 text-sm font-bold shadow-lg"
             >
+              <FaCreditCard className="h-4 w-4" aria-hidden />
               Family payments
             </button>
             <button
@@ -433,8 +529,9 @@ export default function ParentDashboard() {
                 jump('rec')
                 setToast('Receipts and downloads.')
               }}
-              className="rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50"
+              className="btn-portal-outline inline-flex items-center gap-2 px-6 py-3 text-sm font-bold"
             >
+              <FaReceipt className="h-4 w-4" aria-hidden />
               Receipts & downloads
             </button>
           </div>
@@ -442,14 +539,24 @@ export default function ParentDashboard() {
       )}
 
       {activeSection === 'cal' && (
-        <>
+        <div className="space-y-6">
           {childSelector}
-          <div className="mb-6 rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
-            <h2 className="text-lg font-semibold text-slate-900">Schedule</h2>
-            <p className="mt-1 text-sm text-slate-600">
-              Calendar highlights include your child&apos;s assignment deadlines plus admin-published school events.
-            </p>
-            <div className="mt-4">
+          <section className="relative overflow-hidden rounded-3xl border-2 border-secondary/15 bg-white shadow-xl">
+            <div className="h-1.5 bg-gradient-to-r from-secondary via-primary to-secondary" aria-hidden />
+            <div className="border-b border-secondary/10 bg-gradient-to-r from-[#f8fbff] to-white px-5 py-4 md:px-6">
+              <div className="flex flex-wrap items-start gap-3">
+                <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-secondary/10 text-secondary">
+                  <FaCalendarAlt className="h-5 w-5" aria-hidden />
+                </span>
+                <div>
+                  <h2 className="font-heading text-lg font-bold text-secondary md:text-xl">Schedule</h2>
+                  <p className="mt-1 text-sm text-gray-600">
+                    Assignment deadlines and admin-published school events appear on the calendar below.
+                  </p>
+                </div>
+              </div>
+            </div>
+            <div className="p-4 md:p-6">
               <CalendarWidget
                 title="Deadlines & events"
                 highlightDates={[
@@ -458,85 +565,175 @@ export default function ParentDashboard() {
                 ]}
               />
             </div>
-          </div>
+          </section>
 
-          <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
-            <h3 className="mb-2 text-sm font-semibold text-slate-900">Upcoming admin events</h3>
-            {upcomingParentEvents.length === 0 ? (
-              <p className="text-sm text-slate-500">No admin events yet. Admin can publish events in their calendar.</p>
-            ) : (
-              <ul className="space-y-2">
-                {upcomingParentEvents.slice(0, 6).map((e) => (
-                  <li key={e.id} className="rounded border border-slate-100 bg-slate-50/60 p-3">
-                    <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">
-                      {e.target} · {new Date(e.date).toLocaleDateString()}
+          <section className="portal-section-card relative overflow-hidden shadow-xl">
+            <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-primary via-amber-400 to-secondary opacity-90" aria-hidden />
+            <div className="mb-4 flex flex-wrap items-center justify-between gap-3 pt-1">
+              <div className="flex items-center gap-2">
+                <FaCalendarAlt className="h-5 w-5 text-primary" aria-hidden />
+                <h3 className="font-heading text-lg font-bold text-secondary">Upcoming school events</h3>
+              </div>
+              {nextSchoolEvent && (
+                <span className="rounded-full bg-primary/15 px-3 py-1 text-[10px] font-black uppercase tracking-wider text-secondary">
+                  Synced with calendar
+                </span>
+              )}
+            </div>
+
+            {nextSchoolEvent ? (
+              <div className="space-y-6">
+                <div className="relative overflow-hidden rounded-2xl border-2 border-primary/35 bg-gradient-to-br from-[#fff8ef] via-white to-[#f8fbff] p-6 shadow-lg ring-2 ring-primary/10">
+                  <div className="absolute left-0 top-0 h-full w-2 bg-gradient-to-b from-secondary via-[#2d4a73] to-primary" aria-hidden />
+                  <p className="pl-4 text-[10px] font-black uppercase tracking-[0.28em] text-primary">Next school event</p>
+                  <div className="mt-3 flex flex-wrap items-center gap-3 pl-4">
+                    <time
+                      className="font-heading text-2xl font-black text-secondary md:text-3xl"
+                      dateTime={nextSchoolEvent.date}
+                    >
+                      {new Date(nextSchoolEvent.date).toLocaleDateString(undefined, {
+                        weekday: 'long',
+                        month: 'long',
+                        day: 'numeric',
+                        year: 'numeric',
+                      })}
+                    </time>
+                    <span className="rounded-full border border-secondary/15 bg-white px-3 py-1 text-[11px] font-bold uppercase tracking-wide text-secondary shadow-sm">
+                      {nextSchoolEvent.target === 'all' ? 'Everyone' : nextSchoolEvent.target}
+                    </span>
+                  </div>
+                  <p className="mt-4 pl-4 font-heading text-xl font-bold leading-snug text-secondary md:text-2xl">
+                    {nextSchoolEvent.title}
+                  </p>
+                  <p className="mt-3 pl-4 text-sm text-gray-600">
+                    Pulled from the same school events your admin adds — highlighted on the calendar above.
+                  </p>
+                </div>
+
+                {restUpcomingSchoolEvents.length > 0 ? (
+                  <div>
+                    <p className="mb-3 font-heading text-sm font-bold uppercase tracking-wide text-secondary/80">
+                      Also coming up
                     </p>
-                    <p className="mt-1 font-semibold text-slate-900">{e.title}</p>
-                  </li>
-                ))}
-              </ul>
+                    <ul className="space-y-3">
+                      {restUpcomingSchoolEvents.map((e, idx) => (
+                        <li
+                          key={e.id}
+                          className="group relative overflow-hidden rounded-2xl border border-secondary/12 bg-white shadow-md transition hover:-translate-y-0.5 hover:shadow-lg"
+                        >
+                          <div
+                            className={`absolute left-0 top-0 h-full w-1.5 bg-gradient-to-b ${CARD_ACCENTS[idx % CARD_ACCENTS.length]}`}
+                            aria-hidden
+                          />
+                          <div className="pl-5 pr-4 py-4">
+                            <p className="text-[11px] font-bold uppercase tracking-[0.15em] text-gray-500">
+                              {e.target} · {new Date(e.date).toLocaleDateString()}
+                            </p>
+                            <p className="mt-1 font-heading font-semibold text-secondary">{e.title}</p>
+                          </div>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                ) : null}
+              </div>
+            ) : (
+              <p className="rounded-2xl border border-dashed border-secondary/20 bg-[#f8fbff]/70 py-10 text-center text-sm leading-relaxed text-gray-600">
+                No upcoming school events yet. When your school publishes a date (same events as on the admin calendar),
+                the next one will appear here automatically.
+              </p>
             )}
-          </div>
-        </>
+          </section>
+        </div>
       )}
 
       {activeSection === 'child' && resolvedChildId && (
-        <>
+        <div className="space-y-6">
           {childSelector}
-          <div className="mb-6 rounded-xl border border-indigo-100 bg-indigo-50/60 p-4">
-            <h3 className="text-sm font-semibold text-indigo-900">Skill balance (for selected child)</h3>
-            <p className="mt-1 text-xs text-indigo-800/80">
-              Estimated profile from average performance — use with grade trends for a fuller picture.
-            </p>
-            <div className="mx-auto mt-4 max-w-lg">
-              <div className="h-64">
-                <Bar
-                  data={skillBar}
-                  options={{
-                    ...commonOptions,
-                    plugins: { legend: { display: false } },
-                    scales: { y: { min: 0, max: 100, ticks: { stepSize: 25 } } },
-                  }}
-                />
+          <section className="relative overflow-hidden rounded-3xl border-2 border-secondary/15 bg-white shadow-xl">
+            <div className="h-1.5 bg-gradient-to-r from-primary via-amber-400 to-secondary" aria-hidden />
+            <div className="border-b border-secondary/10 bg-gradient-to-r from-[#fff8ef]/80 to-[#f8fbff] px-5 py-4 md:px-6">
+              <div className="flex flex-wrap items-start gap-3">
+                <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-secondary to-[#1a2542] text-primary shadow-md">
+                  <FaChartBar className="h-5 w-5" aria-hidden />
+                </span>
+                <div>
+                  <h3 className="font-heading text-lg font-bold text-secondary md:text-xl">Skill balance</h3>
+                  <p className="mt-1 text-sm text-gray-600">
+                    Estimated profile from average performance — pair this with grade trends for context.
+                  </p>
+                </div>
               </div>
-              <p className="mt-2 text-xs text-indigo-800/80">
-                Higher bars indicate stronger areas (estimated from the child&apos;s graded work).
-              </p>
             </div>
-          </div>
+            <div className="px-5 py-6 md:px-8">
+              <div className="mx-auto max-w-lg">
+                <div className="h-64">
+                  <Bar
+                    data={skillBar}
+                    options={{
+                      ...commonOptions,
+                      plugins: { legend: { display: false } },
+                      scales: { y: { min: 0, max: 100, ticks: { stepSize: 25 } } },
+                    }}
+                  />
+                </div>
+                <p className="mt-3 text-center text-xs text-secondary/80">
+                  Higher bars = stronger estimated skills from graded work.
+                </p>
+              </div>
+            </div>
+          </section>
 
-          <div className="mb-6 grid gap-4 lg:grid-cols-2">
-            <div className="rounded-lg border border-slate-200 bg-white p-4 shadow-sm">
-              <h2 className="mb-2 text-xl font-semibold">Family payment overview</h2>
-              <p className="mb-3 text-sm text-slate-600">Total paid vs estimated annual balance (demo: ${ANNUAL_DUE}).</p>
-              <div className="mx-auto h-64 max-w-md">
-                <Doughnut data={donut} options={commonOptions} />
+          <div className="mb-6 grid gap-6 lg:grid-cols-2">
+            <section className="group relative overflow-hidden rounded-3xl border-2 border-secondary/12 bg-white shadow-xl transition hover:shadow-2xl">
+              <div className="absolute left-0 top-0 h-full w-1.5 bg-gradient-to-b from-secondary via-[#2d4a73] to-primary" aria-hidden />
+              <div className="p-5 md:p-6 pl-7">
+                <div className="mb-3 flex items-center gap-2">
+                  <FaCreditCard className="h-5 w-5 text-primary" aria-hidden />
+                  <h2 className="font-heading text-lg font-bold text-secondary">Family payment overview</h2>
+                </div>
+                <p className="mb-4 text-sm text-gray-600">Total paid vs estimated annual balance (demo: ${ANNUAL_DUE}).</p>
+                <div className="mx-auto h-64 max-w-md">
+                  <Doughnut data={donut} options={commonOptions} />
+                </div>
               </div>
-            </div>
-            <div className="rounded-lg border border-slate-200 bg-white p-4 shadow-sm" id="child-summary">
-              <h2 className="mb-2 text-xl font-semibold">{selectedName} — summary</h2>
-              <ul className="space-y-2 text-sm text-slate-700">
-                <li>
-                  <strong>Completion:</strong> {pct}%
-                </li>
-                <li>
-                  <strong>Average grade:</strong> {submissions.length ? avg.toFixed(1) : 'N/A'}
-                </li>
-                <li>
-                  <strong>Paid toward this child:</strong> ${paidForChild.toFixed(2)}
-                </li>
-                <li className="font-semibold text-orange-700">
-                  <strong>Outstanding (demo):</strong> ${outstandingChild.toFixed(2)}
-                </li>
-              </ul>
-            </div>
+            </section>
+            <section
+              className="group relative overflow-hidden rounded-3xl border-2 border-primary/25 bg-gradient-to-br from-[#f8fbff] to-white shadow-xl ring-2 ring-primary/10"
+              id="child-summary"
+            >
+              <div className="absolute left-0 top-0 h-full w-1.5 bg-gradient-to-b from-primary to-amber-400" aria-hidden />
+              <div className="p-5 md:p-6 pl-7">
+                <h2 className="font-heading text-xl font-black text-secondary">{selectedName}</h2>
+                <p className="text-sm font-semibold uppercase tracking-wide text-primary">Quick summary</p>
+                <ul className="mt-4 space-y-3 text-sm text-secondary">
+                  <li className="flex justify-between gap-4 rounded-xl bg-white/80 px-3 py-2 shadow-sm ring-1 ring-secondary/10">
+                    <span className="text-gray-600">Completion</span>
+                    <strong>{pct}%</strong>
+                  </li>
+                  <li className="flex justify-between gap-4 rounded-xl bg-white/80 px-3 py-2 shadow-sm ring-1 ring-secondary/10">
+                    <span className="text-gray-600">Average grade</span>
+                    <strong>{submissions.length ? avg.toFixed(1) : 'N/A'}</strong>
+                  </li>
+                  <li className="flex justify-between gap-4 rounded-xl bg-white/80 px-3 py-2 shadow-sm ring-1 ring-secondary/10">
+                    <span className="text-gray-600">Paid toward this child</span>
+                    <strong>${paidForChild.toFixed(2)}</strong>
+                  </li>
+                  <li className="flex justify-between gap-4 rounded-xl border border-amber-200 bg-[#fff8ef] px-3 py-2 font-semibold text-amber-950">
+                    <span>Outstanding (demo)</span>
+                    <span>${outstandingChild.toFixed(2)}</span>
+                  </li>
+                </ul>
+              </div>
+            </section>
           </div>
 
           <div className="mb-6 grid gap-4 lg:grid-cols-1" id="child-grade-trend">
-            <div className="rounded border border-slate-200 bg-white p-4 shadow-sm">
-              <h3 className="mb-1 font-semibold text-slate-900">Grade trend</h3>
-              <p className="mb-2 text-xs text-slate-600">
-                Shows your graded attempts over time (chronological). Higher lines mean improving grades.
+            <div className="relative overflow-hidden rounded-3xl border-2 border-secondary/12 bg-white p-5 shadow-xl md:p-6">
+              <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-secondary to-primary opacity-80" aria-hidden />
+              <h3 className="font-heading pt-1 text-lg font-bold text-secondary">Grade trend</h3>
+              <p className="mb-4 text-sm text-gray-600">
+                Graded attempts over time — upward movement usually means stronger submissions.
               </p>
               <div className="h-56">
                 <Line data={trendData} options={{ ...commonOptions, scales: { y: { min: 0, max: 100 } } }} />
@@ -544,47 +741,59 @@ export default function ParentDashboard() {
             </div>
           </div>
 
-          <div className="mb-6 rounded border border-slate-200 bg-white p-4 shadow-sm">
-            <h3 className="mb-1 font-semibold text-slate-900">Grades by assignment (latest)</h3>
-            <p className="mb-3 text-xs text-slate-600">
-              Shows the most recent score per assignment (gray = not submitted, light blue = awaiting grade).
+          <div className="mb-6 relative overflow-hidden rounded-3xl border-2 border-secondary/12 bg-white p-5 shadow-xl md:p-6">
+            <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-primary via-amber-400 to-secondary opacity-90" aria-hidden />
+            <h3 className="font-heading pt-1 text-lg font-bold text-secondary">Grades by assignment (latest)</h3>
+            <p className="mb-4 text-sm text-gray-600">
+              Most recent score per assignment — compare tasks at a glance.
             </p>
             <div className="h-64">
               <Bar data={barByTask} options={commonOptions} />
             </div>
           </div>
 
-          <div className="mb-6 grid gap-4 lg:grid-cols-2">
-            <section className="rounded border border-slate-200 bg-white p-4 shadow-sm" id="child-pending">
-              <h2 className="mb-3 text-lg font-semibold">Pending tasks</h2>
-              <ul className="space-y-2 text-sm">
+          <div className="mb-6 grid gap-6 lg:grid-cols-2">
+            <section className="relative overflow-hidden rounded-3xl border-2 border-amber-300/40 bg-gradient-to-br from-amber-50/80 to-white p-5 shadow-lg ring-1 ring-amber-200/60" id="child-pending">
+              <div className="absolute left-0 top-0 h-full w-1.5 bg-gradient-to-b from-amber-500 to-primary" aria-hidden />
+              <h2 className="font-heading pl-3 text-lg font-bold text-secondary">Pending tasks</h2>
+              <ul className="mt-4 space-y-3 pl-3 text-sm">
                 {pendingTasks.map((t) => (
-                  <li key={t.id} className="rounded border border-amber-100 bg-amber-50/50 p-2">
-                    <strong>{t.title}</strong>
-                    <span className="text-slate-600"> — due {new Date(t.deadline).toLocaleDateString()}</span>
+                  <li
+                    key={t.id}
+                    className="rounded-xl border border-amber-200/80 bg-white/90 px-4 py-3 shadow-sm backdrop-blur-sm"
+                  >
+                    <strong className="text-secondary">{t.title}</strong>
+                    <span className="text-gray-600"> — due {new Date(t.deadline).toLocaleDateString()}</span>
                   </li>
                 ))}
-                {pendingTasks.length === 0 && <p className="text-slate-500">No pending tasks.</p>}
+                {pendingTasks.length === 0 && (
+                  <p className="rounded-xl border border-dashed border-secondary/15 bg-white py-8 text-center text-gray-600">
+                    No pending tasks — great job staying current.
+                  </p>
+                )}
               </ul>
             </section>
-            <section className="rounded border border-slate-200 bg-white p-4 shadow-sm" id="child-done">
-              <h2 className="mb-3 text-lg font-semibold">Completed & graded</h2>
-              <ul className="space-y-2 text-sm">
+            <section className="relative overflow-hidden rounded-3xl border-2 border-secondary/15 bg-white p-5 shadow-xl" id="child-done">
+              <div className="absolute left-0 top-0 h-full w-1.5 bg-gradient-to-b from-emerald-600 to-teal-600" aria-hidden />
+              <h2 className="font-heading pl-3 text-lg font-bold text-secondary">Completed & graded</h2>
+              <ul className="mt-4 space-y-3 pl-3 text-sm">
                 {tasks.map((t) => {
                   const latest = latestSubmissionForTask(t.id, submissions)
                   const st = taskStatus(t, latest)
                   if (st === 'pending') return null
                   return (
-                    <li key={t.id} className="rounded border border-slate-100 p-2">
-                      <strong>{t.title}</strong>
+                    <li key={t.id} className="rounded-xl border border-secondary/10 bg-[#f8fbff]/70 px-4 py-3 shadow-sm">
+                      <strong className="text-secondary">{t.title}</strong>
                       {latest && (
-                        <span className="text-slate-600">
+                        <span className="text-gray-600">
                           {' '}
                           — score {latest.score != null ? Number(latest.score).toFixed(0) : '—'}
                         </span>
                       )}
                       {latest?.feedback && (
-                        <p className="mt-1 text-xs text-slate-600">Feedback: {latest.feedback}</p>
+                        <p className="mt-2 rounded-lg bg-white/90 px-3 py-2 text-xs leading-relaxed text-gray-600 ring-1 ring-secondary/10">
+                          {latest.feedback}
+                        </p>
                       )}
                     </li>
                   )
@@ -592,118 +801,203 @@ export default function ParentDashboard() {
               </ul>
             </section>
           </div>
-        </>
+        </div>
       )}
 
       {activeSection === 'pay' && (
         <div className="space-y-6">
           {childSelector}
-          <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
-            <h2 className="text-xl font-semibold">Family payments</h2>
-            <p className="mt-2 text-sm text-slate-600">Total paid vs estimated annual balance (demo: ${ANNUAL_DUE}).</p>
-            <div className="mx-auto mt-6 h-72 max-w-lg">
-              <Doughnut data={donut} options={commonOptions} />
+          <section className="relative overflow-hidden rounded-3xl border-2 border-secondary/15 bg-white shadow-xl">
+            <div className="h-1.5 bg-gradient-to-r from-secondary via-primary to-secondary" aria-hidden />
+            <div className="border-b border-secondary/10 bg-gradient-to-r from-[#f8fbff] to-white px-5 py-5 md:px-8">
+              <div className="flex flex-wrap items-start gap-4">
+                <span className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-secondary to-[#1a2542] text-primary shadow-lg ring-2 ring-white">
+                  <FaCreditCard className="h-7 w-7" aria-hidden />
+                </span>
+                <div>
+                  <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-primary">Finances</p>
+                  <h2 className="font-heading text-2xl font-black text-secondary md:text-3xl">Family payments</h2>
+                  <p className="mt-2 max-w-xl text-sm text-gray-600">
+                    Snapshot of total contributions versus the demo annual estimate (${ANNUAL_DUE}). Receipts live under{' '}
+                    <strong className="text-secondary">Receipts</strong>.
+                  </p>
+                </div>
+              </div>
             </div>
-            <p className="mt-4 text-center text-sm text-slate-600">
-              Total paid: <strong>${totalPaid.toFixed(2)}</strong> · Outstanding (family):{' '}
-              <strong>${remaining.toFixed(2)}</strong>
-            </p>
-          </div>
+            <div className="flex flex-wrap justify-center gap-8 px-5 py-8 md:px-10">
+              <div className="mx-auto h-72 max-w-md flex-1">
+                <Doughnut data={donut} options={commonOptions} />
+              </div>
+              <div className="flex min-w-[14rem] flex-col justify-center gap-4 rounded-2xl border border-secondary/10 bg-[#f8fbff]/80 p-6 shadow-inner">
+                <div>
+                  <p className="text-[11px] font-bold uppercase tracking-wide text-gray-500">Total paid</p>
+                  <p className="font-heading text-3xl font-black text-secondary">${totalPaid.toFixed(2)}</p>
+                </div>
+                <div>
+                  <p className="text-[11px] font-bold uppercase tracking-wide text-gray-500">Outstanding (family)</p>
+                  <p className="font-heading text-3xl font-black text-amber-800">${remaining.toFixed(2)}</p>
+                </div>
+                <div className="flex gap-3 text-xs font-semibold">
+                  <span className="inline-flex items-center gap-2 rounded-full bg-primary/20 px-3 py-1 text-secondary">
+                    <span className="h-2 w-2 rounded-full bg-[#faa853]" aria-hidden />
+                    Paid
+                  </span>
+                  <span className="inline-flex items-center gap-2 rounded-full bg-slate-200/80 px-3 py-1 text-secondary">
+                    <span className="h-2 w-2 rounded-full bg-slate-400" aria-hidden />
+                    Due
+                  </span>
+                </div>
+              </div>
+            </div>
+          </section>
         </div>
       )}
 
       {activeSection === 'rec' && (
         <div className="space-y-6">
           {childSelector}
-          <section className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
-            <h2 className="mb-3 text-lg font-semibold">Payment history & receipts</h2>
-            <p className="mb-3 text-sm text-slate-600">
-              Download when a receipt file URL is attached. Otherwise use the receipt number for your records.
-            </p>
-            <div className="space-y-2">
-              {payments.map((p) => {
+          <section className="relative overflow-hidden rounded-3xl border-2 border-secondary/15 bg-white shadow-xl">
+            <div className="h-1.5 bg-gradient-to-r from-emerald-600 via-teal-500 to-secondary" aria-hidden />
+            <div className="border-b border-secondary/10 bg-gradient-to-r from-emerald-50/50 to-white px-5 py-5 md:px-8">
+              <div className="flex flex-wrap items-start gap-4">
+                <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-emerald-600/15 text-emerald-800">
+                  <FaFileInvoiceDollar className="h-6 w-6" aria-hidden />
+                </span>
+                <div>
+                  <h2 className="font-heading text-xl font-black text-secondary md:text-2xl">Payment history & receipts</h2>
+                  <p className="mt-2 max-w-2xl text-sm text-gray-600">
+                    Download when finance attaches a file. Otherwise keep the receipt number for your records.
+                  </p>
+                </div>
+              </div>
+            </div>
+            <div className="space-y-3 p-5 md:p-6">
+              {payments.map((p, idx) => {
                 const child = children.find((c) => String(c.id) === String(p.student_id))
                 const r = p.receipts?.[0]
                 const canDownload = r?.receipt_url && String(r.receipt_url).startsWith('http')
+                const accent = CARD_ACCENTS[idx % CARD_ACCENTS.length]
                 return (
                   <div
                     key={p.id}
-                    className="flex flex-wrap items-center justify-between gap-2 rounded border border-slate-100 p-3 text-sm"
+                    className="group relative flex flex-wrap items-center justify-between gap-4 overflow-hidden rounded-2xl border border-secondary/12 bg-white py-4 pl-5 pr-4 shadow-md transition hover:-translate-y-0.5 hover:shadow-xl md:pl-6"
                   >
-                    <div>
-                      <span className="font-medium">${Number(p.amount).toFixed(2)}</span>
-                      <span className="text-slate-600"> — {new Date(p.created_at).toLocaleDateString()}</span>
-                      {child && <span className="ml-2 text-slate-500">({child.full_name})</span>}
-                      <div className="text-xs text-slate-500">Receipt: {r?.receipt_number ?? '—'}</div>
+                    <div className={`absolute left-0 top-0 h-full w-1.5 bg-gradient-to-b ${accent}`} aria-hidden />
+                    <div className="min-w-0 pl-2">
+                      <p className="font-heading text-lg font-bold text-secondary">${Number(p.amount).toFixed(2)}</p>
+                      <p className="text-sm text-gray-600">
+                        {new Date(p.created_at).toLocaleDateString()}
+                        {child && <span className="text-gray-500"> · {child.full_name}</span>}
+                      </p>
+                      <p className="mt-1 font-mono text-xs text-gray-500">Receipt: {r?.receipt_number ?? '—'}</p>
                     </div>
-                    <div className="flex gap-2">
+                    <div className="shrink-0">
                       {canDownload ? (
                         <a
                           href={r.receipt_url}
                           download
                           target="_blank"
                           rel="noreferrer"
-                          className="rounded bg-blue-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-blue-700"
+                          className="btn-portal-primary inline-flex items-center gap-2 px-5 py-2.5 text-xs font-bold shadow-md"
                         >
                           Download
                         </a>
                       ) : (
-                        <span className="rounded bg-slate-200 px-3 py-1.5 text-xs text-slate-500">No file linked</span>
+                        <span className="inline-flex rounded-xl border-2 border-secondary/15 bg-secondary/5 px-4 py-2 text-xs font-bold text-gray-500">
+                          No file linked
+                        </span>
                       )}
                     </div>
                   </div>
                 )
               })}
+              {payments.length === 0 && (
+                <p className="rounded-2xl border border-dashed border-secondary/20 py-12 text-center text-sm text-gray-600">
+                  No payments recorded yet.
+                </p>
+              )}
             </div>
           </section>
         </div>
       )}
 
       {activeSection === 'msg' && (
-        <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
-          <h2 className="text-lg font-semibold">Messages</h2>
-          <p className="mt-2 text-sm text-slate-600">
-            School announcements and instructor notes.
-          </p>
-          <div className="mt-4 space-y-3">
-            {messages.map((m) => (
-              <article key={m.id} className="rounded-xl border border-slate-200 bg-white p-4">
-                <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">
-                  {m.target} · {new Date(m.created_at).toLocaleString()}
+        <div className="space-y-6">
+          <header className="overflow-hidden rounded-3xl border border-secondary/12 bg-gradient-to-r from-white via-[#f8fbff] to-[#fff8ef]/60 p-6 shadow-lg md:p-7">
+            <div className="flex flex-wrap items-start gap-4">
+              <span className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-secondary to-[#1a2542] text-primary shadow-lg ring-2 ring-white">
+                <FaComments className="h-7 w-7" aria-hidden />
+              </span>
+              <div>
+                <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-primary">Inbox</p>
+                <h2 className="font-heading text-2xl font-black text-secondary md:text-3xl">Messages</h2>
+                <p className="mt-2 max-w-2xl text-sm leading-relaxed text-gray-600">
+                  Announcements from your school team. Tips below help you get the most from the portal.
                 </p>
-                <p className="mt-1 font-semibold text-slate-900">{m.title}</p>
-                <p className="mt-2 text-sm text-slate-700">{m.body}</p>
-              </article>
-            ))}
-            {messages.length === 0 && (
-              <p className="rounded-lg border border-dashed border-slate-200 bg-slate-50 py-6 text-center text-sm text-slate-500">
-                No announcements yet.
-              </p>
-            )}
-          </div>
-          <div
-            className={`mt-4 rounded-xl border p-4 transition ${
-              parentMsgRead
-                ? 'border-slate-200 bg-slate-50'
-                : 'border-blue-200 bg-blue-50/80 ring-2 ring-blue-200/50'
-            }`}
-          >
-            <div className="flex flex-wrap items-start justify-between gap-2">
-              <p className="text-sm text-slate-800">
-                <strong>Tip:</strong> Check your child’s progress tab for grades and skill balance after each assignment.
-              </p>
-              {!parentMsgRead && (
-                <span className="rounded-full bg-blue-600 px-2 py-0.5 text-xs font-bold text-white">New</span>
+              </div>
+            </div>
+          </header>
+
+          <section className="relative overflow-hidden rounded-3xl border-2 border-secondary/12 bg-white p-6 shadow-xl md:p-8">
+            <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-secondary via-primary to-secondary opacity-90" aria-hidden />
+            <div className="space-y-4 pt-2">
+              {messages.map((m, idx) => (
+                <article
+                  key={m.id}
+                  className="group relative overflow-hidden rounded-2xl border border-secondary/10 bg-white shadow-md transition hover:shadow-lg"
+                >
+                  <div
+                    className={`absolute left-0 top-0 h-full w-1.5 bg-gradient-to-b ${CARD_ACCENTS[idx % CARD_ACCENTS.length]}`}
+                    aria-hidden
+                  />
+                  <div className="px-5 py-5 pl-7">
+                    <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-gray-500">
+                      {m.target} · {new Date(m.created_at).toLocaleString()}
+                    </p>
+                    <p className="font-heading mt-2 text-lg font-bold text-secondary">{m.title}</p>
+                    <p className="mt-2 text-sm leading-relaxed text-gray-700">{m.body}</p>
+                  </div>
+                </article>
+              ))}
+              {messages.length === 0 && (
+                <p className="rounded-2xl border border-dashed border-secondary/20 bg-[#f8fbff]/80 py-12 text-center text-sm text-gray-600">
+                  No announcements yet — check back soon.
+                </p>
               )}
             </div>
-            <button
-              type="button"
-              onClick={() => markRead()}
-              className="mt-3 text-sm font-semibold text-blue-700 hover:underline"
+
+            <div
+              className={`relative mt-8 overflow-hidden rounded-2xl border-2 p-6 shadow-inner transition ${
+                parentMsgRead
+                  ? 'border-secondary/15 bg-[#f8fbff]/90'
+                  : 'border-primary/35 bg-gradient-to-br from-[#fff8ef] to-white ring-2 ring-primary/20'
+              }`}
             >
-              {parentMsgRead ? 'Marked as read' : 'Mark welcome as read'}
-            </button>
-          </div>
+              <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-secondary via-primary to-secondary" aria-hidden />
+              <div className="flex flex-wrap items-start justify-between gap-3 pt-1">
+                <p className="max-w-xl text-sm leading-relaxed text-secondary">
+                  <strong className="text-secondary">Tip:</strong> After each assignment, open{' '}
+                  <strong className="text-primary">Child progress</strong> for grades and skill balance.
+                </p>
+                {!parentMsgRead && (
+                  <span className="rounded-full bg-gradient-to-r from-primary to-amber-500 px-3 py-1 text-[10px] font-black uppercase tracking-wide text-white shadow-md">
+                    New
+                  </span>
+                )}
+              </div>
+              <button
+                type="button"
+                onClick={() => markRead()}
+                className={
+                  parentMsgRead
+                    ? 'btn-portal-outline mt-5 px-6 py-2.5 text-sm font-bold'
+                    : 'btn-portal-primary mt-5 px-8 py-3 text-sm font-bold shadow-lg'
+                }
+              >
+                {parentMsgRead ? 'Marked as read' : 'Mark welcome as read'}
+              </button>
+            </div>
+          </section>
         </div>
       )}
     </AppShellLayout>
