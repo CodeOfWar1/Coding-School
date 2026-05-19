@@ -1,41 +1,28 @@
 import { forwardRef, useState } from 'react'
 import { FaTimes, FaArrowRight } from 'react-icons/fa'
 import { Link } from 'react-router-dom'
-import { SCHOOL_MEDIA_IMAGES } from '../../content/schoolMedia'
-
-const GALLERY_IMAGES = [
-  { title: 'Coding Projects', img: SCHOOL_MEDIA_IMAGES.hero },
-  { title: 'Robotics Build Day', img: SCHOOL_MEDIA_IMAGES.lab },
-  { title: 'Girls Tech Cohort', img: SCHOOL_MEDIA_IMAGES.classA },
-  { title: 'Community Outreach', img: SCHOOL_MEDIA_IMAGES.social },
-  { title: 'Game Design Studio', img: SCHOOL_MEDIA_IMAGES.classB },
-  { title: 'Classroom Events', img: SCHOOL_MEDIA_IMAGES.classC },
-]
+import { useLandingSiteContent } from '../../hooks/useLandingSiteContent'
 
 const Gallery = forwardRef((_, ref) => {
   const [selectedImage, setSelectedImage] = useState(null)
+  const { data: site } = useLandingSiteContent()
+  const images = site.gallery_items ?? []
 
   return (
     <section id="gallery" ref={ref} className="py-5 md:py-10 bg-gray-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
         <div className="text-center mb-12 md:mb-16">
           <div data-reveal className="scroll-reveal">
-            <p className="text-sm font-bold uppercase tracking-[0.2em] text-[#faa853] mb-3">
-              Moments
-            </p>
-            <h2 className="text-3xl md:text-5xl font-black text-[#2d3f5d] mb-4">
-              Our Learning Journey
-            </h2>
-            <p className="site-body max-w-2xl mx-auto">
-              Capturing the excitement, creativity, and growth at Anvil Tech Academy
-            </p>
+            <p className="text-sm font-bold uppercase tracking-[0.2em] text-[#faa853] mb-3">{site.gallery_eyebrow}</p>
+            <h2 className="text-3xl md:text-5xl font-black text-[#2d3f5d] mb-4">{site.gallery_heading}</h2>
+            <p className="site-body max-w-2xl mx-auto">{site.gallery_subtitle}</p>
           </div>
         </div>
 
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {GALLERY_IMAGES.map((item, idx) => (
+          {images.map((item, idx) => (
             <div
-              key={idx}
+              key={`${item.title}-${idx}`}
               data-reveal
               className={`group relative overflow-hidden rounded-2xl cursor-pointer scroll-reveal ${
                 idx % 2 === 0 ? 'scroll-reveal--left' : 'scroll-reveal--right'
@@ -44,7 +31,7 @@ const Gallery = forwardRef((_, ref) => {
             >
               <div className="relative h-64 overflow-hidden">
                 <img
-                  src={item.img}
+                  src={item.image_url}
                   alt={item.title}
                   className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                 />
@@ -57,7 +44,6 @@ const Gallery = forwardRef((_, ref) => {
           ))}
         </div>
 
-        {/* See Our Gallery Button */}
         <div data-reveal className="text-center mt-12 md:mt-16 scroll-reveal">
           <Link
             to="/gallery"
@@ -66,19 +52,20 @@ const Gallery = forwardRef((_, ref) => {
             <span>See Our Full Gallery</span>
             <FaArrowRight className="text-sm group-hover:translate-x-1 transition-transform" />
           </Link>
-          <p className="text-base text-gray-500 mt-3">
-            Explore more memorable moments from our academy
-          </p>
+          <p className="text-base text-gray-500 mt-3">Explore more memorable moments from our academy</p>
         </div>
       </div>
 
-      {/* Lightbox */}
       {selectedImage && (
-        <div className="fixed inset-0 z-50 bg-black/90 flex items-center justify-center p-4 animate-fade-in" onClick={() => setSelectedImage(null)}>
-          <button className="absolute top-4 right-4 text-white hover:text-[#faa853] transition-colors">
+        <div
+          className="fixed inset-0 z-50 bg-black/90 flex items-center justify-center p-4 animate-fade-in"
+          onClick={() => setSelectedImage(null)}
+          role="presentation"
+        >
+          <button type="button" className="absolute top-4 right-4 text-white hover:text-[#faa853] transition-colors">
             <FaTimes size={32} />
           </button>
-          <img src={selectedImage.img} alt={selectedImage.title} className="max-w-full max-h-[90vh] object-contain rounded-lg" />
+          <img src={selectedImage.image_url} alt={selectedImage.title} className="max-w-full max-h-[90vh] object-contain rounded-lg" />
         </div>
       )}
     </section>

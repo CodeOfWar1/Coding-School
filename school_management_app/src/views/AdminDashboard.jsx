@@ -97,6 +97,81 @@ export default function AdminDashboard() {
     } finally {
       setLoading(false)
     }
+    const { error } = await supabase.from('landing_content').upsert(buildLandingUpsertPayload(content))
+    if (error) {
+      setToast(error.message || 'Save failed. Add missing columns in Supabase (see supabase/landing_content_extend.sql).')
+      return
+    }
+    await loadAll()
+    setToast('Website content saved.')
+  }
+
+  const addGalleryItem = () => {
+    setContent((p) => ({
+      ...p,
+      gallery_items: [...(p.gallery_items || []), { title: 'Photo title', image_url: '' }],
+    }))
+  }
+
+  const removeGalleryItem = (idx) => {
+    setContent((p) => ({
+      ...p,
+      gallery_items: (p.gallery_items || []).filter((_, i) => i !== idx),
+    }))
+  }
+
+  const patchGalleryItem = (idx, field, value) => {
+    setContent((p) => {
+      const items = [...(p.gallery_items || [])]
+      items[idx] = { ...items[idx], [field]: value }
+      return { ...p, gallery_items: items }
+    })
+  }
+
+  const addPartnerItem = () => {
+    setContent((p) => ({
+      ...p,
+      partners_items: [...(p.partners_items || []), { name: 'Partner name', logo_url: '', activity_summary: '' }],
+    }))
+  }
+
+  const removePartnerItem = (idx) => {
+    setContent((p) => ({
+      ...p,
+      partners_items: (p.partners_items || []).filter((_, i) => i !== idx),
+    }))
+  }
+
+  const patchPartnerItem = (idx, field, value) => {
+    setContent((p) => {
+      const items = [...(p.partners_items || [])]
+      items[idx] = { ...items[idx], [field]: value }
+      return { ...p, partners_items: items }
+    })
+  }
+
+  const uploadGalleryFile = async (idx, fileList) => {
+    const file = fileList?.[0]
+    if (!file) return
+    const r = await uploadSiteMediaFile(file, 'gallery')
+    if (r.error) {
+      setToast(r.error)
+      return
+    }
+    patchGalleryItem(idx, 'image_url', r.publicUrl)
+    setToast('Image uploaded — save to publish on the public site.')
+  }
+
+  const uploadPartnerLogo = async (idx, fileList) => {
+    const file = fileList?.[0]
+    if (!file) return
+    const r = await uploadSiteMediaFile(file, 'partners')
+    if (r.error) {
+      setToast(r.error)
+      return
+    }
+    patchPartnerItem(idx, 'logo_url', r.publicUrl)
+    setToast('Logo uploaded — save to publish.')
   }
 
   const handleLogout = async () => {

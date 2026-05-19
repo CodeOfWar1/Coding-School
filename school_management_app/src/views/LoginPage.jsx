@@ -14,10 +14,8 @@ export default function LoginPage() {
 
   const navigate = useNavigate();
 
-  // 🔥 GET FROM CONTEXT (NO REFETCHING)
   const { user, loading: authLoading } = useAuth();
 
-  // 🔥 AFTER LOGIN → REDIRECT ONCE CONTEXT UPDATES
   useEffect(() => {
     if (!authLoading && user) {
       const role = user?.profile?.role;
@@ -56,10 +54,6 @@ export default function LoginPage() {
       setLoading(false);
       return;
     }
-
-    // IMPORTANT:
-    // ❌ DO NOT navigate here
-    // Context will update user + profile automatically
     setLoading(false);
   };
 

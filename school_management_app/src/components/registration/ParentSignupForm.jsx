@@ -148,7 +148,7 @@ export default function ParentSignupForm({ onSuccess }) {
 
       <div className="space-y-4">
         <h3 className="text-lg font-bold text-[#2d3f5d] border-b border-gray-200 pb-2">Parent Information</h3>
-        
+
         {/* Parent Full Name */}
         <div>
           <label className="block text-sm font-semibold text-[#2d3f5d] mb-2">

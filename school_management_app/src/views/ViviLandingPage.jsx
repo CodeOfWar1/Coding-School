@@ -9,14 +9,14 @@ import Gallery from '../components/Sections/Gallery'
 import Partners from '../components/Sections/Partners'
 import Testimonials from '../components/Sections/Testimonials'
 import Contact from '../components/Sections/Contact'
-import { SCHOOL_PROFILE } from '../content/siteProfile'
-import { SCHOOL_MEDIA_IMAGES } from '../content/schoolMedia'
 import RegisterModal from '../components/registration/RegisterModal'
 import { useLandingScrollReveal } from '../hooks/useLandingScrollReveal'
+import { useLandingSiteContent } from '../hooks/useLandingSiteContent'
 
 export default function ViviLandingPage() {
   const [signUp, setSignUp] = useState(false)
   const [activeSection, setActiveSection] = useState('home')
+  const { data: site } = useLandingSiteContent()
 
   useLandingScrollReveal()
 
@@ -61,6 +61,12 @@ export default function ViviLandingPage() {
   return (
     <div className="min-h-screen bg-white">
       <RegisterModal open={signUp} onClose={() => setSignUp(false)} />
+
+      {site.announcement_banner?.trim() ? (
+        <div className="relative z-[60] border-b border-secondary/15 bg-gradient-to-r from-secondary to-[#1a2542] px-4 py-2.5 text-center text-sm font-semibold text-white shadow-md">
+          {site.announcement_banner.trim()}
+        </div>
+      ) : null}
 
       <Navbar
         activeSection={activeSection}

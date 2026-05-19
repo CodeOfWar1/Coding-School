@@ -1,4 +1,14 @@
-const KEY = 'myschool_portal_events_v1'
+export const PORTAL_EVENTS_STORAGE_KEY = 'myschool_portal_events_v1'
+
+const KEY = PORTAL_EVENTS_STORAGE_KEY
+
+/** Same-tab + cross-component refresh when events change (parent/student calendars listen). */
+export const PORTAL_EVENTS_CHANGED = 'myschool-portal-events-changed'
+
+function notifyPortalEventsChanged() {
+  if (typeof window === 'undefined') return
+  window.dispatchEvent(new CustomEvent(PORTAL_EVENTS_CHANGED))
+}
 
 function nowIso() {
   return new Date().toISOString()
@@ -42,6 +52,7 @@ export function createPortalEvent({ title, date, target = 'all', author = 'admin
   const prev = listPortalEvents()
   const merged = [next, ...prev].slice(0, 200)
   localStorage.setItem(KEY, JSON.stringify(merged))
+  notifyPortalEventsChanged()
   return next
 }
 

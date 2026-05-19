@@ -1,9 +1,17 @@
 import { forwardRef, useState } from 'react'
 import { MdOutlineEmail, MdPhone, MdLocationOn, MdKeyboardArrowDown } from 'react-icons/md'
+import { useLandingSiteContent } from '../../hooks/useLandingSiteContent'
+import { SCHOOL_PROFILE } from '../../content/siteProfile'
 
 const Contact = forwardRef((_, ref) => {
   const [interestMenuOpen, setInterestMenuOpen] = useState(false)
   const [selectedInterest, setSelectedInterest] = useState('')
+  const { data: site } = useLandingSiteContent()
+
+  const email = site.contact_email_display?.trim() || SCHOOL_PROFILE.contact.email
+  const phoneLabel = site.contact_phone_display?.trim() || SCHOOL_PROFILE.contact.phone
+  const phoneDigits = phoneLabel.replace(/\D/g, '')
+  const telHref = phoneDigits ? (phoneDigits.startsWith('260') ? `tel:+${phoneDigits}` : `tel:${phoneDigits}`) : `tel:${SCHOOL_PROFILE.contact.phone.replace(/\D/g, '')}`
 
   const interestOptions = [
     'Events',
@@ -30,14 +38,14 @@ const Contact = forwardRef((_, ref) => {
             <div className="space-y-4">
               <div className="flex items-center gap-3 group hover:translate-x-2 transition-transform">
                 <MdOutlineEmail className="text-2xl" />
-                <a href="mailto:admission@anvilcodingacademy.com" className="text-base underline-offset-4 hover:underline">
-                  admission@anvilcodingacademy.com
+                <a href={`mailto:${encodeURIComponent(email)}`} className="text-base underline-offset-4 hover:underline">
+                  {email}
                 </a>
               </div>
               <div className="flex items-center gap-3 group hover:translate-x-2 transition-transform">
                 <MdPhone className="text-2xl" />
-                <a href="tel:773823113" className="text-base underline-offset-4 hover:underline">
-                  773823113
+                <a href={telHref} className="text-base underline-offset-4 hover:underline">
+                  {phoneLabel}
                 </a>
               </div>
               <div className="flex items-center gap-3 group hover:translate-x-2 transition-transform">
@@ -49,12 +57,6 @@ const Contact = forwardRef((_, ref) => {
                   className="text-base underline-offset-4 hover:underline"
                 >
                   Ibex hill American embassy road, plot 100/735, Lusaka, Zambia
-                </a>
-              </div>
-              <div className="flex items-center gap-3 group hover:translate-x-2 transition-transform">
-                <MdPhone className="text-2xl" />
-                <a href="tel:+260773823113" className="text-base underline-offset-4 hover:underline">
-                  +260 773823113
                 </a>
               </div>
               <div className="flex items-center gap-3 group hover:translate-x-2 transition-transform">

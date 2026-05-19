@@ -1,3 +1,16 @@
+/** Landing-aligned metric tile — navy/orange/cream (matches About / Programs sections). */
+function accentFromColorProp(color = '') {
+  const c = String(color)
+  if (c.includes('blue')) return 'from-[#2d3f5d] to-[#1a2542]'
+  if (c.includes('green')) return 'from-emerald-600 to-teal-700'
+  if (c.includes('orange')) return 'from-[#faa853] to-[#f28c38]'
+  if (c.includes('red')) return 'from-rose-600 to-red-700'
+  if (c.includes('slate')) return 'from-[#2d3f5d] to-[#3f5780]'
+  if (c.includes('indigo')) return 'from-[#2d3f5d] to-[#1a2542]'
+  if (c.includes('amber')) return 'from-[#faa853] to-[#e89235]'
+  return 'from-[#2d3f5d] to-[#1a2542]'
+}
+
 export default function MetricCard({
   color,
   value,
@@ -10,27 +23,22 @@ export default function MetricCard({
   motion = true,
 }) {
   const interactive = typeof onMoreInfo === 'function'
+  const accent = accentFromColorProp(color)
 
   return (
     <div
       style={motion ? { animationDelay: `${animationDelayMs}ms` } : undefined}
-      className={`group relative overflow-hidden rounded-2xl shadow-lg ring-1 transition duration-300 hover:-translate-y-0.5 hover:shadow-xl hover:ring-2 hover:ring-white/25 focus-within:ring-2 focus-within:ring-white/25 ${color} ring-white/10 ${motion ? 'animate-metric-card' : ''}`}
+      className={`group relative overflow-hidden rounded-2xl border border-secondary/10 bg-white shadow-[0_16px_48px_-20px_rgba(45,63,93,0.14)] ring-1 ring-secondary/10 transition duration-300 hover:-translate-y-1 hover:border-primary/35 hover:shadow-[0_22px_50px_-16px_rgba(45,63,93,0.18)] hover:ring-primary/10 ${motion ? 'animate-fade-in-up' : ''}`}
     >
-      <div
-        className="pointer-events-none absolute inset-0 opacity-30"
-        style={{
-          background:
-            'linear-gradient(135deg, rgba(255,255,255,0.35) 0%, transparent 45%, rgba(0,0,0,0.08) 100%)',
-        }}
-      />
-      <div className="relative flex items-start justify-between gap-3 p-5 text-white">
+      <div className={`h-1.5 w-full bg-gradient-to-r ${accent}`} aria-hidden />
+      <div className="relative flex items-start justify-between gap-3 p-5">
         <div className="min-w-0 flex-1">
-          <p className="text-4xl font-black tabular-nums tracking-tight drop-shadow-sm">{value}</p>
-          <p className="mt-1 text-sm font-bold uppercase tracking-wide text-white/95">{title}</p>
-          {subtitle && <p className="mt-2 text-xs leading-relaxed text-white/80">{subtitle}</p>}
+          <p className="text-3xl font-black tabular-nums tracking-tight text-secondary md:text-4xl">{value}</p>
+          <p className="mt-1 text-[11px] font-bold uppercase tracking-[0.14em] text-primary">{title}</p>
+          {subtitle && <p className="mt-2 text-sm leading-relaxed text-gray-600">{subtitle}</p>}
         </div>
         <span
-          className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-white/20 text-2xl shadow-inner backdrop-blur-sm ring-1 ring-white/30"
+          className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-secondary to-[#1a2542] text-xl text-primary shadow-md ring-1 ring-white/20"
           aria-hidden
         >
           {icon}
@@ -40,13 +48,13 @@ export default function MetricCard({
         <button
           type="button"
           onClick={onMoreInfo}
-          className="relative w-full cursor-pointer border-t border-white/15 bg-black/15 py-3 text-center text-sm font-semibold text-white transition hover:bg-black/25 active:bg-black/30"
+          className="relative w-full cursor-pointer border-t border-secondary/10 bg-gradient-to-r from-[#f8fbff]/90 to-[#fff8ef]/80 py-3 text-center text-sm font-semibold text-secondary transition hover:from-[#fff8ef] hover:to-[#f8fbff] hover:text-primary"
         >
           {foot}
           <span className="ml-1 inline-block transition group-hover:translate-x-0.5">→</span>
         </button>
       ) : (
-        <div className="relative w-full border-t border-white/15 bg-black/10 py-3 text-center text-sm font-semibold text-white/90">
+        <div className="relative w-full border-t border-secondary/10 bg-[#f8fbff]/60 py-3 text-center text-sm font-semibold text-gray-600">
           {foot}
         </div>
       )}
