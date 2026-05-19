@@ -13,6 +13,10 @@ export default function StudentSignupForm({ onSuccess }) {
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
+    email: '',
+    dateOfBirth: '',
+    gender: '',
+    homeAddress: '',
     password: '',
     confirmPassword: '',
   })
@@ -36,6 +40,22 @@ export default function StudentSignupForm({ onSuccess }) {
       setError('Last name is required')
       return false
     }
+    if (!formData.email.trim()) {
+      setError('Email is required')
+      return false
+    }
+    if (!formData.dateOfBirth) {
+      setError('Date of birth is required')
+      return false
+    }
+    if (!formData.gender) {
+      setError('Gender is required')
+      return false
+    }
+    if (!formData.homeAddress.trim()) {
+      setError('Home address is required')
+      return false
+    }
     if (!formData.password) {
       setError('Password is required')
       return false
@@ -51,13 +71,6 @@ export default function StudentSignupForm({ onSuccess }) {
     return true
   }
 
-  const buildStudentEmail = () => {
-    const first = formData.firstName.trim().toLowerCase().replace(/\s+/g, '')
-    const last = formData.lastName.trim().toLowerCase().replace(/\s+/g, '')
-    const stamp = Date.now()
-    return `${first}.${last}.${stamp}@${SYSTEM_STUDENT_EMAIL_DOMAIN}`
-  }
-
   const handleSubmit = async (e) => {
     e.preventDefault()
     if (!validateForm()) return
@@ -68,7 +81,7 @@ export default function StudentSignupForm({ onSuccess }) {
     try {
       // Sign up with Supabase
       const { data: authData, error: authError } = await supabase.auth.signUp({
-        email: buildStudentEmail(),
+        email: formData.email,
         password: formData.password,
         options: {
           data: {
@@ -76,6 +89,9 @@ export default function StudentSignupForm({ onSuccess }) {
             last_name: formData.lastName,
             full_name: `${formData.firstName} ${formData.lastName}`,
             role: 'student',
+            date_of_birth: formData.dateOfBirth,
+            gender: formData.gender,
+            home_address: formData.homeAddress,
           }
         }
       })
@@ -149,6 +165,96 @@ export default function StudentSignupForm({ onSuccess }) {
               required
             />
           </div>
+        </div>
+
+        {/* Email */}
+        <div>
+          <label className="block text-sm font-semibold text-[#2d3f5d] mb-2">
+            Email *
+          </label>
+          <input
+            type="email"
+            name="email"
+            value={formData.email}
+            onChange={handleChange}
+            className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-[#faa853] focus:ring-2 focus:ring-[#faa853]/20 transition-all outline-none"
+            placeholder="your@email.com"
+            required
+          />
+        </div>
+
+        {/* Date of Birth */}
+        <div>
+          <label className="block text-sm font-semibold text-[#2d3f5d] mb-2">
+            Date of Birth *
+          </label>
+          <input
+            type="date"
+            name="dateOfBirth"
+            value={formData.dateOfBirth}
+            onChange={handleChange}
+            className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-[#faa853] focus:ring-2 focus:ring-[#faa853]/20 transition-all outline-none"
+            required
+          />
+        </div>
+
+        {/* Gender Selection */}
+        <div>
+          <label className="block text-sm font-semibold text-[#2d3f5d] mb-2">
+            Gender *
+          </label>
+          <div className="grid grid-cols-3 gap-4">
+            <label className="flex items-center gap-2 cursor-pointer">
+              <input
+                type="radio"
+                name="gender"
+                value="male"
+                checked={formData.gender === 'male'}
+                onChange={handleChange}
+                className="w-4 h-4 text-[#faa853] focus:ring-[#faa853]/20"
+                required
+              />
+              <span className="text-[#2d3f5d]">Male</span>
+            </label>
+            <label className="flex items-center gap-2 cursor-pointer">
+              <input
+                type="radio"
+                name="gender"
+                value="female"
+                checked={formData.gender === 'female'}
+                onChange={handleChange}
+                className="w-4 h-4 text-[#faa853] focus:ring-[#faa853]/20"
+              />
+              <span className="text-[#2d3f5d]">Female</span>
+            </label>
+            <label className="flex items-center gap-2 cursor-pointer">
+              <input
+                type="radio"
+                name="gender"
+                value="other"
+                checked={formData.gender === 'other'}
+                onChange={handleChange}
+                className="w-4 h-4 text-[#faa853] focus:ring-[#faa853]/20"
+              />
+              <span className="text-[#2d3f5d]">Other</span>
+            </label>
+          </div>
+        </div>
+
+        {/* Home Address */}
+        <div>
+          <label className="block text-sm font-semibold text-[#2d3f5d] mb-2">
+            Home Address *
+          </label>
+          <textarea
+            name="homeAddress"
+            value={formData.homeAddress}
+            onChange={handleChange}
+            rows={3}
+            className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-[#faa853] focus:ring-2 focus:ring-[#faa853]/20 transition-all outline-none resize-none"
+            placeholder="Enter your full home address"
+            required
+          />
         </div>
 
         {/* Password */}
@@ -226,7 +332,6 @@ export default function StudentSignupForm({ onSuccess }) {
         )}
       </button>
 
-
       <p className="text-center text-xs text-gray-500 mt-4">
         By signing up, you agree to our Terms of Service and Privacy Policy
       </p>
@@ -239,6 +344,5 @@ export default function StudentSignupForm({ onSuccess }) {
       )}
 
     </form>
-
   )
 }
