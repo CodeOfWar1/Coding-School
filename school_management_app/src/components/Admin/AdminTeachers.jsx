@@ -56,6 +56,22 @@ export default function AdminTeachers() {
     return password + '@Anvil2026'
   }
 
+  const formatAuthError = (error) => {
+    const msg = error?.message || ''
+    if (msg.includes('Database error saving new user') || msg.includes('Profile creation failed')) {
+      return (
+        'Supabase could not create the profile for this user. ' +
+        'In SQL Editor, run the latest supabase/profiles_teacher_role.sql ' +
+        '(fixes the signup trigger — your profiles table has no full_name column by default). ' +
+        'Then try again. Details: ' + msg
+      )
+    }
+    if (msg.includes('already registered') || msg.includes('already been registered')) {
+      return 'This email is already registered. Use Reset Password on that teacher, or use a different email.'
+    }
+    return msg || 'Error creating teacher account'
+  }
+
   const handleCreateTeacher = async (e) => {
     e.preventDefault()
     if (!formData.email || !formData.firstName || !formData.lastName) {
@@ -66,46 +82,60 @@ export default function AdminTeachers() {
     setSendingInvite(true)
     try {
       const tempPassword = generateTemporaryPassword()
-      
+      const email = formData.email.trim().toLowerCase()
       const { data: authData, error: authError } = await supabase.auth.signUp({
-        email: formData.email,
+        email,
         password: tempPassword,
         options: {
           data: {
-            first_name: formData.firstName,
-            last_name: formData.lastName,
-            full_name: `${formData.firstName} ${formData.lastName}`,
-            role: 'teacher'
-          }
-        }
+            first_name: formData.firstName.trim(),
+            last_name: formData.lastName.trim(),
+            role: 'teacher',
+          },
+        },
       })
 
       if (authError) throw authError
 
-      await new Promise(resolve => setTimeout(resolve, 1000))
-      
-      if (authData.user) {
-        const { error: profileError } = await supabase
-          .from('profiles')
-          .update({ role: 'teacher' })
-          .eq('id', authData.user.id)
+      if (!authData?.user?.id) {
+        throw new Error(
+          'Account may have been created but no user was returned. Check Supabase Auth users, or confirm email settings.',
+        )
+      }
 
-        if (profileError) console.error('Error updating profile role:', profileError)
+      await new Promise((resolve) => setTimeout(resolve, 800))
+
+      const { error: profileError } = await supabase.from('profiles').upsert(
+        {
+          id: authData.user.id,
+          email,
+          first_name: formData.firstName.trim(),
+          last_name: formData.lastName.trim(),
+          role: 'teacher',
+        },
+        { onConflict: 'id' },
+      )
+
+      if (profileError) {
+        console.error('Error saving teacher profile:', profileError)
+        throw new Error(
+          `User was created in Auth but profile save failed: ${profileError.message}. ` +
+            'Run supabase/profiles_teacher_role.sql and ensure your admin user has role admin.',
+        )
       }
 
       setNewTeacherCredentials({
-        email: formData.email,
-        password: tempPassword
+        email,
+        password: tempPassword,
       })
       setShowPasswordModal(true)
-      
+
       setFormData({ email: '', firstName: '', lastName: '' })
       setShowInviteModal(false)
       await fetchTeachers()
-      
     } catch (error) {
       console.error('Error creating teacher:', error)
-      alert(error.message || 'Error creating teacher account')
+      alert(formatAuthError(error))
     } finally {
       setSendingInvite(false)
     }

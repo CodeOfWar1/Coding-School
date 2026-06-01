@@ -4,10 +4,13 @@ import { useStudentDashboard } from '../hooks/useStudentDashboard'
 import StudentOverview from '../components/Students/StudentOverview'
 import StudentApplicationManager from '../components/Students/StudentApplicationManager'
 import StudentEnrollments from '../components/Students/StudentEnrollments'
+import StudentAssignments from '../components/Students/StudentAssignments'
+import { useStudentAssignments } from '../hooks/useStudentAssignments'
 import { 
   FaHome, 
   FaFileAlt, 
-  FaBook, 
+  FaBook,
+  FaCode,
   FaCheckCircle, 
   FaExclamationTriangle, 
   FaSpinner,
@@ -20,16 +23,19 @@ const NAV_ITEMS = [
   { id: 'overview', label: 'Overview', icon: <FaHome className="text-lg" /> },
   { id: 'applications', label: 'Applications', icon: <FaFileAlt className="text-lg" /> },
   { id: 'classes', label: 'My Classes', icon: <FaBook className="text-lg" /> },
+  { id: 'assignments', label: 'Assignments', icon: <FaCode className="text-lg" /> },
 ]
 
 export default function StudentDashboard() {
-  const { user, profile, logout } = useAuth()
+  const { user, signOut } = useAuth()
+  const profile = user?.profile
   const [activeSection, setActiveSection] = useState('overview')
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const [toast, setToast] = useState(null)
-  
-// Change this line in the destructuring:
-const {
+
+  const assignments = useStudentAssignments(user?.id)
+
+  const {
   studentRecord,
   applications,
   enrollments,  // Changed from 'classes' to 'enrollments'
@@ -164,7 +170,8 @@ const {
           {/* Sign Out Button - Fixed at bottom */}
           <div className="border-t border-gray-100 p-3 flex-shrink-0">
             <button
-              onClick={logout}
+              type="button"
+              onClick={signOut}
               className="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors"
             >
               <FaSignOutAlt className="h-4 w-4" />
@@ -242,6 +249,26 @@ const {
               <div className="bg-blue-50 border border-blue-200 rounded-xl p-8 text-center">
                 <FaBook className="text-4xl text-blue-500 mx-auto mb-3" />
                 <p className="text-blue-800">Complete your application to access classes.</p>
+              </div>
+            )}
+
+            {activeSection === 'assignments' && isStudent && (
+              <StudentAssignments
+                classes={assignments.classes}
+                tasks={assignments.tasks}
+                isLoading={assignments.isLoading}
+                error={assignments.error}
+                getSubmissionForTask={assignments.getSubmissionForTask}
+                submitAssignment={assignments.submitAssignment}
+                onRefresh={assignments.refresh}
+                classDisplayName={assignments.classDisplayName}
+              />
+            )}
+
+            {activeSection === 'assignments' && !isStudent && (
+              <div className="bg-blue-50 border border-blue-200 rounded-xl p-8 text-center">
+                <FaCode className="text-4xl text-blue-500 mx-auto mb-3" />
+                <p className="text-blue-800">Complete your application to access coding assignments.</p>
               </div>
             )}
           </div>

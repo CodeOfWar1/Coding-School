@@ -42,6 +42,20 @@ export const ROLE_META = {
     applyBtn: 'bg-emerald-600 text-white shadow-sm hover:bg-emerald-700 active:scale-[0.98]',
     pie: '#0d9488',
   },
+  teacher: {
+    label: 'Teachers',
+    singular: 'Teacher',
+    description: 'Classes, assignments, roster, grading',
+    chip: 'border-primary/50 bg-[#fff8ef] text-[#5c3d12] ring-1 ring-primary/25',
+    row: 'border-l-[5px] border-l-primary bg-gradient-to-r from-[#fff8ef]/90 to-white hover:from-[#fff4e6]',
+    header: 'from-[#faa853] via-[#f59e38] to-[#e89235]',
+    dot: 'bg-white shadow ring-2 ring-white/80',
+    card: 'border border-primary/35 bg-white shadow-lg shadow-amber-900/10 ring-1 ring-primary/22',
+    divide: 'divide-primary/12',
+    selectRing: 'border-primary/25 ring-primary/20 focus:border-primary/40 focus:ring-2 focus:ring-primary/30',
+    applyBtn: 'bg-[#faa853] text-white shadow-sm hover:bg-[#e89235] active:scale-[0.98]',
+    pie: '#e89235',
+  },
   parent: {
     label: 'Parents',
     singular: 'Parent',
@@ -58,4 +72,4 @@ export const ROLE_META = {
   },
 }
 
-export const ROLE_ORDER = ['admin', 'finance', 'student', 'parent']
+export const ROLE_ORDER = ['admin', 'finance', 'teacher', 'student', 'parent']
