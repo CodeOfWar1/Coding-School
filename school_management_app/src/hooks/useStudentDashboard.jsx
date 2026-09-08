@@ -61,8 +61,7 @@ export function useStudentDashboard(userId) {
           .from('application')
           .select(`
             *,
-            course:course_id (*),
-            parent_details:application_parent (*)
+            course:course_id (*)
           `)
           .eq('user_id', studentData.student_id)
           .order('created_at', { ascending: false })
@@ -95,10 +94,9 @@ export function useStudentDashboard(userId) {
           .from('application')
           .select(`
             *,
-            course:course_id (*),
-            parent_details:application_parent (*)
+            course:course_id (*)
           `)
-          .eq('user_id', userId)
+          .eq('parent_id', userId)
           .order('created_at', { ascending: false })
         
         if (appError) {
@@ -196,15 +194,16 @@ export function useStudentDashboard(userId) {
     await loadDashboardData()
   }, [loadDashboardData])
   
-  const createNewApplication = useCallback(async (courseId, lessonType, paymentPlan) => {
+  const createNewApplication = useCallback(async (courseId, lessonType, paymentPlan, selectedChild) => {
     const { data, error } = await supabase
       .from('application')
       .insert({
-        user_id: userId,
+        parent_id: userId,
+        child_id: selectedChild,
         course_id: courseId,
         lesson_type: lessonType,
         payment_plan: paymentPlan,
-        progress: 'parent_details',
+        progress: 'payment',
         status: 'pending'
       })
       .select()

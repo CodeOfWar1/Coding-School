@@ -23,7 +23,7 @@ const NAV_ITEMS = [
 ]
 
 export default function StudentDashboard() {
-  const { user, profile, logout } = useAuth()
+  const { user, profile, signOut } = useAuth()
   const [activeSection, setActiveSection] = useState('overview')
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const [toast, setToast] = useState(null)
@@ -164,7 +164,7 @@ const {
           {/* Sign Out Button - Fixed at bottom */}
           <div className="border-t border-gray-100 p-3 flex-shrink-0">
             <button
-              onClick={logout}
+              onClick={signOut}
               className="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors"
             >
               <FaSignOutAlt className="h-4 w-4" />

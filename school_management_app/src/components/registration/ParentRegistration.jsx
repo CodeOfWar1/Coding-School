@@ -4,7 +4,7 @@ import { FaEye, FaEyeSlash, FaCheckCircle, FaExclamationCircle } from 'react-ico
 
 const SYSTEM_STUDENT_EMAIL_DOMAIN = 'student.anvilcodingacademy.local'
 
-export default function StudentSignupForm({ onSuccess }) {
+export default function ParentRegistration({ onSuccess }) {
   const pricing = {
     tuition: 'K1300 per month',
     plans: '25% | 50% | 75% | 100%',
@@ -14,9 +14,6 @@ export default function StudentSignupForm({ onSuccess }) {
     firstName: '',
     lastName: '',
     email: '',
-    dateOfBirth: '',
-    gender: '',
-    homeAddress: '',
     password: '',
     confirmPassword: '',
   })
@@ -42,18 +39,6 @@ export default function StudentSignupForm({ onSuccess }) {
     }
     if (!formData.email.trim()) {
       setError('Email is required')
-      return false
-    }
-    if (!formData.dateOfBirth) {
-      setError('Date of birth is required')
-      return false
-    }
-    if (!formData.gender) {
-      setError('Gender is required')
-      return false
-    }
-    if (!formData.homeAddress.trim()) {
-      setError('Home address is required')
       return false
     }
     if (!formData.password) {
@@ -89,19 +74,16 @@ export default function StudentSignupForm({ onSuccess }) {
             last_name: formData.lastName,
             full_name: `${formData.firstName} ${formData.lastName}`,
             role: 'student',
-            date_of_birth: formData.dateOfBirth,
-            gender: formData.gender,
-            home_address: formData.homeAddress,
           }
         }
       })
 
       if (authError) throw authError
 
-      // Best effort: clear profile email if backend trigger created one.
-      if (authData?.user?.id) {
-        await supabase.from('profiles').update({ email: null }).eq('id', authData.user.id)
-      }
+      // // Best effort: clear profile email if backend trigger created one.
+      // if (authData?.user?.id) {
+      //   await supabase.from('profiles').update({ email: null }).eq('id', authData.user.id)
+      // }
 
       setSuccess(true)
     } catch (err) {
@@ -183,80 +165,6 @@ export default function StudentSignupForm({ onSuccess }) {
           />
         </div>
 
-        {/* Date of Birth */}
-        <div>
-          <label className="block text-sm font-semibold text-[#2d3f5d] mb-2">
-            Date of Birth *
-          </label>
-          <input
-            type="date"
-            name="dateOfBirth"
-            value={formData.dateOfBirth}
-            onChange={handleChange}
-            className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-[#faa853] focus:ring-2 focus:ring-[#faa853]/20 transition-all outline-none"
-            required
-          />
-        </div>
-
-        {/* Gender Selection */}
-        <div>
-          <label className="block text-sm font-semibold text-[#2d3f5d] mb-2">
-            Gender *
-          </label>
-          <div className="grid grid-cols-3 gap-4">
-            <label className="flex items-center gap-2 cursor-pointer">
-              <input
-                type="radio"
-                name="gender"
-                value="male"
-                checked={formData.gender === 'male'}
-                onChange={handleChange}
-                className="w-4 h-4 text-[#faa853] focus:ring-[#faa853]/20"
-                required
-              />
-              <span className="text-[#2d3f5d]">Male</span>
-            </label>
-            <label className="flex items-center gap-2 cursor-pointer">
-              <input
-                type="radio"
-                name="gender"
-                value="female"
-                checked={formData.gender === 'female'}
-                onChange={handleChange}
-                className="w-4 h-4 text-[#faa853] focus:ring-[#faa853]/20"
-              />
-              <span className="text-[#2d3f5d]">Female</span>
-            </label>
-            <label className="flex items-center gap-2 cursor-pointer">
-              <input
-                type="radio"
-                name="gender"
-                value="other"
-                checked={formData.gender === 'other'}
-                onChange={handleChange}
-                className="w-4 h-4 text-[#faa853] focus:ring-[#faa853]/20"
-              />
-              <span className="text-[#2d3f5d]">Other</span>
-            </label>
-          </div>
-        </div>
-
-        {/* Home Address */}
-        <div>
-          <label className="block text-sm font-semibold text-[#2d3f5d] mb-2">
-            Home Address *
-          </label>
-          <textarea
-            name="homeAddress"
-            value={formData.homeAddress}
-            onChange={handleChange}
-            rows={3}
-            className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-[#faa853] focus:ring-2 focus:ring-[#faa853]/20 transition-all outline-none resize-none"
-            placeholder="Enter your full home address"
-            required
-          />
-        </div>
-
         {/* Password */}
         <div>
           <label className="block text-sm font-semibold text-[#2d3f5d] mb-2">
@@ -308,14 +216,7 @@ export default function StudentSignupForm({ onSuccess }) {
         </div>
       </div>
 
-      <div className="mt-6 rounded-xl bg-[#2d3f5d]/5 border border-[#2d3f5d]/10 p-3">
-        <p className="text-base font-semibold text-[#2d3f5d]">
-          Tuition Fee: <span className="text-[#faa853]">{pricing.tuition}</span>
-        </p>
-        <p className="text-base text-[#2d3f5d]/90">
-          Flexible Payment Options: <span className="font-semibold text-[#faa853]">{pricing.plans}</span>
-        </p>
-      </div>
+      
 
       <button
         type="submit"

@@ -3,12 +3,15 @@ import { useAuth } from "./state/AuthContext";
 
 import LoginPage from "./views/LoginPage";
 import ViviLandingPage from "./views/ViviLandingPage";
-import StudentDashboard from "./views/StudentDashboard";
+// import StudentDashboard from "./views/StudentDashboard";
 import ParentDashboard from "./views/ParentDashboard";
 import AdminDashboard from "./views/AdminDashboard";
 import Gallery from "./views/Gallery";
 import AboutPage from "./views/AboutPage";
 import PartnersPage from "./views/PartnersPage";
+import ProfilePage from "./views/ProfilePage";
+import ChildProfileConfirmation from "./components/registration/childEmailConfirmation";
+import StudentDashboard from "./views/StudentDashboard";
 
 export default function App() {
   const { user, loading } = useAuth();
@@ -29,6 +32,13 @@ export default function App() {
       <Route path="/about" element={<AboutPage />} />
       <Route path="/partners" element={<PartnersPage />} />
       <Route path="/login" element={<LoginPage />} />
+      
+      <Route
+        path="/dashboard/student/profile"
+        element={
+          <ChildProfileConfirmation />
+        }
+      />
 
       {/* PROTECTED: STUDENT */}
       <Route
@@ -48,6 +58,17 @@ export default function App() {
         element={
           isLoggedIn && role === "parent" ? (
             <ParentDashboard />
+          ) : (
+            <Navigate to="/login" replace />
+          )
+        }
+      />
+
+      <Route
+        path="/dashboard/parent/profile"
+        element={
+          isLoggedIn && role === "parent" ? (
+            <ProfilePage />
           ) : (
             <Navigate to="/login" replace />
           )

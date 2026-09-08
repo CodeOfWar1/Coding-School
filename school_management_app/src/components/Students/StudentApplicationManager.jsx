@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { supabase } from '../../lib/supabase'
+import { useAuth } from '../../state/AuthContext'
 import { 
   FaPlus, 
   FaTrash, 
@@ -17,7 +18,8 @@ import {
   FaHistory,
   FaWallet,
   FaHourglassHalf,
-  FaUserCheck
+  FaUserCheck,
+  FaUserGraduate
 } from 'react-icons/fa'
 import PaymentModal from './PaymentModal'
 
@@ -31,6 +33,7 @@ export default function StudentApplicationManager({
   onSuccess,
   showToast 
 }) {
+  const { user } = useAuth()
   const [showNewModal, setShowNewModal] = useState(false)
   const [showEditModal, setShowEditModal] = useState(false)
   const [showDetailsModal, setShowDetailsModal] = useState(false)
@@ -43,6 +46,34 @@ export default function StudentApplicationManager({
   const [paymentPlan, setPaymentPlan] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [paymentModalState, setPaymentModalState] = useState({ show: false, application: null })
+  const [children, setChildren] = useState([])
+  const [selectedChild, setSelectedChild] = useState('')
+  const [loadingChildren, setLoadingChildren] = useState(false)
+
+  // Fetch children for the logged-in parent
+  useEffect(() => {
+    if (user?.id) {
+      fetchChildren(user.id)
+    }
+  }, [user])
+
+  const fetchChildren = async (parentId) => {
+    try {
+      setLoadingChildren(true)
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('parent_id', parentId)
+        .eq('role', 'student')
+      
+      if (error) throw error
+      setChildren(data || [])
+    } catch (error) {
+      console.error('Error fetching children:', error)
+    } finally {
+      setLoadingChildren(false)
+    }
+  }
 
   const fetchPayments = async (applicationId) => {
     setLoadingPayments(true)
@@ -100,7 +131,7 @@ export default function StudentApplicationManager({
     if (selectedApp?.status === 'approved') {
       return { 
         type: 'approved',
-        message: '✅ Your application has been approved! You are now officially enrolled. Welcome to the class!',
+        message: 'Your application has been approved! You are now officially enrolled. Welcome to the class!',
         color: 'text-green-600',
         bgColor: 'bg-green-50',
         borderColor: 'border-green-200',
@@ -111,7 +142,7 @@ export default function StudentApplicationManager({
     if (selectedApp?.status === 'awaiting_approval') {
       return { 
         type: 'awaiting_approval',
-        message: '⏳ Your payment has been confirmed! Your application is now awaiting admin approval. You will be admitted to the class within 3 business working days.',
+        message: 'Your payment has been confirmed! Your application is now awaiting admin approval. You will be admitted to the class within 3 business working days.',
         color: 'text-yellow-600',
         bgColor: 'bg-yellow-50',
         borderColor: 'border-yellow-200',
@@ -120,11 +151,11 @@ export default function StudentApplicationManager({
     }
     
     // Check progress for payment flow
-    if (selectedApp?.progress === 'parent_details' || selectedApp?.progress === 'payment') {
+    if (selectedApp?.progress === 'payment') {
       if (hasFullPayment) {
         return { 
           type: 'payment_complete',
-          message: `✅ Full payment received (K${totalPaid.toFixed(2)}). Your application is being processed for admin approval.`,
+          message: `Full payment received (K${totalPaid.toFixed(2)}). Your application is being processed for admin approval.`,
           color: 'text-green-600',
           bgColor: 'bg-green-50',
           borderColor: 'border-green-200',
@@ -133,7 +164,7 @@ export default function StudentApplicationManager({
       } else if (totalPaid > 0) {
         return { 
           type: 'partial_payment',
-          message: `⚠️ Partial payment of K${totalPaid.toFixed(2)} received. Remaining balance: K${calculateRemainingBalance().toFixed(2)}. Please complete your payment.`,
+          message: `Partial payment of K${totalPaid.toFixed(2)} received. Remaining balance: K${calculateRemainingBalance().toFixed(2)}. Please complete your payment.`,
           color: 'text-orange-600',
           bgColor: 'bg-orange-50',
           borderColor: 'border-orange-200',
@@ -173,8 +204,8 @@ export default function StudentApplicationManager({
   }
 
   const handleContinue = async (app) => {
-    // If progress is parent_details or payment, open payment modal
-    if (app.progress === 'parent_details' || app.progress === 'payment') {
+    // If progress is payment, open payment modal
+    if (app.progress === 'payment') {
       setPaymentModalState({ show: true, application: app })
     }
   }
@@ -196,6 +227,7 @@ export default function StudentApplicationManager({
     setSelectedCourse(app.course_id)
     setLessonType(app.lesson_type)
     setPaymentPlan(app.payment_plan)
+    setSelectedChild(app.child_id || '')
     setShowEditModal(true)
   }
   
@@ -208,13 +240,20 @@ export default function StudentApplicationManager({
     
     setIsSubmitting(true)
     try {
+      const updateData = {
+        course_id: selectedCourse,
+        lesson_type: lessonType,
+        payment_plan: paymentPlan
+      }
+      
+      // Only add child_id if it's provided (parent is making application)
+      if (selectedChild) {
+        updateData.child_id = selectedChild
+      }
+      
       const { error } = await supabase
         .from('application')
-        .update({
-          course_id: selectedCourse,
-          lesson_type: lessonType,
-          payment_plan: paymentPlan
-        })
+        .update(updateData)
         .eq('id', editingApplication.id)
       
       if (error) throw error
@@ -224,6 +263,7 @@ export default function StudentApplicationManager({
       setSelectedCourse('')
       setLessonType('')
       setPaymentPlan('')
+      setSelectedChild('')
       onSuccess()
       showToast('Application updated successfully!', 'success')
     } catch (error) {
@@ -242,11 +282,12 @@ export default function StudentApplicationManager({
     
     setIsSubmitting(true)
     try {
-      const newApp = await onCreateNew(selectedCourse, lessonType, paymentPlan)
+      const newApp = await onCreateNew(selectedCourse, lessonType, paymentPlan, selectedChild)
       setShowNewModal(false)
       setSelectedCourse('')
       setLessonType('')
       setPaymentPlan('')
+      setSelectedChild('')
       onSuccess()
       
       if (newApp) {
@@ -274,7 +315,6 @@ export default function StudentApplicationManager({
   
   const getProgressColor = (progress) => {
     const colors = {
-      parent_details: 'bg-[#faa853]/10 text-[#faa853]',
       payment: 'bg-amber-100 text-amber-700',
       completed: 'bg-blue-100 text-blue-700',
       rejected: 'bg-red-100 text-red-700'
@@ -284,7 +324,6 @@ export default function StudentApplicationManager({
   
   const getProgressLabel = (progress) => {
     const labels = {
-      parent_details: 'Payment Required',
       payment: 'Payment Required',
       completed: 'completed',
       rejected: 'Rejected'
@@ -294,7 +333,6 @@ export default function StudentApplicationManager({
   
   const getProgressIcon = (progress) => {
     const icons = {
-      parent_details: <FaMoneyBillWave className="text-xs" />,
       payment: <FaMoneyBillWave className="text-xs" />,
       completed: <FaClock className="text-xs" />,
       rejected: <FaExclamationTriangle className="text-xs" />
@@ -307,6 +345,7 @@ export default function StudentApplicationManager({
     setSelectedCourse('')
     setLessonType('')
     setPaymentPlan('')
+    setSelectedChild('')
   }
   
   const handleCloseEditModal = () => {
@@ -315,6 +354,7 @@ export default function StudentApplicationManager({
     setSelectedCourse('')
     setLessonType('')
     setPaymentPlan('')
+    setSelectedChild('')
   }
   
   return (
@@ -401,7 +441,7 @@ export default function StudentApplicationManager({
                     <FaEye className="text-xs" />
                     Details
                   </button>
-                  {(app.progress === 'parent_details' || app.progress === 'payment') && app.status !== 'approved' && app.status !== 'rejected' && (
+                  {(app.progress === 'payment') && app.status !== 'approved' && app.status !== 'rejected' && (
                     <>
                       <button
                         onClick={() => handleEdit(app)}
@@ -419,7 +459,7 @@ export default function StudentApplicationManager({
                       </button>
                     </>
                   )}
-                  {(app.progress === 'parent_details' || app.progress === 'payment') && (
+                  {(app.progress === 'payment') && (
                     <button
                       onClick={() => handleDeleteApp(app.id, app.course?.course_name)}
                       className="px-4 py-2 border border-red-300 text-red-600 rounded-lg hover:bg-red-50 text-sm flex items-center gap-2 transition-colors"
@@ -630,7 +670,7 @@ export default function StudentApplicationManager({
               
               {/* Action Buttons */}
               <div className="flex gap-3 pt-4">
-                {calculateRemainingBalance() > 0 && (selectedApp.progress === 'parent_details' || selectedApp.progress === 'payment') && selectedApp.status !== 'approved' && selectedApp.status !== 'rejected' && (
+                {calculateRemainingBalance() > 0 && (selectedApp.progress === 'payment') && selectedApp.status !== 'approved' && selectedApp.status !== 'rejected' && (
                   <button
                     onClick={() => {
                       setShowDetailsModal(false)
@@ -692,6 +732,29 @@ export default function StudentApplicationManager({
             </div>
             
             <form onSubmit={handleCreateApplication} className="p-5 space-y-5">
+              {/* Select Child Dropdown - Only show for parents */}
+              {children.length > 0 && (
+                <div>
+                  <label className="block text-sm font-medium text-[#2d3f5d] mb-2">
+                    <FaUserGraduate className="inline mr-2 text-[#faa853]" />
+                    Select Child *
+                  </label>
+                  <select
+                    value={selectedChild}
+                    onChange={(e) => setSelectedChild(e.target.value)}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#faa853] focus:border-[#faa853] outline-none transition-colors"
+                    required
+                  >
+                    <option value="">Choose a child...</option>
+                    {children.map(child => (
+                      <option key={child.id} value={child.id}>
+                        {child.first_name} {child.last_name} - {child.email}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              )}
+
               <div>
                 <label className="block text-sm font-medium text-[#2d3f5d] mb-2">Select Course *</label>
                 {!courses || courses.length === 0 ? (
@@ -813,6 +876,29 @@ export default function StudentApplicationManager({
             </div>
             
             <form onSubmit={handleUpdateApplication} className="p-5 space-y-5">
+              {/* Select Child Dropdown - Only show for parents */}
+              {children.length > 0 && (
+                <div>
+                  <label className="block text-sm font-medium text-[#2d3f5d] mb-2">
+                    <FaUserGraduate className="inline mr-2 text-[#faa853]" />
+                    Select Child *
+                  </label>
+                  <select
+                    value={selectedChild}
+                    onChange={(e) => setSelectedChild(e.target.value)}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#faa853] focus:border-[#faa853] outline-none transition-colors"
+                    required
+                  >
+                    <option value="">Choose a child...</option>
+                    {children.map(child => (
+                      <option key={child.id} value={child.id}>
+                        {child.first_name} {child.last_name} - {child.email}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              )}
+
               <div>
                 <label className="block text-sm font-medium text-[#2d3f5d] mb-2">Select Course *</label>
                 {!courses || courses.length === 0 ? (
