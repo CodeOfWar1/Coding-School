@@ -1,22 +1,20 @@
 import { useState, useEffect } from 'react'
 import { supabase } from '../../lib/supabase'
-import { 
-  FaSpinner, 
-  FaCheckCircle, 
-  FaTimesCircle, 
-  FaEye, 
+import {
+  FaSpinner,
+  FaCheckCircle,
+  FaTimesCircle,
+  FaEye,
   FaMoneyBillWave,
-  FaHistory,
   FaUserCheck,
   FaHourglassHalf,
-  FaTimes,
   FaCalendarAlt,
   FaBook,
-  FaWallet,
   FaUser,
   FaEnvelope,
   FaClock
 } from 'react-icons/fa'
+import ApplicationDetailsModal from './ApplicationDetailModal'
 
 export default function AdminApplications({ onRefresh }) {
   const [applications, setApplications] = useState([])
@@ -38,7 +36,8 @@ export default function AdminApplications({ onRefresh }) {
         .select(`
           *,
           course:course_id (*),
-          user:user_id (id, email, first_name, last_name)
+          child:child_id (*),
+          parent:parent_id (*)
         `)
         .order('created_at', { ascending: false })
 
@@ -60,15 +59,6 @@ export default function AdminApplications({ onRefresh }) {
     setPayments(data || [])
   }
 
-  const calculateTotalPaid = () => {
-    return payments.reduce((sum, p) => sum + (p.amount || 0), 0)
-  }
-
-  const calculateRemainingBalance = () => {
-    const totalFee = selectedApp?.course?.tuition_fee || 0
-    return totalFee - calculateTotalPaid()
-  }
-
   const handleViewDetails = async (app) => {
     setSelectedApp(app)
     await fetchPayments(app.id)
@@ -80,21 +70,19 @@ export default function AdminApplications({ onRefresh }) {
 
     setProcessingId(app.id)
     try {
-      // Check if student already exists
       let { data: existingStudent } = await supabase
         .from('students')
         .select('id')
-        .eq('student_id', app.user_id)
+        .eq('student_id', app.child_id)
         .maybeSingle()
 
       let studentId = existingStudent?.id
 
       if (!existingStudent) {
-        // Create student record
         const { data: newStudent, error: studentError } = await supabase
           .from('students')
           .insert({
-            student_id: app.user_id,
+            student_id: app.child_id,
             admitted_date: new Date().toISOString().split('T')[0]
           })
           .select()
@@ -104,7 +92,6 @@ export default function AdminApplications({ onRefresh }) {
         studentId = newStudent.id
       }
 
-      // Create enrollment for the student
       const { error: enrollmentError } = await supabase
         .from('enrollments')
         .insert({
@@ -116,7 +103,6 @@ export default function AdminApplications({ onRefresh }) {
 
       if (enrollmentError) throw enrollmentError
 
-      // Update application status
       const { error: appError } = await supabase
         .from('application')
         .update({ status: 'approved', progress: 'completed' })
@@ -215,11 +201,11 @@ export default function AdminApplications({ onRefresh }) {
                       <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 text-sm text-gray-500">
                         <div className="flex items-center gap-1">
                           <FaUser className="text-[#faa853] text-xs" />
-                          {app.user?.first_name} {app.user?.last_name}
+                          {app.child?.first_name} {app.child?.last_name}
                         </div>
                         <div className="flex items-center gap-1">
                           <FaEnvelope className="text-[#faa853] text-xs" />
-                          {app.user?.email}
+                          {app.child?.email}
                         </div>
                         <div className="flex items-center gap-1">
                           <FaCalendarAlt className="text-[#faa853] text-xs" />
@@ -262,145 +248,15 @@ export default function AdminApplications({ onRefresh }) {
         )}
       </div>
 
-      {/* Details Modal - same as before */}
       {showDetailsModal && selectedApp && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4" onClick={() => setShowDetailsModal(false)}>
-          <div className="bg-white rounded-xl max-w-3xl w-full max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
-            <div className="sticky top-0 bg-white border-b border-gray-200 p-5">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-[#faa853]/10 flex items-center justify-center">
-                    <FaBook className="text-[#faa853] text-lg" />
-                  </div>
-                  <div>
-                    <h2 className="text-xl font-semibold text-[#2d3f5d]">Application Details</h2>
-                    <p className="text-sm text-gray-500">{selectedApp.course?.course_name}</p>
-                  </div>
-                </div>
-                <button onClick={() => setShowDetailsModal(false)} className="text-gray-400 hover:text-gray-600">
-                  <FaTimes />
-                </button>
-              </div>
-            </div>
-
-            <div className="p-5 space-y-6">
-              {/* Student Info */}
-              <div className="border border-gray-200 rounded-lg p-4">
-                <h3 className="font-semibold text-[#2d3f5d] mb-4 flex items-center gap-2">
-                  <FaUser className="text-[#faa853]" />
-                  Student Information
-                </h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-                  <div className="flex items-start gap-2">
-                    <FaUser className="text-gray-400 text-xs mt-0.5" />
-                    <div>
-                      <p className="text-gray-500">Name</p>
-                      <p className="font-medium text-[#2d3f5d]">{selectedApp.user?.first_name} {selectedApp.user?.last_name}</p>
-                    </div>
-                  </div>
-                  <div className="flex items-start gap-2">
-                    <FaEnvelope className="text-gray-400 text-xs mt-0.5" />
-                    <div>
-                      <p className="text-gray-500">Email</p>
-                      <p className="font-medium text-[#2d3f5d]">{selectedApp.user?.email}</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Course Info */}
-              <div className="border border-gray-200 rounded-lg p-4">
-                <h3 className="font-semibold text-[#2d3f5d] mb-4 flex items-center gap-2">
-                  <FaBook className="text-[#faa853]" />
-                  Course Information
-                </h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-                  <div><span className="text-gray-500">Course:</span> <span className="font-medium text-[#2d3f5d]">{selectedApp.course?.course_name}</span></div>
-                  <div><span className="text-gray-500">Lesson Type:</span> <span className="font-medium text-[#2d3f5d] capitalize">{selectedApp.lesson_type?.replace('_', ' ')}</span></div>
-                  <div><span className="text-gray-500">Payment Plan:</span> <span className="font-medium text-[#2d3f5d]">{selectedApp.payment_plan}</span></div>
-                  <div><span className="text-gray-500">Total Fee:</span> <span className="font-medium text-[#faa853]">K{selectedApp.course?.tuition_fee}</span></div>
-                </div>
-              </div>
-
-              {/* Payment Summary */}
-              <div className="border border-gray-200 rounded-lg p-4">
-                <h3 className="font-semibold text-[#2d3f5d] mb-4 flex items-center gap-2">
-                  <FaWallet className="text-[#faa853]" />
-                  Payment Summary
-                </h3>
-                <div className="space-y-2">
-                  <div className="flex justify-between items-center">
-                    <span className="text-gray-600">Total Paid</span>
-                    <span className="font-semibold text-green-600">K{calculateTotalPaid().toFixed(2)}</span>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-gray-600">Remaining Balance</span>
-                    <span className={`font-semibold ${calculateRemainingBalance() > 0 ? 'text-red-600' : 'text-green-600'}`}>
-                      K{calculateRemainingBalance().toFixed(2)}
-                    </span>
-                  </div>
-                </div>
-              </div>
-
-              {/* Payment History */}
-              {payments.length > 0 && (
-                <div className="rounded-lg border border-gray-200 overflow-hidden">
-                  <h3 className="font-semibold p-4 bg-gray-50 border-b flex items-center gap-2">
-                    <FaHistory className="text-[#faa853]" />
-                    Payment History
-                  </h3>
-                  <div className="overflow-x-auto">
-                    <table className="w-full text-sm">
-                      <thead className="bg-gray-50">
-                        <tr>
-                          <th className="px-4 py-2 text-left text-gray-600">Date</th>
-                          <th className="px-4 py-2 text-left text-gray-600">Amount</th>
-                          <th className="px-4 py-2 text-left text-gray-600">Method</th>
-                          <th className="px-4 py-2 text-left text-gray-600">Reference</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {payments.map(p => (
-                          <tr key={p.id} className="border-t hover:bg-gray-50">
-                            <td className="px-4 py-2 text-gray-600">{new Date(p.created_at).toLocaleDateString()}</td>
-                            <td className="px-4 py-2 text-green-600 font-medium">K{p.amount?.toFixed(2)}</td>
-                            <td className="px-4 py-2 text-gray-600 capitalize">{p.payment_method}</td>
-                            <td className="px-4 py-2 text-gray-500 text-xs">{p.reference}</td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-                </div>
-              )}
-
-              <div className="flex gap-3 pt-4">
-                {selectedApp.status === 'awaiting_approval' && (
-                  <>
-                    <button 
-                      onClick={() => handleApprove(selectedApp)} 
-                      className="flex-1 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors flex items-center justify-center gap-2"
-                    >
-                      <FaUserCheck /> Approve Application
-                    </button>
-                    <button 
-                      onClick={() => handleReject(selectedApp)} 
-                      className="flex-1 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors flex items-center justify-center gap-2"
-                    >
-                      <FaTimesCircle /> Reject Application
-                    </button>
-                  </>
-                )}
-                <button 
-                  onClick={() => setShowDetailsModal(false)} 
-                  className="px-6 py-2 border border-gray-300 text-[#2d3f5d] rounded-lg hover:bg-gray-50 transition-colors"
-                >
-                  Close
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
+        <ApplicationDetailsModal
+          app={selectedApp}
+          payments={payments}
+          processingId={processingId}
+          onClose={() => setShowDetailsModal(false)}
+          onApprove={handleApprove}
+          onReject={handleReject}
+        />
       )}
     </>
   )

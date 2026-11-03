@@ -62,7 +62,7 @@ const paymentAmount = 2.50
         .from('payments')
         .insert({
           application_id: application.id,
-          user_id: application.user_id,
+          parent_id: application.parent_id,
           course_id: application.course_id,
           amount: paymentAmount,
           payment_plan: application.payment_plan,
@@ -115,72 +115,83 @@ const paymentAmount = 2.50
     
     try {
       const reference = `app-${application.id}-${Date.now()}`
+      const transactionId = `TRAN-${application.id}-${Date.now()}`
+
+      setPaymentStatus('success')
+      // Save payment record to database
+      await savePaymentRecord({
+        reference: reference,
+        transactionId: transactionId
+      })
+      
+      // Call parent onSubmit to mark application as completed
+      await onSubmit()
       
       // Wait for LencoPay to be available
-      await new Promise(resolve => {
-        const checkLenco = setInterval(() => {
-          if (window.LencoPay) {
-            clearInterval(checkLenco)
-            resolve()
-          }
-        }, 100)
-      })
+      // await new Promise(resolve => {
+      //   const checkLenco = setInterval(() => {
+      //     if (window.LencoPay) {
+      //       clearInterval(checkLenco)
+      //       resolve()
+      //     }
+      //   }, 100)
+      // })
       
-      window.LencoPay.getPaid({
-        key: LENCO_PUBLIC_KEY,
-        reference: reference,
-        email: payerDetails.email,
-        amount: paymentAmount,
-        currency: "ZMW",
-        channels: ["card", "mobile-money"],
-        customer: {
-          firstName: payerDetails.firstName,
-          lastName: payerDetails.lastName || '',
-          phone: payerDetails.phone
-        },
-        onSuccess: async function (res) {
-          try {
-            setPaymentStatus('success')
-            // Save payment record to database
-            await savePaymentRecord({
-              reference: res.reference,
-              transactionId: res.transactionId || res.reference
-            })
+      // window.LencoPay.getPaid({
+      //   key: LENCO_PUBLIC_KEY,
+      //   reference: reference,
+      //   email: payerDetails.email,
+      //   amount: paymentAmount,
+      //   currency: "ZMW",
+      //   channels: ["card", "mobile-money"],
+      //   customer: {
+      //     firstName: payerDetails.firstName,
+      //     lastName: payerDetails.lastName || '',
+      //     phone: payerDetails.phone
+      //   },
+      //   onSuccess: async function (res) {
+      //     try {
+      //       setPaymentStatus('success')
+      //       // Save payment record to database
+      //       await savePaymentRecord({
+      //         reference: res.reference,
+      //         transactionId: res.transactionId || res.reference
+      //       })
             
-            // Call parent onSubmit to mark application as completed
-            await onSubmit()
+      //       // Call parent onSubmit to mark application as completed
+      //       await onSubmit()
             
-            // Show success and close after delay
-            setTimeout(() => {
-              onClose()
-            }, 1500)
-          } catch (error) {
-            console.error('Error saving payment:', error)
-            setPaymentStatus('error')
-            alert('Payment was successful but failed to save. Please contact support with your transaction reference: ' + reference)
-            setTimeout(() => {
-              onClose()
-            }, 3000)
-          }
-        },
-        onClose: function () {
-          if (paymentStatus !== 'success') {
-            setIsSubmitting(false)
-            setStep(1)
-            setPaymentStatus(null)
-          }
-        },
-        onError: function (error) {
-          console.error('Payment error:', error)
-          setPaymentStatus('error')
-          setIsSubmitting(false)
-          setStep(1)
-          alert('Payment failed. Please try again.')
-          setTimeout(() => {
-            setPaymentStatus(null)
-          }, 3000)
-        }
-      })
+      //       // Show success and close after delay
+      //       setTimeout(() => {
+      //         onClose()
+      //       }, 1500)
+      //     } catch (error) {
+      //       console.error('Error saving payment:', error)
+      //       setPaymentStatus('error')
+      //       alert('Payment was successful but failed to save. Please contact support with your transaction reference: ' + reference)
+      //       setTimeout(() => {
+      //         onClose()
+      //       }, 3000)
+      //     }
+      //   },
+      //   onClose: function () {
+      //     if (paymentStatus !== 'success') {
+      //       setIsSubmitting(false)
+      //       setStep(1)
+      //       setPaymentStatus(null)
+      //     }
+      //   },
+      //   onError: function (error) {
+      //     console.error('Payment error:', error)
+      //     setPaymentStatus('error')
+      //     setIsSubmitting(false)
+      //     setStep(1)
+      //     alert('Payment failed. Please try again.')
+      //     setTimeout(() => {
+      //       setPaymentStatus(null)
+      //     }, 3000)
+      //   }
+      // })
     } catch (error) {
       console.error('Error initializing payment:', error)
       setIsSubmitting(false)

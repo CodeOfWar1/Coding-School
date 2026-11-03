@@ -2,13 +2,7 @@ import { useState } from 'react'
 import { supabase } from '../../lib/supabase'
 import { FaEye, FaEyeSlash, FaCheckCircle, FaExclamationCircle } from 'react-icons/fa'
 
-const SYSTEM_STUDENT_EMAIL_DOMAIN = 'student.anvilcodingacademy.local'
-
 export default function ParentRegistration({ onSuccess }) {
-  const pricing = {
-    tuition: 'K1300 per month',
-    plans: '25% | 50% | 75% | 100%',
-  }
 
   const [formData, setFormData] = useState({
     firstName: '',
@@ -73,7 +67,7 @@ export default function ParentRegistration({ onSuccess }) {
             first_name: formData.firstName,
             last_name: formData.lastName,
             full_name: `${formData.firstName} ${formData.lastName}`,
-            role: 'student',
+            role: 'parent',
           }
         }
       })
@@ -101,7 +95,7 @@ export default function ParentRegistration({ onSuccess }) {
         </div>
         <h3 className="text-2xl font-bold text-[#2d3f5d] mb-2">Registration Successful!</h3>
         <p className="text-gray-600 mb-6">
-          Welcome to AnvilCodingAcademy, {formData.firstName}! Your student account has been created.
+          Welcome to AnvilCodingAcademy, {formData.firstName}! Your account has been created.
         </p>
         <button
           onClick={onSuccess}
@@ -229,7 +223,7 @@ export default function ParentRegistration({ onSuccess }) {
             Creating Account...
           </div>
         ) : (
-          'Sign Up as Student'
+          'Sign Up'
         )}
       </button>
 

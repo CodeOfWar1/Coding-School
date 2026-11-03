@@ -17,7 +17,6 @@ const CORE_CLASS_OFFERINGS = [
 ]
 
 const PRICING_STRIP = {
-  tuition: 'K1300 per month',
   plans: ['25%', '50%', '75%', '100%'],
   duration: '8 months',
 }
@@ -42,9 +41,6 @@ const Classes = forwardRef(({ onRegisterClick }, ref) => {
 
         <div data-reveal className="mb-8 md:mb-10 rounded-2xl bg-gradient-to-r from-[#2d3f5d] to-[#3f5780] text-white p-4 md:p-5 shadow-lg scroll-reveal">
           <div className="flex flex-col md:flex-row md:items-center md:justify-center gap-3 md:gap-6 text-center">
-            <p className="text-base font-bold">
-              Tuition Fee: <span className="text-[#faa853]">{PRICING_STRIP.tuition}</span>
-            </p>
             <div className="flex flex-col items-center gap-1">
               <p className="text-base font-semibold text-white/90">Flexible Payment Options</p>
               <div className="flex flex-wrap justify-center gap-2">

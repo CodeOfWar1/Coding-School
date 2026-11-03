@@ -6,12 +6,14 @@ import ViviLandingPage from "./views/ViviLandingPage";
 // import StudentDashboard from "./views/StudentDashboard";
 import ParentDashboard from "./views/ParentDashboard";
 import AdminDashboard from "./views/AdminDashboard";
+import TeacherDashboard from "./views/TeacherDashboard";
 import Gallery from "./views/Gallery";
 import AboutPage from "./views/AboutPage";
 import PartnersPage from "./views/PartnersPage";
 import ProfilePage from "./views/ProfilePage";
 import ChildProfileConfirmation from "./components/registration/childEmailConfirmation";
 import StudentDashboard from "./views/StudentDashboard";
+import TeacherProfileConfirmation from "./components/Admin/TeacherProfileConfirmation";
 
 export default function App() {
   const { user, loading } = useAuth();
@@ -39,6 +41,8 @@ export default function App() {
           <ChildProfileConfirmation />
         }
       />
+
+      <Route path="/dashboard/teacher/profile" element={<TeacherProfileConfirmation />} />
 
       {/* PROTECTED: STUDENT */}
       <Route
@@ -81,6 +85,18 @@ export default function App() {
         element={
           isLoggedIn && role === "admin" ? (
             <AdminDashboard />
+          ) : (
+            <Navigate to="/login" replace />
+          )
+        }
+      />
+
+      {/* PROTECTED: TEACHER */}
+      <Route
+        path="/dashboard/teacher"
+        element={
+          isLoggedIn && role === "teacher" ? (
+            <TeacherDashboard />
           ) : (
             <Navigate to="/login" replace />
           )

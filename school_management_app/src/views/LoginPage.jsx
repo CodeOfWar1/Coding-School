@@ -26,6 +26,8 @@ export default function LoginPage() {
         navigate("/dashboard/parent", { replace: true });
       } else if (role === "admin") {
         navigate("/dashboard/admin", { replace: true });
+      } else if (role === "teacher") {
+        navigate("/dashboard/teacher", { replace: true });
       }
     }
   }, [user, authLoading, navigate]);

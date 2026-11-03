@@ -4,6 +4,7 @@ import { useStudentDashboard } from '../hooks/useStudentDashboard'
 import StudentOverview from '../components/Students/StudentOverview'
 import StudentApplicationManager from '../components/Students/StudentApplicationManager'
 import ParentChildrenList from './MyChildren'
+import ParentPayments from './ParentPayment'
 import { 
   FaHome, 
   FaFileAlt, 
@@ -13,18 +14,20 @@ import {
   FaSignOutAlt,
   FaBars,
   FaUser,
-  FaUserFriends 
+  FaUserFriends,
+  FaMoneyBill
 } from 'react-icons/fa'
 import { useNavigate } from 'react-router-dom'
 
 const NAV_ITEMS = [
   { id: 'overview', label: 'Overview', icon: <FaHome className="text-lg" /> },
   { id: 'applications', label: 'Applications', icon: <FaFileAlt className="text-lg" /> },
-  { id: 'children', label: 'My Kids', icon: <FaUserFriends  className="text-lg" /> }
+  { id: 'children', label: 'My Kids', icon: <FaUserFriends  className="text-lg" /> },
+  { id: 'payments', label: 'Payments', icon: <FaMoneyBill  className="text-lg" /> }
 ]
 
 export default function ParentDashboard() {
-  const { user, profile, logout } = useAuth()
+  const { user, profile, signOut } = useAuth()
   const navigate = useNavigate()
   const [activeSection, setActiveSection] = useState('overview')
   const [sidebarOpen, setSidebarOpen] = useState(false)
@@ -170,7 +173,7 @@ export default function ParentDashboard() {
           {/* Sign Out Button - Fixed at bottom */}
           <div className="border-t border-gray-100 p-3 flex-shrink-0">
             <button
-              onClick={logout}
+              onClick={signOut}
               className="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm text-[#2d3f5d] hover:bg-red-50 hover:text-red-600 transition-colors"
             >
               <FaSignOutAlt className="h-4 w-4" />
@@ -233,6 +236,10 @@ export default function ParentDashboard() {
 
             {activeSection === 'children' && (
               <ParentChildrenList />
+            )}
+
+            {activeSection === 'payments' && (
+              <ParentPayments />
             )}
           </div>
         </main>

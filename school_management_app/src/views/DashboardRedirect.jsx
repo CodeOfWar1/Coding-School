@@ -18,6 +18,8 @@ export default function DashboardRedirect() {
       navigate('/dashboard/finance', { replace: true })
     } else if (profile.role === 'admin') {
       navigate('/dashboard/admin', { replace: true })
+    } else if (profile.role === 'teacher') {
+      navigate('/dashboard/teacher', { replace: true })
     } else {
       navigate('/login', { replace: true })
     }
